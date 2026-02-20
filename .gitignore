@@ -1,0 +1,22 @@
+# Key material - NEVER commit
+keys/
+*.skey
+*.vkey
+
+# Configuration with secrets
+config.env
+
+# Build artifacts
+*.action
+*.raw
+*.signed
+tx.*
+
+# OS
+.DS_Store
+*.swp
+*~
+
+# Editor
+.vscode/
+.idea/
