@@ -7,6 +7,12 @@ Uses [SundaeSwap treasury-contracts](https://github.com/SundaeSwap-finance/treas
 - **treasury.ak** - Holds funds withdrawn from the Cardano treasury
 - **vendor.ak** - Manages milestone-based vesting for Blink Labs as sole vendor
 
+## Oversight Board
+
+- **Pi Lanningham** (SundaeSwap)
+- **Santiago Carmuega** (TxPipe)
+- **Lucas Rosa** (Aiken, Midnight)
+
 ## Permission Scheme
 
 | Action | Required Signatures |

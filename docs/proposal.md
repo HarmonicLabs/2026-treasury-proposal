@@ -212,10 +212,10 @@ Requested Amount: 6,900,000 ADA (at $0.30/ADA)
   roughly 4,140,000 ADA. We'd rather price honestly and let the numbers
   speak.
 
-- Contingency is about 15%. Dijkstra CDDL specs aren't published.
-  Leios is evolving. The audit might find things that need fixing. Since we
-  priced at near-market rather than $0.50, price volatility is less of a
-  concern. Our hedge is converting to stablecoin or fiat upon receipt.
+- Contingency is about 15%. The audit might find things that need fixing.
+  Since we priced at near-market rather than $0.50, price volatility is
+  less of a concern. Our hedge is converting to stablecoin or fiat upon
+  receipt.
 
 - Single withdrawal. Full amount in one treasury withdrawal, with
   milestones enforced by smart contract escrow and oversight board review
@@ -276,10 +276,15 @@ If something isn't delivered, you know exactly who to hold accountable.
 
 ### Independent Oversight Board
 
-An independent oversight board provides third-party governance. Board
-members are PRAGMA-adjacent people who don't have a stake in Blink Labs.
-They co-sign disbursements, review milestones, and can halt funding if
-we're not delivering.
+An independent oversight board provides third-party governance:
+
+- **Pi Lanningham** (SundaeSwap)
+- **Santiago Carmuega** (TxPipe)
+- **Lucas Rosa** (Aiken, Midnight)
+
+Board members don't have a stake in Blink Labs. They co-sign
+disbursements, review milestones, and can halt funding if we're not
+delivering.
 
 ### Permission Scheme
 
@@ -405,10 +410,11 @@ specified: engineering, audit, infrastructure, contingency.
 
 Assessment: COMPLIANT.
 
-Audited SundaeSwap smart contracts with an independent oversight board.
-Board members are PRAGMA-adjacent, not Blink Labs stakeholders. Permissions,
-disbursement schedule, and oversight fully specified. Emergency halt and
-dispute resolution authority included.
+Audited SundaeSwap smart contracts with an independent oversight board:
+Pi Lanningham (SundaeSwap), Santiago Carmuega (TxPipe), and Lucas Rosa
+(Aiken, Midnight). Board members are not Blink Labs stakeholders.
+Permissions, disbursement schedule, and oversight fully specified.
+Emergency halt and dispute resolution authority included.
 
 ### Article IV, Section 3: Net Change Limit
 
