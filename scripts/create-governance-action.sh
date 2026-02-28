@@ -2,29 +2,25 @@
 set -euo pipefail
 
 # create-governance-action.sh - Create a treasury withdrawal governance action.
-# Usage: scripts/create-governance-action.sh <network-flag>
-#   e.g.  scripts/create-governance-action.sh --mainnet
-#         scripts/create-governance-action.sh --testnet-magic 2
+# Usage: NETWORK=preview scripts/create-governance-action.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # ── Source configuration ─────────────────────────────────────────────────────
 
 if [[ -f "${REPO_ROOT}/config.env" ]]; then
+    set -a
     # shellcheck source=/dev/null
     source "${REPO_ROOT}/config.env"
+    set +a
 fi
 
-# ── Parse network flag ───────────────────────────────────────────────────────
+# ── Network flag (governance commands use --testnet/--mainnet) ────────────────
 
-if [[ $# -lt 1 ]]; then
-    echo "Usage: $(basename "$0") <network-flag>" >&2
-    echo "  e.g. $(basename "$0") --mainnet" >&2
-    echo "       $(basename "$0") --testnet-magic 2" >&2
-    exit 1
-fi
-
-NETWORK_FLAG=("$@")
+case "${NETWORK:-preview}" in
+    mainnet) NETWORK_FLAG=(--mainnet) ;;
+    *)       NETWORK_FLAG=(--testnet) ;;
+esac
 
 # ── Read metadata hash ──────────────────────────────────────────────────────
 

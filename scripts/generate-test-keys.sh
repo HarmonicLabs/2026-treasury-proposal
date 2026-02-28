@@ -39,8 +39,15 @@ echo "  Stake key pair generated"
 
 # ── Build address ─────────────────────────────────────────────────────────────
 
+# Network flag for address build (uses --testnet-magic N)
+case "${NETWORK:-preview}" in
+    mainnet) ADDR_FLAG=(--mainnet) ;;
+    preprod) ADDR_FLAG=(--testnet-magic 1) ;;
+    *)       ADDR_FLAG=(--testnet-magic 2) ;;
+esac
+
 cardano-cli conway address build \
-    --testnet-magic 2 \
+    "${ADDR_FLAG[@]}" \
     --payment-verification-key-file "${KEYS_DIR}/payment.vkey" \
     --stake-verification-key-file "${KEYS_DIR}/deposit-return-stake.vkey" \
     --out-file "${KEYS_DIR}/payment.addr"

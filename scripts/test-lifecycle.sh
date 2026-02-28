@@ -2,10 +2,11 @@
 set -euo pipefail
 
 # test-lifecycle.sh - Full automated governance action lifecycle test on preview testnet.
-# Refuses to run on mainnet. Exercises: metadata generation, hashing, governance
-# action creation, transaction build/sign/submit, and governance state query.
+# Refuses to run on mainnet. Exercises: hashing, governance action creation,
+# transaction build/sign/submit, and governance state query.
 #
 # Usage: scripts/test-lifecycle.sh
+#        METADATA_FILE=metadata/test-metadata.json scripts/test-lifecycle.sh
 #
 # Prerequisites:
 #   - cardano-cli, jq available
@@ -13,6 +14,7 @@ set -euo pipefail
 #   - CARDANO_NODE_SOCKET_PATH set
 #   - Test keys in keys/ directory
 #   - config.env with preview testnet values
+#   - Committed metadata JSON file
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPTS="${REPO_ROOT}/scripts"
@@ -20,8 +22,10 @@ SCRIPTS="${REPO_ROOT}/scripts"
 # ── Source configuration ─────────────────────────────────────────────────────
 
 if [[ -f "${REPO_ROOT}/config.env" ]]; then
+    set -a
     # shellcheck source=/dev/null
     source "${REPO_ROOT}/config.env"
+    set +a
 fi
 
 # ── Mainnet safety check ────────────────────────────────────────────────────
@@ -34,12 +38,12 @@ if [[ "${NETWORK:-}" == "mainnet" ]]; then
 fi
 
 # Default to preview network
-NETWORK_FLAG=(--testnet-magic 2)
-NETWORK_NAME="preview"
+: "${NETWORK:=preview}"
+export NETWORK
 
 echo "============================================================"
 echo "  Treasury Proposal - Full Lifecycle Test"
-echo "  Network: ${NETWORK_NAME} (testnet-magic 2)"
+echo "  Network: ${NETWORK}"
 echo "============================================================"
 echo ""
 
@@ -52,26 +56,36 @@ step() {
     echo ""
 }
 
-# ── Step 1: Generate metadata ───────────────────────────────────────────────
+# ── Resolve metadata file ────────────────────────────────────────────────────
 
-step 1 "Generate proposal metadata"
-"${SCRIPTS}/generate-metadata.sh"
+METADATA_FILE="${METADATA_FILE:-metadata/proposal-metadata.json}"
+# Resolve relative paths against REPO_ROOT
+if [[ "$METADATA_FILE" != /* ]]; then
+    METADATA_FILE="${REPO_ROOT}/${METADATA_FILE}"
+fi
 
-# ── Step 2: Hash metadata ───────────────────────────────────────────────────
+# ── Step 1: Hash metadata ───────────────────────────────────────────────────
 
-step 2 "Hash proposal metadata"
-"${SCRIPTS}/hash-metadata.sh" "${REPO_ROOT}/metadata/proposal-metadata.json"
+step 1 "Hash metadata"
+
+if [[ ! -f "$METADATA_FILE" ]]; then
+    echo "Error: Metadata file not found: ${METADATA_FILE}" >&2
+    exit 1
+fi
+
+echo "Using: ${METADATA_FILE}"
+"${SCRIPTS}/hash-metadata.sh" "$METADATA_FILE"
 
 HASH=$(cat "${REPO_ROOT}/metadata/metadata-hash.txt")
 echo "Metadata hash: ${HASH}"
 
-# ── Step 3: Set test-specific values if not configured ──────────────────────
+# ── Step 2: Validate configuration ──────────────────────────────────────────
 
-step 3 "Validate configuration"
+step 2 "Validate configuration"
 
 # Use test placeholder values where config is missing
 : "${GOVERNANCE_ACTION_DEPOSIT:=100000000000}"
-: "${ANCHOR_URL:=https://raw.githubusercontent.com/blinklabs-io/treasury-proposal/main/metadata/proposal-metadata.json}"
+: "${ANCHOR_URL:=ipfs://bafkreie7i4phsirjhmceidookh77vsmfqruaxgphttryexzitylrj7gmlu}"
 : "${TRANSFER_AMOUNT:=1000000}"
 
 export GOVERNANCE_ACTION_DEPOSIT ANCHOR_URL TRANSFER_AMOUNT
@@ -98,31 +112,39 @@ echo "  Anchor URL:  ${ANCHOR_URL}"
 echo "  Transfer:    ${TRANSFER_AMOUNT} lovelace"
 echo "  Payment:     ${PAYMENT_ADDRESS}"
 
-# ── Step 4: Create governance action ────────────────────────────────────────
+# ── Network flags for direct queries in this script ──────────────────────────
 
-step 4 "Create treasury withdrawal governance action"
-"${SCRIPTS}/create-governance-action.sh" "${NETWORK_FLAG[@]}"
+case "${NETWORK}" in
+    mainnet) QUERY_FLAG=(--mainnet) ;;
+    preprod) QUERY_FLAG=(--testnet-magic 1) ;;
+    *)       QUERY_FLAG=(--testnet-magic 2) ;;
+esac
 
-# ── Step 5: Build transaction ───────────────────────────────────────────────
+# ── Step 3: Create governance action ────────────────────────────────────────
 
-step 5 "Build transaction"
-"${SCRIPTS}/build-tx.sh" "${NETWORK_FLAG[@]}"
+step 3 "Create treasury withdrawal governance action"
+"${SCRIPTS}/create-governance-action.sh"
 
-# ── Step 6: Sign transaction ────────────────────────────────────────────────
+# ── Step 4: Build transaction ───────────────────────────────────────────────
 
-step 6 "Sign transaction"
-"${SCRIPTS}/sign-tx.sh" "${NETWORK_FLAG[@]}"
+step 4 "Build transaction"
+"${SCRIPTS}/build-tx.sh"
 
-# ── Step 7: Submit transaction ──────────────────────────────────────────────
+# ── Step 5: Sign transaction ────────────────────────────────────────────────
 
-step 7 "Submit transaction"
-"${SCRIPTS}/submit-tx.sh" "${NETWORK_FLAG[@]}"
+step 5 "Sign transaction"
+"${SCRIPTS}/sign-tx.sh"
+
+# ── Step 6: Submit transaction ──────────────────────────────────────────────
+
+step 6 "Submit transaction"
+"${SCRIPTS}/submit-tx.sh"
 
 TX_HASH=$(cardano-cli conway transaction txid --tx-file "${REPO_ROOT}/tx.signed")
 
-# ── Step 8: Wait for confirmation ───────────────────────────────────────────
+# ── Step 7: Wait for confirmation ───────────────────────────────────────────
 
-step 8 "Wait for on-chain confirmation"
+step 7 "Wait for on-chain confirmation"
 
 echo "Transaction hash: ${TX_HASH}"
 echo "Waiting for transaction to appear on-chain (up to 120 seconds)..."
@@ -132,23 +154,18 @@ INTERVAL=5
 ELAPSED=0
 
 while [[ "$ELAPSED" -lt "$TIMEOUT" ]]; do
-    # Query the UTxO set - if tx hash appears, it's confirmed
     RESULT=$(cardano-cli conway query utxo \
-        "${NETWORK_FLAG[@]}" \
+        "${QUERY_FLAG[@]}" \
         --tx-in "${TX_HASH}#0" \
         --out-file /dev/stdout 2>/dev/null || echo "{}")
 
-    # Check if we got any results (even empty means the tx was processed)
     ENTRY_COUNT=$(echo "$RESULT" | jq 'length' 2>/dev/null || echo "0")
 
     if [[ "$ENTRY_COUNT" -gt 0 ]] || [[ "$ELAPSED" -gt 0 ]]; then
-        # Also try checking if the tx is no longer in the mempool
-        # by looking for governance state changes
         echo "Checking after ${ELAPSED}s..."
     fi
 
-    # A simpler confirmation: query the tx hash directly
-    if cardano-cli conway query tx-mempool tx-exists --tx-id "$TX_HASH" "${NETWORK_FLAG[@]}" 2>/dev/null | grep -q "False"; then
+    if cardano-cli conway query tx-mempool tx-exists --tx-id "$TX_HASH" "${QUERY_FLAG[@]}" 2>/dev/null | grep -q "False"; then
         echo "Transaction confirmed (no longer in mempool)."
         break
     fi
@@ -162,15 +179,14 @@ if [[ "$ELAPSED" -ge "$TIMEOUT" ]]; then
     echo "The transaction may still be processed. Check manually."
 fi
 
-# ── Step 9: Query governance state ──────────────────────────────────────────
+# ── Step 8: Query governance state ──────────────────────────────────────────
 
-step 9 "Query governance state"
+step 8 "Query governance state"
 
 echo "Querying governance state for treasury withdrawal proposals..."
 
-GOV_STATE=$(cardano-cli conway query gov-state "${NETWORK_FLAG[@]}" --out-file /dev/stdout 2>/dev/null || echo "{}")
+GOV_STATE=$(cardano-cli conway query gov-state "${QUERY_FLAG[@]}" --out-file /dev/stdout 2>/dev/null || echo "{}")
 
-# Count treasury withdrawal proposals
 PROPOSAL_COUNT=$(echo "$GOV_STATE" | jq '[.proposals // [] | .[] | select(.proposalProcedure.govAction.tag == "TreasuryWithdrawals")] | length' 2>/dev/null || echo "unknown")
 
 echo "Active treasury withdrawal proposals: ${PROPOSAL_COUNT}"
@@ -183,10 +199,10 @@ echo "  Lifecycle Test Complete"
 echo "============================================================"
 echo ""
 echo "Transaction hash: ${TX_HASH}"
-echo "Network:          ${NETWORK_NAME}"
+echo "Network:          ${NETWORK}"
 echo ""
 echo "Artifacts generated:"
-echo "  metadata/proposal-metadata.json"
+echo "  ${METADATA_FILE}"
 echo "  metadata/metadata-hash.txt"
 echo "  treasury-withdrawal.action"
 echo "  tx.raw"

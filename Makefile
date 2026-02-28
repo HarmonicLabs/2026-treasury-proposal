@@ -1,19 +1,10 @@
 # Blink Treasury Proposal - Makefile
-# Usage: make [target] [NETWORK=preview|preprod|mainnet] [CARDANO_CLI=cardano-cli]
+# Usage: make [target] [NETWORK=preview|preprod|mainnet]
 
-NETWORK   ?= preview
-CARDANO_CLI ?= cardano-cli
+NETWORK       ?= preview
+METADATA_FILE ?= metadata/proposal-metadata.json
 
-# Network flag logic
-ifeq ($(NETWORK),mainnet)
-  NETWORK_FLAG := --mainnet
-else ifeq ($(NETWORK),preprod)
-  NETWORK_FLAG := --testnet-magic 1
-else
-  NETWORK_FLAG := --testnet-magic 2
-endif
-
-.PHONY: help check-prereqs generate-test-keys metadata hash governance-action build-tx sign-tx \
+.PHONY: help check-prereqs generate-test-keys hash governance-action build-tx sign-tx \
         submit-testnet submit-mainnet test-lifecycle report journal-entry clean
 
 help: ## Show all available targets
@@ -24,35 +15,30 @@ check-prereqs: ## Run prerequisite checks
 	scripts/check-prereqs.sh
 
 generate-test-keys: ## Generate a fresh wallet for preview testnet
-	scripts/generate-test-keys.sh
-
-metadata: ## Generate proposal metadata
-	scripts/generate-metadata.sh
+	NETWORK=$(NETWORK) scripts/generate-test-keys.sh
 
 hash: ## Hash the proposal metadata JSON
-	scripts/hash-metadata.sh metadata/proposal-metadata.json
+	scripts/hash-metadata.sh $(METADATA_FILE)
 
 governance-action: hash ## Create the governance action (depends on hash)
-	scripts/create-governance-action.sh $(NETWORK_FLAG)
+	NETWORK=$(NETWORK) scripts/create-governance-action.sh
 
 build-tx: governance-action ## Build the transaction (depends on governance-action)
-	scripts/build-tx.sh $(NETWORK_FLAG)
+	NETWORK=$(NETWORK) scripts/build-tx.sh
 
 sign-tx: build-tx ## Sign the transaction (depends on build-tx)
-	scripts/sign-tx.sh $(NETWORK_FLAG)
+	NETWORK=$(NETWORK) scripts/sign-tx.sh
 
 submit-testnet: NETWORK = preview
-submit-testnet: NETWORK_FLAG = --testnet-magic 2
 submit-testnet: sign-tx ## Submit transaction to preview testnet
-	scripts/submit-tx.sh $(NETWORK_FLAG)
+	NETWORK=$(NETWORK) scripts/submit-tx.sh
 
 submit-mainnet: NETWORK = mainnet
-submit-mainnet: NETWORK_FLAG = --mainnet
 submit-mainnet: sign-tx ## Submit transaction to mainnet (with confirmation)
-	scripts/submit-tx.sh $(NETWORK_FLAG) --confirm
+	NETWORK=$(NETWORK) scripts/submit-tx.sh --confirm
 
 test-lifecycle: ## Run the full test lifecycle
-	scripts/test-lifecycle.sh
+	NETWORK=$(NETWORK) METADATA_FILE=$(METADATA_FILE) scripts/test-lifecycle.sh
 
 report: ## Generate a status report
 	scripts/generate-report.sh

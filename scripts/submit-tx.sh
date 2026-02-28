@@ -2,48 +2,35 @@
 set -euo pipefail
 
 # submit-tx.sh - Submit a signed transaction to the Cardano network.
-# Usage: scripts/submit-tx.sh <network-flag> [--confirm]
-#   e.g.  scripts/submit-tx.sh --mainnet --confirm
-#         scripts/submit-tx.sh --testnet-magic 2
+# Usage: NETWORK=preview scripts/submit-tx.sh [--confirm]
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # ── Source configuration ─────────────────────────────────────────────────────
 
 if [[ -f "${REPO_ROOT}/config.env" ]]; then
+    set -a
     # shellcheck source=/dev/null
     source "${REPO_ROOT}/config.env"
+    set +a
 fi
 
 # ── Parse arguments ──────────────────────────────────────────────────────────
 
-if [[ $# -lt 1 ]]; then
-    echo "Usage: $(basename "$0") <network-flag> [--confirm]" >&2
-    echo "  e.g. $(basename "$0") --mainnet --confirm" >&2
-    echo "       $(basename "$0") --testnet-magic 2" >&2
-    exit 1
-fi
-
 CONFIRM=false
-NETWORK_FLAG=()
-
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --confirm)
-            CONFIRM=true
-            shift
-            ;;
-        *)
-            NETWORK_FLAG+=("$1")
-            shift
-            ;;
-    esac
+for arg in "$@"; do
+    if [[ "$arg" == "--confirm" ]]; then
+        CONFIRM=true
+    fi
 done
 
-if [[ ${#NETWORK_FLAG[@]} -eq 0 ]]; then
-    echo "Error: No network flag provided." >&2
-    exit 1
-fi
+# ── Network flag (submit uses --testnet-magic N) ─────────────────────────────
+
+case "${NETWORK:-preview}" in
+    mainnet) NETWORK_FLAG=(--mainnet) ;;
+    preprod) NETWORK_FLAG=(--testnet-magic 1) ;;
+    *)       NETWORK_FLAG=(--testnet-magic 2) ;;
+esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────
 
