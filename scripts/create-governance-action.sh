@@ -45,9 +45,14 @@ REQUIRED_VARS=(
     GOVERNANCE_ACTION_DEPOSIT
     DEPOSIT_RETURN_STAKE_VKEY
     ANCHOR_URL
-    RECEIVING_STAKE_VKEY
     TRANSFER_AMOUNT
 )
+
+# Either RECEIVING_STAKE_VKEY (key-based) or RECEIVING_STAKE_SCRIPT_FILE (script-based) is required
+if [[ -z "${RECEIVING_STAKE_VKEY:-}" && -z "${RECEIVING_STAKE_SCRIPT_FILE:-}" ]]; then
+    echo "Error: Either RECEIVING_STAKE_VKEY or RECEIVING_STAKE_SCRIPT_FILE must be set." >&2
+    MISSING=$((MISSING + 1))
+fi
 
 MISSING=0
 for var in "${REQUIRED_VARS[@]}"; do
@@ -63,25 +68,7 @@ if [[ "$MISSING" -gt 0 ]]; then
     exit 1
 fi
 
-# ── Validate key files exist ────────────────────────────────────────────────
-
-for keyfile_var in DEPOSIT_RETURN_STAKE_VKEY RECEIVING_STAKE_VKEY; do
-    keypath="${!keyfile_var}"
-    # Resolve relative paths against REPO_ROOT
-    if [[ "$keypath" != /* ]]; then
-        keypath="${REPO_ROOT}/${keypath}"
-    fi
-    if [[ ! -f "$keypath" ]]; then
-        echo "Error: Key file not found: ${keypath} (from ${keyfile_var})" >&2
-        MISSING=$((MISSING + 1))
-    fi
-done
-
-if [[ "$MISSING" -gt 0 ]]; then
-    exit 1
-fi
-
-# ── Resolve key paths ───────────────────────────────────────────────────────
+# ── Validate key/script files exist ───────────────────────────────────────────
 
 resolve_path() {
     local p="$1"
@@ -93,7 +80,34 @@ resolve_path() {
 }
 
 DEPOSIT_VKEY_PATH=$(resolve_path "$DEPOSIT_RETURN_STAKE_VKEY")
-RECEIVING_VKEY_PATH=$(resolve_path "$RECEIVING_STAKE_VKEY")
+if [[ ! -f "$DEPOSIT_VKEY_PATH" ]]; then
+    echo "Error: Key file not found: ${DEPOSIT_VKEY_PATH} (from DEPOSIT_RETURN_STAKE_VKEY)" >&2
+    MISSING=$((MISSING + 1))
+fi
+
+# Determine receiving credential type (script vs key)
+RECEIVING_FLAG=()
+if [[ -n "${RECEIVING_STAKE_SCRIPT_FILE:-}" ]]; then
+    RECEIVING_SCRIPT_PATH=$(resolve_path "$RECEIVING_STAKE_SCRIPT_FILE")
+    if [[ ! -f "$RECEIVING_SCRIPT_PATH" ]]; then
+        echo "Error: Script file not found: ${RECEIVING_SCRIPT_PATH} (from RECEIVING_STAKE_SCRIPT_FILE)" >&2
+        MISSING=$((MISSING + 1))
+    else
+        RECEIVING_FLAG=(--funds-receiving-stake-script-file "$RECEIVING_SCRIPT_PATH")
+    fi
+elif [[ -n "${RECEIVING_STAKE_VKEY:-}" ]]; then
+    RECEIVING_VKEY_PATH=$(resolve_path "$RECEIVING_STAKE_VKEY")
+    if [[ ! -f "$RECEIVING_VKEY_PATH" ]]; then
+        echo "Error: Key file not found: ${RECEIVING_VKEY_PATH} (from RECEIVING_STAKE_VKEY)" >&2
+        MISSING=$((MISSING + 1))
+    else
+        RECEIVING_FLAG=(--funds-receiving-stake-verification-key-file "$RECEIVING_VKEY_PATH")
+    fi
+fi
+
+if [[ "$MISSING" -gt 0 ]]; then
+    exit 1
+fi
 
 # ── Query constitution script hash ────────────────────────────────────────────
 
@@ -137,7 +151,7 @@ cardano-cli conway governance action create-treasury-withdrawal \
     --deposit-return-stake-verification-key-file "$DEPOSIT_VKEY_PATH" \
     --anchor-url "$ANCHOR_URL" \
     --anchor-data-hash "$ANCHOR_DATA_HASH" \
-    --funds-receiving-stake-verification-key-file "$RECEIVING_VKEY_PATH" \
+    "${RECEIVING_FLAG[@]}" \
     --transfer "$TRANSFER_AMOUNT" \
     "${CONSTITUTION_FLAG[@]}" \
     --out-file "$OUTPUT_FILE"
