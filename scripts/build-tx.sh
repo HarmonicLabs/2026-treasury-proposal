@@ -52,16 +52,50 @@ UTXO_OUTPUT=$(cardano-cli conway query utxo \
     --address "$PAYMENT_ADDRESS" \
     --out-file /dev/stdout)
 
-# Parse the first UTxO with sufficient funds
-TX_IN=$(echo "$UTXO_OUTPUT" | jq -r 'to_entries | .[0].key // empty')
+# Deposit is in lovelace; we need enough to cover deposit + fees
+REQUIRED_LOVELACE="${GOVERNANCE_ACTION_DEPOSIT:-100000000000}"
 
-if [[ -z "$TX_IN" ]]; then
+# Find UTxOs with ADA, sorted by value descending, accumulate until we have enough
+readarray -t UTXO_ENTRIES < <(echo "$UTXO_OUTPUT" | jq -r '
+    [to_entries[] | {key: .key, lovelace: .value.value.lovelace}]
+    | sort_by(-.lovelace)
+    | .[]
+    | "\(.key) \(.lovelace)"
+')
+
+if [[ ${#UTXO_ENTRIES[@]} -eq 0 ]]; then
     echo "Error: No UTxOs found at ${PAYMENT_ADDRESS}" >&2
     echo "Fund this address before building the transaction." >&2
     exit 1
 fi
 
-echo "Using UTxO: ${TX_IN}"
+TX_INS=()
+TOTAL_LOVELACE=0
+
+for entry in "${UTXO_ENTRIES[@]}"; do
+    utxo=$(echo "$entry" | awk '{print $1}')
+    lovelace=$(echo "$entry" | awk '{print $2}')
+    TX_INS+=("$utxo")
+    TOTAL_LOVELACE=$((TOTAL_LOVELACE + lovelace))
+    if [[ "$TOTAL_LOVELACE" -ge "$REQUIRED_LOVELACE" ]]; then
+        break
+    fi
+done
+
+TOTAL_ADA=$(echo "scale=6; $TOTAL_LOVELACE / 1000000" | bc)
+REQUIRED_ADA=$(echo "scale=6; $REQUIRED_LOVELACE / 1000000" | bc)
+
+if [[ "$TOTAL_LOVELACE" -lt "$REQUIRED_LOVELACE" ]]; then
+    echo "Error: Insufficient funds." >&2
+    echo "  Available: ${TOTAL_ADA} ADA (${#UTXO_ENTRIES[@]} UTxOs)" >&2
+    echo "  Required:  ${REQUIRED_ADA} ADA (deposit + fees)" >&2
+    exit 1
+fi
+
+echo "Selected ${#TX_INS[@]} UTxO(s) totaling ${TOTAL_ADA} ADA (need ${REQUIRED_ADA}):"
+for utxo in "${TX_INS[@]}"; do
+    echo "  ${utxo}"
+done
 echo ""
 
 # ── Check for guardrails script ──────────────────────────────────────────────
@@ -74,7 +108,7 @@ if [[ -f "$GUARDRAILS_SCRIPT" ]]; then
     PROPOSAL_SCRIPT_FLAGS=(
         --proposal-script-file "$GUARDRAILS_SCRIPT"
         --proposal-redeemer-value '{}'
-        --tx-in-collateral "$TX_IN"
+        --tx-in-collateral "${TX_INS[0]}"
     )
 else
     echo "No guardrails script found (skipping script witness)"
@@ -86,9 +120,15 @@ echo ""
 
 TX_RAW="${REPO_ROOT}/tx.raw"
 
+# Build --tx-in flags for all selected UTxOs
+TX_IN_FLAGS=()
+for utxo in "${TX_INS[@]}"; do
+    TX_IN_FLAGS+=(--tx-in "$utxo")
+done
+
 cardano-cli conway transaction build \
     "${NETWORK_FLAG[@]}" \
-    --tx-in "$TX_IN" \
+    "${TX_IN_FLAGS[@]}" \
     --change-address "$PAYMENT_ADDRESS" \
     --proposal-file "$ACTION_FILE" \
     "${PROPOSAL_SCRIPT_FLAGS[@]}" \
