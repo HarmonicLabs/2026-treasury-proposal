@@ -115,8 +115,23 @@ openssl pkey -inform DER -outform PEM -in "${TMPDIR}/skey.der" -out "${TMPDIR}/s
 echo "Signing body hash with ed25519..."
 echo -n "$BODY_HASH" | xxd -r -p > "${TMPDIR}/hash.bin"
 
-SIGNATURE_HEX=$(openssl pkeyutl -sign -inkey "${TMPDIR}/skey.pem" -rawin \
-    -in "${TMPDIR}/hash.bin" | xxd -p | tr -d '\n')
+# OpenSSL 3.x supports pkeyutl -rawin; 1.1.1 CLI can't sign ed25519 at all
+if openssl pkeyutl -sign -inkey "${TMPDIR}/skey.pem" -rawin \
+    -in "${TMPDIR}/hash.bin" -out "${TMPDIR}/sig.bin" 2>/dev/null; then
+    SIGNATURE_HEX=$(xxd -p "${TMPDIR}/sig.bin" | tr -d '\n')
+elif command -v python3 >/dev/null 2>&1; then
+    SIGNATURE_HEX=$(python3 -c "
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+import sys
+key = Ed25519PrivateKey.from_private_bytes(bytes.fromhex(sys.argv[1]))
+sig = key.sign(bytes.fromhex(sys.argv[2]))
+print(sig.hex())
+" "$SKEY_HEX" "$BODY_HASH")
+else
+    echo "Error: OpenSSL 3.x or Python 3 with cryptography library required." >&2
+    echo "Install either: OpenSSL >= 3.0, or: pip3 install cryptography" >&2
+    exit 1
+fi
 
 echo "Signature:  ${SIGNATURE_HEX}"
 
