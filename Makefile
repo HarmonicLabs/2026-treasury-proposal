@@ -4,7 +4,7 @@
 NETWORK       ?= preprod
 METADATA_FILE ?= metadata/proposal-metadata.json
 
-.PHONY: help check-prereqs generate-test-keys register-stake delegate-always-abstain fetch-guardrails sign-metadata upload-ipfs hash \
+.PHONY: help check-prereqs generate-test-keys metadata register-stake delegate-always-abstain fetch-guardrails sign-metadata upload-ipfs hash \
         governance-action build-tx sign-tx submit-testnet submit-mainnet test-lifecycle report journal-entry clean
 
 help: ## Show all available targets
@@ -18,7 +18,7 @@ generate-test-keys: ## Generate a fresh wallet for preprod testnet
 	NETWORK=$(NETWORK) scripts/generate-test-keys.sh
 
 metadata: ## Generate proposal metadata
-	scripts/generate-metadata.sh
+	NETWORK=$(NETWORK) scripts/generate-metadata.sh
 
 register-stake: ## Register the stake key on-chain (required once)
 	NETWORK=$(NETWORK) scripts/register-stake.sh
