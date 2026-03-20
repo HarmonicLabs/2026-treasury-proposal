@@ -18,10 +18,10 @@ fi
 
 # ── Network flag ─────────────────────────────────────────────────────────────
 
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) NETWORK_FLAG=(--mainnet) ;;
-    preprod) NETWORK_FLAG=(--testnet-magic 1) ;;
-    *)       NETWORK_FLAG=(--testnet-magic 2) ;;
+    preview) NETWORK_FLAG=(--testnet-magic 2) ;;
+    *)       NETWORK_FLAG=(--testnet-magic 1) ;;
 esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────

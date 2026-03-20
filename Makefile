@@ -1,7 +1,7 @@
 # Blink Treasury Proposal - Makefile
-# Usage: make [target] [NETWORK=preview|preprod|mainnet]
+# Usage: make [target] [NETWORK=preprod|preview|mainnet]
 
-NETWORK       ?= preview
+NETWORK       ?= preprod
 METADATA_FILE ?= metadata/proposal-metadata.json
 
 .PHONY: help check-prereqs generate-test-keys register-stake delegate-always-abstain fetch-guardrails sign-metadata upload-ipfs hash \
@@ -14,7 +14,7 @@ help: ## Show all available targets
 check-prereqs: ## Run prerequisite checks
 	scripts/check-prereqs.sh
 
-generate-test-keys: ## Generate a fresh wallet for preview testnet
+generate-test-keys: ## Generate a fresh wallet for preprod testnet
 	NETWORK=$(NETWORK) scripts/generate-test-keys.sh
 
 register-stake: ## Register the stake key on-chain (required once)
@@ -44,8 +44,8 @@ build-tx: governance-action ## Build the transaction (depends on governance-acti
 sign-tx: build-tx ## Sign the transaction (depends on build-tx)
 	NETWORK=$(NETWORK) scripts/sign-tx.sh
 
-submit-testnet: NETWORK = preview
-submit-testnet: sign-tx ## Submit transaction to preview testnet
+submit-testnet: NETWORK = preprod
+submit-testnet: sign-tx ## Submit transaction to preprod testnet
 	NETWORK=$(NETWORK) scripts/submit-tx.sh
 
 submit-mainnet: NETWORK = mainnet

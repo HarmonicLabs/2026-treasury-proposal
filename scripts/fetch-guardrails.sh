@@ -5,7 +5,7 @@ set -euo pipefail
 # Queries the constitution for the script hash, then attempts to download
 # the script from known sources. Works on any network.
 #
-# Usage: NETWORK=preview scripts/fetch-guardrails.sh
+# Usage: NETWORK=preprod scripts/fetch-guardrails.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPTS_DIR="${REPO_ROOT}/scripts"
@@ -21,15 +21,15 @@ fi
 
 # ── Network flags ────────────────────────────────────────────────────────────
 
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) QUERY_FLAG=(--mainnet) ;;
-    preprod) QUERY_FLAG=(--testnet-magic 1) ;;
-    *)       QUERY_FLAG=(--testnet-magic 2) ;;
+    preview) QUERY_FLAG=(--testnet-magic 2) ;;
+    *)       QUERY_FLAG=(--testnet-magic 1) ;;
 esac
 
 echo "=== Fetch Guardrails Script ==="
 echo ""
-echo "Network: ${NETWORK:-preview}"
+echo "Network: ${NETWORK:-preprod}"
 echo ""
 
 # ── Query constitution ───────────────────────────────────────────────────────

@@ -5,25 +5,25 @@
 Uses [SundaeSwap treasury-contracts](https://github.com/SundaeSwap-finance/treasury-contracts) (audited by TxPipe and MLabs, deployed on mainnet).
 
 - **treasury.ak** - Holds funds withdrawn from the Cardano treasury
-- **vendor.ak** - Manages milestone-based vesting for Blink Labs as sole vendor
+- **vendor.ak** - Manages milestone-based vesting for HLabs as sole vendor
 
 ## Oversight Board
 
-- **Pi Lanningham** (SundaeSwap)
-- **Santiago Carmuega** (TxPipe)
-- **Lucas Rosa** (Aiken, Midnight)
+- **Santiago Carmuega** (TxPipe, Dolos)
+- **Lucas Rosa** (Aiken, Starstream, Midnight)
+- **Chris Gianelloni** (BlinkLabs, Dingo)
 
 ## Permission Scheme
 
 | Action | Required Signatures |
 |--------|-------------------|
-| Disburse | Blink Labs + any 1 oversight board member |
-| Sweep Early | Blink Labs + any 1 oversight board member |
-| Reorganize | Blink Labs only |
+| Disburse | HLabs + any 1 oversight board member |
+| Sweep Early | HLabs + any 1 oversight board member |
+| Reorganize | HLabs only |
 | Fund (setup vendor) | Oversight board majority |
 | Pause milestone | Any 1 oversight board member |
 | Resume milestone | Oversight board majority |
-| Modify project | Blink Labs + oversight board majority |
+| Modify project | HLabs + oversight board majority |
 
 ## Built-in Safeguards
 

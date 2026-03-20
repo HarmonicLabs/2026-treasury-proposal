@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # build-tx.sh - Build a transaction to submit the treasury withdrawal governance action.
-# Usage: NETWORK=preview scripts/build-tx.sh
+# Usage: NETWORK=preprod scripts/build-tx.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -17,10 +17,10 @@ fi
 
 # ── Network flag (query/tx commands use --testnet-magic N) ───────────────────
 
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) NETWORK_FLAG=(--mainnet) ;;
-    preprod) NETWORK_FLAG=(--testnet-magic 1) ;;
-    *)       NETWORK_FLAG=(--testnet-magic 2) ;;
+    preview) NETWORK_FLAG=(--testnet-magic 2) ;;
+    *)       NETWORK_FLAG=(--testnet-magic 1) ;;
 esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────

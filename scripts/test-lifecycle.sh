@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# test-lifecycle.sh - Full automated governance action lifecycle test on preview testnet.
+# test-lifecycle.sh - Full automated governance action lifecycle test on preprod testnet.
 # Refuses to run on mainnet. Exercises: hashing, governance action creation,
 # transaction build/sign/submit, and governance state query.
 #
@@ -10,10 +10,10 @@ set -euo pipefail
 #
 # Prerequisites:
 #   - cardano-cli, jq available
-#   - cardano-node running on preview network
+#   - cardano-node running on preprod network
 #   - CARDANO_NODE_SOCKET_PATH set
 #   - Test keys in keys/ directory
-#   - config.env with preview testnet values
+#   - config.env with preprod testnet values
 #   - Committed metadata JSON file
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -37,8 +37,8 @@ if [[ "${NETWORK:-}" == "mainnet" ]]; then
     exit 1
 fi
 
-# Default to preview network
-: "${NETWORK:=preview}"
+# Default to preprod network
+: "${NETWORK:=preprod}"
 export NETWORK
 
 echo "============================================================"
@@ -116,8 +116,8 @@ echo "  Payment:     ${PAYMENT_ADDRESS}"
 
 case "${NETWORK}" in
     mainnet) QUERY_FLAG=(--mainnet) ;;
-    preprod) QUERY_FLAG=(--testnet-magic 1) ;;
-    *)       QUERY_FLAG=(--testnet-magic 2) ;;
+    preview) QUERY_FLAG=(--testnet-magic 2) ;;
+    *)       QUERY_FLAG=(--testnet-magic 1) ;;
 esac
 
 # ── Step 3: Create governance action ────────────────────────────────────────

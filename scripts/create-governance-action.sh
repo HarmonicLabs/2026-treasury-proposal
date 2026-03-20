@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # create-governance-action.sh - Create a treasury withdrawal governance action.
-# Usage: NETWORK=preview scripts/create-governance-action.sh
+# Usage: NETWORK=preprod scripts/create-governance-action.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -17,7 +17,7 @@ fi
 
 # ── Network flag (governance commands use --testnet/--mainnet) ────────────────
 
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) NETWORK_FLAG=(--mainnet) ;;
     *)       NETWORK_FLAG=(--testnet) ;;
 esac
@@ -112,10 +112,10 @@ fi
 # ── Query constitution script hash ────────────────────────────────────────────
 
 # Query commands need --testnet-magic N, not --testnet
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) QUERY_FLAG=(--mainnet) ;;
-    preprod) QUERY_FLAG=(--testnet-magic 1) ;;
-    *)       QUERY_FLAG=(--testnet-magic 2) ;;
+    preview) QUERY_FLAG=(--testnet-magic 2) ;;
+    *)       QUERY_FLAG=(--testnet-magic 1) ;;
 esac
 
 echo "Querying on-chain constitution script hash..."

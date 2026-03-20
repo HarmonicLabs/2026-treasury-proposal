@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # register-stake.sh - Register the stake key on-chain (required before governance actions).
-# Usage: NETWORK=preview scripts/register-stake.sh
+# Usage: NETWORK=preprod scripts/register-stake.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -17,10 +17,10 @@ fi
 
 # ── Network flag ─────────────────────────────────────────────────────────────
 
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) NETWORK_FLAG=(--mainnet) ;;
-    preprod) NETWORK_FLAG=(--testnet-magic 1) ;;
-    *)       NETWORK_FLAG=(--testnet-magic 2) ;;
+    preview) NETWORK_FLAG=(--testnet-magic 2) ;;
+    *)       NETWORK_FLAG=(--testnet-magic 1) ;;
 esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────

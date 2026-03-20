@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # submit-tx.sh - Submit a signed transaction to the Cardano network.
-# Usage: NETWORK=preview scripts/submit-tx.sh [--confirm]
+# Usage: NETWORK=preprod scripts/submit-tx.sh [--confirm]
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -26,10 +26,10 @@ done
 
 # ── Network flag (submit uses --testnet-magic N) ─────────────────────────────
 
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) NETWORK_FLAG=(--mainnet) ;;
-    preprod) NETWORK_FLAG=(--testnet-magic 1) ;;
-    *)       NETWORK_FLAG=(--testnet-magic 2) ;;
+    preview) NETWORK_FLAG=(--testnet-magic 2) ;;
+    *)       NETWORK_FLAG=(--testnet-magic 1) ;;
 esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# generate-test-keys.sh - Generate a fresh wallet for preview testnet testing.
+# generate-test-keys.sh - Generate a fresh wallet for preprod testnet testing.
 # Usage: scripts/generate-test-keys.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -17,7 +17,7 @@ fi
 
 # ── Generate payment key pair ─────────────────────────────────────────────────
 
-echo "=== Generate Preview Testnet Wallet ==="
+echo "=== Generate Preprod Testnet Wallet ==="
 echo ""
 
 cardano-cli conway address key-gen \
@@ -40,10 +40,10 @@ echo "  Stake key pair generated"
 # ── Build address ─────────────────────────────────────────────────────────────
 
 # Network flag for address build (uses --testnet-magic N)
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) ADDR_FLAG=(--mainnet) ;;
-    preprod) ADDR_FLAG=(--testnet-magic 1) ;;
-    *)       ADDR_FLAG=(--testnet-magic 2) ;;
+    preview) ADDR_FLAG=(--testnet-magic 2) ;;
+    *)       ADDR_FLAG=(--testnet-magic 1) ;;
 esac
 
 cardano-cli conway address build \
@@ -57,7 +57,7 @@ ADDRESS=$(cat "${KEYS_DIR}/payment.addr")
 echo ""
 echo "Address: ${ADDRESS}"
 echo ""
-echo "Fund this address from the preview faucet:"
+echo "Fund this address from the preprod faucet:"
 echo "  https://docs.cardano.org/cardano-testnets/tools/faucet/"
 echo ""
 echo "Then update PAYMENT_ADDRESS in config.env"

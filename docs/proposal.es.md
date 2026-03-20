@@ -1,723 +1,568 @@
-# Dingo: un Nodo Productor de Bloques de Grado Productivo en Go, por Blink Labs
+# Presupuesto del Tesoro 2026 de Harmonic Laboratories
 
-## 1. Resumen Ejecutivo
+> [!NOTE]
+> El siguiente documento es una propuesta para sostener los esfuerzos de Harmonic Laboratories (HLabs) en el mantenimiento y la evolución de la infraestructura de código abierto de Cardano.
+>
+> Está concebido como punto de partida para la discusión sobre retiros del tesoro de Cardano.
+>
+> Por lo tanto, invitamos a cualquier persona interesada a comentar este documento y compartir su retroalimentación con nosotros.
 
-Blink Labs solicita 6.900.000 ADA del Tesoro de Cardano para financiar
-doce meses de ingeniería a tiempo completo en
-[Dingo](https://github.com/blinklabs-io/dingo), nuestro nodo de Cardano
-desarrollado en Go. Dingo se encuentra en desarrollo activo, y precisamente
-ese es el propósito de esta propuesta. No obstante, se trata de un proyecto
-con avances sustanciales: más de 1.290 PRs (sin incluir dependencias)
-integrados durante el último año, conformidad del 100% en Plutus V1/V2/V3
-frente al conjunto de pruebas de Plutus, 314 pruebas de conformidad
-aprobadas, criptografía VRF/KES, ChainSync, mempool y soporte para
-transacciones de gobernanza. Este financiamiento permitirá llevar a Dingo
-a un estado de preparación para la producción de bloques en mainnet:
-completar el consenso Ouroboros Praos, incorporar soporte para el hard fork
-Dijkstra, implementar CIP-0164 Linear Leios en colaboración con IO
-Engineering, realizar una auditoría de seguridad integral y ejecutar el
-endurecimiento operativo necesario para garantizar la fiabilidad del nodo
-a escala.
+## Visión
+
+Harmonic Laboratories (HLabs para abreviar) es una empresa de I+D nacida y enfocada exclusivamente en el ecosistema de Cardano.
+
+Harmonic Laboratories apoya y mantiene una porción considerable de las herramientas TypeScript para el ecosistema de Cardano, que la mayoría de los desarrolladores de Cardano utilizan, ya sea directamente o indirectamente a través de otras bibliotecas que dependen del código escrito y mantenido por HLabs.
+
+La misión de HLabs es que la verdadera descentralización se convierta en la base del desarrollo de aplicaciones, no solo una característica deseable.
+
+Lo hacemos desarrollando y manteniendo infraestructura y herramientas fundamentales.
+
+## Resumen Ejecutivo
+
+Antes de profundizar en los detalles y el desglose de costos, aquí presentamos una vista de alto nivel de la solicitud, algunas suposiciones que estamos haciendo y la dirección general de este presupuesto.
+
+#### Retrospectiva 2025
+
+Proporcionamos una [retrospectiva completa de nuestra hoja de ruta 2025](#2025-Retrospective) en el anexo de este documento. Esto incluye una comparación directa con los elementos de la hoja de ruta presentados el año pasado junto con sus entregas correspondientes.
+
+#### Duración y Hitos
+
+Esta propuesta abarca **12 meses**, durante los cuales habrá varias entregas y demostraciones. Entre las entregas clave, destacamos:
+
+- un mantenimiento de hard fork próximo;
+- un nodo con capacidad de relay (Gerolamo);
+- un lenguaje de programación para smart contracts completamente maduro, imperativo y eficiente (Pebble).
+
+### Beneficios para el ecosistema
+
+Gerolamo, Pebble y el mantenimiento continuo de herramientas sirven cada uno a distintos grupos de interés mientras fortalecen colectivamente la infraestructura, la experiencia del desarrollador y la sostenibilidad a largo plazo de Cardano.
+
+#### ¿Quién se beneficiará de Gerolamo?
+
+##### TL;DR
+
+- SPOs para nodos relay
+- dApps para aplicaciones con mínima confianza
+- wallets para seguridad similar a Daedalus
+
+##### SPOs
+
+Los Operadores de Stake Pools pueden usar Gerolamo como un nodo relay adicional junto a su infraestructura existente. La producción de bloques continúa en su configuración actual, mientras que los relays de Gerolamo añaden diversidad y resiliencia a su pool.
+
+Un panorama diverso de implementaciones de nodos fortalece la resiliencia de la red. Al proporcionar una base de código alternativa para relays, Gerolamo reduce el riesgo de problemas a nivel de toda la red derivados de errores en una sola implementación; un factor crítico para la salud a largo plazo y la descentralización de la red.
+
+##### dApps
+
+Las aplicaciones descentralizadas se benefician enormemente del acceso con mínima confianza a los datos de la blockchain. Actualmente, la mayoría de las dApps dependen de indexadores centralizados o APIs de terceros para consultar el estado de la cadena, introduciendo puntos de fallo y suposiciones de confianza que socavan la filosofía de descentralización.
+
+Gerolamo permite a las dApps ejecutar sus propios nodos ligeros; incluso directamente en el navegador; proporcionando acceso directo y sin necesidad de confianza al libro mayor de Cardano.
+
+Esto significa que las dApps pueden verificar estados de UTxO, validar transacciones y consultar datos de la cadena sin depender de servicios externos. El resultado es una arquitectura de aplicación más resiliente y resistente a la censura, alineada con los principios fundamentales de la descentralización.
+
+##### Wallets ligeras
+
+Las wallets ligeras actuales deben confiar en servidores externos para proporcionar datos precisos de la cadena. Esto crea un compromiso de seguridad: los usuarios ganan comodidad pero sacrifican la capacidad de verificar independientemente sus saldos e historial de transacciones.
+
+Con Gerolamo, los desarrolladores de wallets pueden integrar un nodo ligero directamente en sus aplicaciones, ofreciendo a los usuarios garantías de seguridad similares a Daedalus sin la sobrecarga de ejecutar un nodo completo. Los usuarios pueden verificar sus propios UTxOs, validar transacciones entrantes y mantener plena soberanía sobre sus fondos, todo mientras disfrutan de la experiencia de usuario de una wallet ligera.
+
+#### ¿Quién se beneficiará de Pebble?
+
+##### TL;DR
+
+Desarrolladores que buscan una alternativa a la programación funcional sin sacrificar eficiencia.
+
+El lenguaje pretende ser lo más similar posible a TypeScript, que es un lenguaje ampliamente adoptado en Web2, así como similar a lenguajes usados en otros ecosistemas más maduros, como Solidity en cadenas EVM.
+
+##### Incorporación de desarrolladores Web2
+
+Uno de los mayores desafíos de Cardano es la pronunciada curva de aprendizaje para el desarrollo de smart contracts. Aiken, el lenguaje de smart contracts más ampliamente adoptado en Cardano, aunque una gran mejora en comparación con Haskell, aún requiere familiaridad con paradigmas de programación funcional, conceptos desconocidos para la gran mayoría de desarrolladores a nivel mundial. Esta barrera limita significativamente el grupo de talento que puede contribuir al ecosistema de dApps de Cardano.
+
+Pebble cierra esta brecha ofreciendo una sintaxis y experiencia de desarrollo familiar para los desarrolladores de TypeScript y JavaScript, las comunidades de programación más grandes del mundo. Al reducir la barrera de entrada, Pebble abre el desarrollo de Cardano a millones de desarrolladores que de otro modo se verían disuadidos por la curva de aprendizaje de la programación funcional.
+
+##### Código en cadena eficiente
+
+A pesar de su sintaxis imperativa, Pebble compila a UPLC (Untyped Plutus Core) altamente optimizado. Los desarrolladores no tienen que elegir entre familiaridad y eficiencia: Pebble ofrece ambas. El compilador realiza optimizaciones agresivas para minimizar los costos de ejecución, asegurando que los contratos escritos en Pebble sean competitivos con código Plutus optimizado manualmente, haciéndolos una opción viable para aplicaciones en producción.
+
+##### Experiencia de desarrollo profesional
+
+Las herramientas de Pebble, incluyendo una implementación completa del Language Server Protocol (LSP), CLI con modo watch e integración de depuración mediante sourcemaps, proporcionan una experiencia de desarrollo a la par de ecosistemas maduros. Los desarrolladores pueden disfrutar de autocompletado, reporte de errores en línea, ir a definición y todas las comodidades que esperan de los IDEs modernos. Este conjunto de herramientas de nivel profesional acelera los ciclos de desarrollo y reduce errores, lo que en última instancia conduce a dApps de mayor calidad en Cardano.
+
+#### ¿Quién se beneficiará del mantenimiento de herramientas?
+
+##### TL;DR
+
+Todo el ecosistema puede tener la garantía de que siempre habrá herramientas actualizadas y fáciles de usar a su disposición, sin el temor de tener que rediseñar aplicaciones completas por falta de soporte.
+
+##### Estabilidad a nivel de ecosistema
+
+Las herramientas TypeScript mantenidas por HLabs sustentan una porción significativa del ecosistema de desarrolladores de Cardano. Bibliotecas como `cardano-ledger-ts`, `ouroboros-miniprotocols-ts` y `uplc` son dependencias de numerosos proyectos, tanto directamente como de forma transitiva a través de otras bibliotecas. Cuando un hard fork introduce cambios en el protocolo, estas bibliotecas fundamentales deben actualizarse oportunamente, o los proyectos dependientes enfrentan cambios incompatibles y posibles vulnerabilidades de seguridad.
+
+Al financiar el mantenimiento continuo, el Tesoro asegura que el ecosistema TypeScript permanezca sincronizado con las actualizaciones del protocolo. Los desarrolladores pueden confiar en que sus aplicaciones seguirán funcionando a través de los hard forks sin necesidad de reescrituras de emergencia o tiempos de inactividad prolongados.
+
+##### Reducción del riesgo de fragmentación
+
+Sin mantenimiento dedicado, las bibliotecas críticas corren el riesgo de ser abandonadas, un destino común en los ecosistemas de código abierto.
+
+Las dependencias abandonadas obligan a los equipos a bifurcar y mantener el código por su cuenta (duplicando esfuerzo en todo el ecosistema) o a migrar a soluciones alternativas (fragmentando la comunidad de desarrolladores). Ambos resultados son costosos y desestabilizadores.
+
+El financiamiento sostenido para el mantenimiento de herramientas de HLabs elimina este riesgo, proporcionando al ecosistema una base confiable sobre la cual los desarrolladores pueden construir proyectos a largo plazo con confianza.
+
+### Alineación con Cardano 2030
+
+Esta propuesta apoya directamente el [Marco Estratégico Cardano 2030](https://product.cardano.intersectmbo.org/vision/strategy-2030/), contribuyendo a los KPIs fundamentales y pilares estratégicos como se describe a continuación.
+
+#### Alineación con KPIs Fundamentales
+
+| KPI / Prioridad Estratégica                | Objetivo / Meta 2030           | Contribución de HLabs                                                           |
+| :----------------------------------------- | :----------------------------- | :------------------------------------------------------------------------------ |
+| **Clientes de nodo completo alternativos** | ≥2 conformes con la especificación | Gerolamo contribuye directamente como una segunda implementación de cliente conforme con la especificación |
+| **Disponibilidad Mensual**                 | 99.98%                         | El mantenimiento de hard forks asegura estabilidad del ecosistema en las actualizaciones del protocolo |
+| **Vías de migración de desarrolladores** (A.3) | "Más desarrolladores pueden incorporarse" | Pebble proporciona a los desarrolladores EVM/TS una sintaxis familiar para smart contracts en Cardano |
+
+> **Nota**: Las dos primeras filas son KPIs formales de Cardano 2030. La tercera fila corresponde al Pilar Estratégico A.3 (Experiencia del Desarrollador → Educación y migración), que es una prioridad explícita de 2030 pero aún no es un KPI numérico. TVL, transacciones mensuales y MAU son resultados a nivel de ecosistema habilitados por inversiones en infraestructura como esta propuesta; hacemos seguimiento de indicadores de adopción (a continuación) como métricas iniciales que contribuyen a estos resultados.
+
+#### Alineación con Pilares Estratégicos
+
+**Pilar 1: Excelencia en Infraestructura e Investigación**
+
+- **I.2 Seguridad y Resiliencia → Diversidad de Clientes**: Gerolamo está explícitamente alineado con el objetivo 2030 de "apoyar implementaciones adicionales de nodo completo y cliente ligero" para lograr "mejor descentralización" y "reducir el riesgo de cliente único".
+
+**Pilar 2: Adopción y Utilidad**
+
+- **A.3 Experiencia del Desarrollador → Incentivos de código abierto**: Esta propuesta aborda directamente la prioridad estratégica de "incentivar el mantenimiento de SDKs, frameworks e infraestructura central de Cardano en línea con las mejores prácticas de código abierto" para un "ecosistema de constructores sostenible".
+- **A.3 Experiencia del Desarrollador → Educación y migración**: Pebble aborda el objetivo de "proporcionar materiales para desarrolladores EVM/basados en cuentas que migran a Cardano/UTxO" ofreciendo una sintaxis imperativa familiar, permitiendo que "más desarrolladores se incorporen".
+
+#### Indicadores de Adopción Medibles
+
+Para proporcionar visibilidad sobre cómo esta propuesta contribuye a los resultados a nivel de ecosistema, nos comprometemos a rastrear e informar los siguientes indicadores de adopción:
+
+##### Objetivos de Adopción de Gerolamo
+
+| Métrica                          | Objetivo a 12 Meses | Método de Medición                     |
+| :------------------------------- | :------------------- | :------------------------------------- |
+| SPOs ejecutando Gerolamo como relay | ≥10 pools         | Registro público + auto-reporte        |
+| Integraciones de nodo en navegador | ≥3 wallets/dApps  | Integraciones de dApps/wallets         |
+
+##### Objetivos de Adopción de Pebble
+
+| Métrica                    | Objetivo a 12 Meses    | Método de Medición                             |
+| :------------------------- | :--------------------- | :--------------------------------------------- |
+| Incorporación de desarrolladores | ≥20 desarrolladores | Descargas npm, estrellas en GitHub, miembros de Discord |
+| Completitud de documentación | 100% de cobertura    | Todas las características del lenguaje documentadas con ejemplos |
+| Completitud de tutoriales  | ≥3 tutoriales de extremo a extremo | Guías publicadas cubriendo patrones comunes |
+
+## Desglose del Presupuesto
+
+### Solicitud de Presupuesto Total
+
+La solicitud total para 2026 es de **`₳8,035,714`**, cubriendo un presupuesto en USD de **`$2,250,000`** (o **`₳6,428,571`**) + 25% en contingencia reembolsable (**`₳1,607,143`**).
+
+Esta cifra incluye los costos estimados, así como una contingencia reembolsable, que nos permitirá operar con cierto grado de independencia respecto a la volatilidad del mercado. La contingencia será reembolsada total o parcialmente al tesoro en caso de no ser utilizada.
+
+El desglose completo del presupuesto se presenta a continuación.
+
+Para una valoración justa de la propuesta, seguiremos un proceso similar al utilizado en la propuesta de Amaru, que creemos está estableciendo un buen estándar en términos de propuestas de presupuesto del Tesoro, y estimaremos los alcances de esta propuesta en _FTE_ (Equivalente a Tiempo Completo), que consideraremos igual a una tarifa anual de `$225k`.
+
+Utilizamos una tasa de conversión de `0.35` ADA [`₳`] por USD [`$`].
+
+### Vista Completa
+
+| Alcance                                                   | Estimado (FTEs) | Total del Proyecto ($) |
+| :---                                                      | ---:            | ---:                   |
+| Gerolamo (nodo Cardano en TypeScript)                     | 5               | `$1,125,000`           |
+| Pebble (lenguaje de programación + herramientas de desarrollo de dApps) | 3.5 | `$785,500`          |
+| Mantenimiento de hard fork                                | 1.5             | `$337,500`             |
+|                                                           |                 |                        |
+| **Total**                                                 | **10 FTEs**     | `$2,250,000`           |
+
+El costo fijo estimado incluye:
+
+#### Justificación
+
+La solicitud total para el proyecto es de `10 FTEs`.
+
+Los FTEs se valoran a una tarifa anual de `$225k`.
+
+Además, somos conscientes de nuestro sesgo de suposición/optimismo (nuestra previsión está sujeta a subestimar la complejidad, pasar por alto desafíos y subvalorar el tiempo y el costo requeridos para entregar, así como nuestra expectativa sesgada de los movimientos del mercado). Por lo tanto, añadimos un margen de contingencia adicional del 25%, aprendiendo de nuestros errores pasados.
+
+Esto nos deja con el siguiente total: `(10 x $225k) x 1.25 = $2,812,500`
+
+Finalmente, utilizando una tasa de conversión de `0.35` ADA por USD, formulamos una solicitud de presupuesto de **`₳8,035,714`**. Un [desglose completo de este presupuesto][detailed-scopes] está disponible a continuación.
+
+> **NOTA** ¿Es `0.35 ADA/USD` una tasa de conversión justa?
+>
+> Aprendiendo de nuestra experiencia de financiación en 2025, reconocemos la importancia de tener en cuenta la volatilidad del mercado al planificar entregas a largo plazo.
+>
+> Al momento de escribir, el precio de ADA es aproximadamente `0.3 USD` por ADA. Proponemos una tasa de conversión de `0.35 ADA/USD`, que tiene en cuenta el mercado actual al tiempo que proporciona un margen razonable.
+>
+> Combinado con la contingencia reembolsable del 25%, este enfoque busca asegurar una entrega segura e ininterrumpida de los proyectos sin solicitar en exceso al tesoro.
+
+## Administración del Presupuesto y Supervisión de Gobernanza
+
+### Custodia Mediante Smart Contract
+
+Los fondos se mantienen y liberan a través de los treasury-contracts de SundaeLabs (https://github.com/SundaeSwap-finance/treasury-contracts), un marco probado con dos validadores:
+
+treasury.ak: Custodia todos los ADA retirados del tesoro de Cardano. Todo se bloquea aquí cuando la acción de gobernanza se promulga.
+vendor.ak: Gestiona la liberación basada en hitos para HLabs. Calendario de pagos, fechas de liberación, condiciones de entrega.
+Ambos contratos han sido auditados de forma independiente por TxPipe y MLabs y están en uso en producción en mainnet.
+
+#### Comité de Supervisión Independiente
+
+Un comité de supervisión independiente proporciona gobernanza de terceros:
+
+Santiago Carmuega (TxPipe, Dolos)
+Lucas Rosa (Aiken, Starstream, Midnight)
+Chris Gianelloni (BlinkLabs, Dingo)
+
+Los miembros del comité no tienen participación en HLabs. Co-firman los desembolsos, revisan los hitos y pueden detener el financiamiento si no estamos entregando.
+
+#### Esquema de Permisos
+
+Las acciones permitidas por el contrato de custodia son las siguientes:
+
+Desembolso (liberación periódica): HLabs inicia + cualquier miembro del comité co-firma
+Devolución anticipada (retorno de fondos no utilizados): HLabs + cualquier miembro del comité
+Reorganización (ajuste del calendario de hitos): Solo HLabs
+Financiación (configuración inicial del proveedor): Mayoría del comité
+Suspensión de hito: Cualquier miembro del comité
+Reanudación de hito: Mayoría del comité
+Modificación del proyecto: HLabs + mayoría del comité
+Las operaciones diarias requieren una firma del comité. Los cambios estructurales requieren al comité completo. Y cualquier miembro individual puede pausar si algo no parece correcto.
+
+#### Política de Delegación
+
+El contrato del tesoro establece la delegación automática como DRep abstencionista y sin delegación a SPOs para todos los fondos en custodia. Los fondos del tesoro no influyen en las votaciones de gobernanza ni en el staking.
+
+#### Mecanismo de Devolución Automática
+
+Los fondos que permanezcan en el contrato después de su vencimiento se devuelven automáticamente al tesoro de Cardano. Esto se ejecuta a nivel contractual. No puede ser anulado.
+
+## Lista de verificación de constitucionalidad
+
+En un esfuerzo por convencernos de la constitucionalidad de la propuesta, consideramos relevante incluir una lista de verificación de los puntos que cubrimos y, para cada uno, nuestra interpretación de la Constitución de Cardano.
+
+#### Propósito
+
+- [x] Esta propuesta es para trabajo destinado a mejorar la seguridad, la descentralización y la sostenibilidad a largo plazo de Cardano.
+
+#### Artículo III.5: el proceso de gobernanza en cadena
+
+- [x] Hemos presentado esta propuesta en un formato estandarizado y legible, que incluye una URL y un hash de todo el contenido documentado fuera de cadena. Creemos que nuestra justificación es detallada y suficiente. La propuesta contiene un título, un resumen, la razón de la propuesta y materiales de apoyo relevantes.
+
+#### Artículo IV.1: propuesta de presupuestos
+
+- [x] Esta propuesta se ajusta a las disposiciones de este artículo ya que está destinada a cubrir el mantenimiento y el desarrollo futuro de la Blockchain de Cardano.
+
+- [x] Esta propuesta cubre un período de 12 meses (73 épocas) como recomienda esta disposición de la Constitución.
+
+#### Artículo IV.3: Límite de Cambio Neto
+
+- [x] Los presupuestos no necesitan ser evaluados en el contexto de un Límite de Cambio Neto, solo los retiros. Sin embargo, reconocemos que el establecimiento de un nuevo Límite de Cambio Neto probablemente será necesario para promulgar retiros correspondientes a este presupuesto. Reevaluaremos la situación a su debido tiempo y posiblemente dividiremos los retiros en múltiples si fuera necesario.
+
+#### Alineación Estratégica con Cardano 2030
+
+- [x] Esta propuesta apoya directamente el Marco Estratégico Cardano 2030, contribuyendo al KPI de "Clientes de nodo completo alternativos" (Pilar 1: Seguridad y Resiliencia) y las prioridades de Experiencia del Desarrollador (Pilar 2: Adopción y Utilidad).
+
+- [x] Se han definido indicadores de adopción medibles para proporcionar visibilidad sobre las contribuciones a los KPIs a nivel de ecosistema (TVL, transacciones mensuales, MAU).
+
+## Vista Detallada del Presupuesto
+
+<!---------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+<!------------------------------------------ gerolamo ------------------------------------------>
+<!---------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+
+### Gerolamo (nodo Cardano en TypeScript)
+
+[repo](https://github.com/HarmonicLabs/gerolamo)
+
+| 🎯 Objetivo Principal                |
+| ---                                  |
+| nodo de datos con mínima confianza para dApps |
+
+Gerolamo es una implementación en TypeScript del nodo de Cardano diseñada para:
+- **Compatibilidad con navegadores**: Servir como base para nodos que se ejecutan en navegadores
+- **Extensibilidad**: Ser la base para nodos con propósitos específicos (nodos ligeros, nodos solo-UTxO, indexadores de cadena)
+
+#### Cobertura Completa de Reglas del Libro Mayor
+
+##### Objetivo
+
+Implementar las reglas completas de validación del libro mayor para permitir que Gerolamo valide completamente bloques y transacciones de acuerdo con las especificaciones del protocolo Cardano.
+
+##### Resultados Clave
+
+- Gestión completa del estado del libro mayor utilizando LMDB (o IndexedDB para navegadores) para mejoras de rendimiento.
+- Implementación de consenso (Praos) con selección de cadena y manejo de reversiones
+- Base de datos volátil para gestionar bifurcaciones de cadena
+- Validación de bloques y transacciones cubriendo todas las eras
+
+##### Esfuerzo Estimado
+
+2.5 FTEs
+
+#### APIs del Nodo
+
+##### Objetivo
+
+Proporcionar APIs completas para desarrolladores de dApps y operadores de infraestructura para interactuar con la red de Cardano a través de Gerolamo.
+
+##### Resultados Clave
+
+- Endpoints RPC de UTxO para consultas eficientes de UTxO
+- Soporte de socket local para protocolos node-to-client (compatibilidad con cardano-db-sync, cardano-cli)
+- API de navegador para uso de dApps
+
+##### Esfuerzo Estimado
+
+2 FTEs
+
+#### Mejoras de la Máquina Plutus
+
+##### Objetivo
+
+Mejorar continuamente el intérprete CEK de [plutus-machine](https://github.com/HarmonicLabs/plutus-machine) para mejor rendimiento y conformidad total con la especificación de Plutus.
+
+##### Resultados Clave
+
+- Optimizaciones de rendimiento para la evaluación de scripts
+- Seguimiento de presupuesto y mejoras en la precisión del modelo de costos
+- Soporte de sourcemaps para depuración
+
+##### Esfuerzo Estimado
+
+0.5 FTEs
+
+### Gerolamo ━ Resumen
+
+- total de recursos estimados: `5 FTEs`
+
+#### Criterios de Preparación para Producción
+
+Gerolamo se considerará listo para producción para despliegue como relay cuando cumpla los siguientes criterios objetivos:
+
+| Criterio                 | Requisito                                                      | Método de Verificación  |
+| :----------------------- | :------------------------------------------------------------- | :---------------------- |
+| **Fiabilidad de sincronización** | Sincronización exitosa desde génesis hasta la punta en mainnet | Integración continua    |
+| **Rendimiento de sincronización** | Sincronización inicial ≤48 horas en hardware estándar (4 CPU, 16GB RAM) | Suite de benchmarks |
+| **Conectividad de pares** | Conexiones estables con ≥15 pares durante ≥24 horas           | Validación de red       |
+| **Propagación de bloques** | Latencia de retransmisión de bloques dentro de 2x de la línea base del nodo Haskell | Benchmarks comparativos |
+| **Manejo de reversiones** | Recuperación exitosa de reversiones de hasta k=2160 bloques    | Escenarios adversos     |
+
+#### Propuesta de Valor vs. Otras Implementaciones de Nodo
+
+| Dimensión            | Nodo Haskell                 | Amaru                                    | Gerolamo                       | Beneficio de Gerolamo                             |
+| :------------------- | :------------------------- | :--------------------------------------- | :----------------------------- | :------------------------------------------------ |
+| **Entorno de ejecución** | Entorno GHC              | Nativo (Rust)                            | Bun/Node.js/Navegador          | Se ejecuta donde sea que JavaScript funcione, incluyendo navegadores |
+| **Soporte de navegador** | No                       | Soporte limitado planeado (WASM, finales 2026) | Sí (IndexedDB + WebWorkers) | Soporte de navegador listo para producción antes |
+| **Acceso para desarrolladores** | Requiere experiencia en Haskell | Requiere experiencia en Rust       | TypeScript/JavaScript          | Mayor grupo de contribuidores (17M+ desarrolladores JS/TS) |
+| **Extensibilidad**   | Específico de Cardano        | Ecosistema de crates de Rust             | Integración con ecosistema npm | Integración fluida con herramientas web/dApp      |
+| **Casos de uso**     | Producción completa de bloques | Producción completa de bloques         | Relay, nodo de datos, nodo de navegador | Complementario; capacidad nativa de navegador JS/TS |
+
+> [!NOTE]
+>  Gerolamo está diseñado como una **implementación complementaria** para casos de uso de relay y nodo de datos, no como un reemplazo para nodos productores de bloques aún. La producción de bloques hasta ahora permanece en el nodo Haskell.
+>
+> Llegar a un punto donde el nodo pueda considerarse seriamente como relay, en cuanto a funcionalidad, debería acercarnos bastante a un punto donde también pueda usarse para producción de bloques.
+>
+> sin embargo, habilitar la producción de bloques en un entorno de mainnet incurriría en un aumento serio en los fondos que necesitaríamos solicitar
+>
+> solo para la auditoría de seguridad, los equipos de Amaru y BlinkLabs están solicitando 500k USD adicionales, lo cual creemos que es apropiado.
+>
+> adicionalmente, si fuéramos a incluir la producción de bloques entre los objetivos de este año, también necesitaríamos aumentar el esfuerzo estimado en *al menos* 1 FTE más.
+>
+> si las condiciones lo permiten el próximo año, la producción de bloques se considerará seriamente.
+>
+> dado el entorno actual, decidimos que sería mejor recortar esos esfuerzos para contener los costos.
+
+<!---------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+<!------------------------------------------- pebble ------------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+
+### Pebble (lenguaje de programación para smart contracts)
+
+[repo](https://github.com/HarmonicLabs/pebble)
+
+| 🎯 Objetivo Principal              |
+| ---                                |
+| lenguaje y herramientas listos para producción |
+
+Pebble es un lenguaje funcional simple, pero sólido como una roca, con sesgo imperativo, que compila a UPLC (Untyped Plutus Core). Proporciona a los desarrolladores una sintaxis intuitiva mientras compila a código en cadena altamente optimizado.
+
+#### Estabilidad del Compilador
+
+##### Objetivo
+
+Alcanzar estabilidad de compilador de nivel producción con generación de código optimizado.
+
+##### Resultados Clave
+
+- Sistema de tipos completo con inferencia de tipos total
+- Generación de código UPLC optimizado con tamaños de script mínimos
+- Reporte de errores completo con mensajes accionables
+- Soporte para Plutus V4
+- Documentación y tutoriales para la incorporación de nuevos desarrolladores
+
+##### Esfuerzo Estimado
+
+2 FTEs
+
+#### Herramientas para Desarrolladores
+
+##### Objetivo
+
+Proporcionar una experiencia de desarrollo completa para desarrolladores de Pebble con integración de IDE, herramientas de depuración y soporte del sistema de compilación.
+
+##### Resultados Clave
+
+- Implementación del **Language Server Protocol (LSP)**:
+  - Resaltado de sintaxis
+  - Autocompletado
+  - Ir a definición
+  - Buscar referencias
+  - Reporte de errores en línea
+  - Documentación al pasar el cursor
+- **Sourcemaps estables y confiables** para depuración de contratos compilados
+- **Mejoras de CLI**:
+  - Modos de compilación y vigilancia
+  - REPL para desarrollo interactivo
+- **Generación de blueprints** para metadatos de contratos
+
+##### Esfuerzo Estimado
+
+1.5 FTEs
+
+### Pebble ━ Resumen
+
+- total de recursos estimados: `3.5 FTEs`
+
+#### Diferenciación respecto a Aiken
+
+Pebble y Aiken sirven a diferentes perfiles de desarrolladores y son **complementarios** dentro del ecosistema de Cardano, no competitivos.
+
+| Dimensión              | Aiken                            | Pebble                                 | Implicación                                           |
+| :--------------------- | :------------------------------- | :------------------------------------- | :---------------------------------------------------- |
+| **Paradigma**          | Funcional primero (inspirado en Rust) | Imperativo primero (inspirado en TypeScript) | Diferentes modelos mentales para diferentes desarrolladores |
+| **Audiencia objetivo** | Desarrolladores cómodos con PF   | Desarrolladores Web2/EVM               | Amplía el grupo total de desarrolladores alcanzables   |
+| **Familiaridad de sintaxis** | Rust, Gleam                | TypeScript, JavaScript, Solidity       | Menor barrera para los 17M+ desarrolladores JS/TS a nivel global |
+| **Curva de aprendizaje** | Requiere fundamentos de PF     | Patrones imperativos familiares        | Incorporación más rápida para la mayoría de desarrolladores |
+
+##### Por qué ambos importan
+
+Cardano necesita múltiples vías de acceso para desarrolladores:
+- Desarrolladores con experiencia en Rust/Haskell/PF gravitan hacia Aiken
+- Desarrolladores con experiencia en JS/TS/Solidity encontrarán Pebble más accesible
+- Ambos compilan a UPLC optimizado; la elección es sobre preferencia del desarrollador, no rendimiento en tiempo de ejecución
+
+Al financiar Pebble, el Tesoro amplía el embudo de desarrolladores de Cardano sin fragmentarlo.
+
+<!---------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+<!--------------------------------------- hf maintenance --------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+<!---------------------------------------------------------------------------------------------->
+
+### Mantenimiento de hard fork
+
+| 🎯 Objetivo Principal          |
+| ---                            |
+| garantizar estabilidad del ecosistema |
+
+#### Próximo Hard Fork Intra-Era
+
+##### Objetivo
+
+Asegurar que todas las bibliotecas TypeScript de HLabs estén actualizadas y sean totalmente compatibles con el próximo hard fork, incluyendo los cambios de Plutus V4 y los nuevos parámetros del protocolo.
+
+##### Resultados Clave
+
+Mantenimiento de los repositorios afectados para soportar nuevas características del protocolo:
+
+- **[cardano-ledger-ts](https://github.com/HarmonicLabs/cardano-ledger-ts)**: Colección de funciones y clases que definen las estructuras de datos del libro mayor de Cardano
+- **[ouroboros-miniprotocols-ts](https://github.com/HarmonicLabs/ouroboros-miniprotocols-ts)**: Implementación en TypeScript del protocolo de red Ouroboros
+- **[plutus-machine](https://github.com/HarmonicLabs/plutus-machine)**: Implementación de la máquina CEK para evaluación de UPLC
+- **[uplc](https://github.com/HarmonicLabs/uplc)**: Representación en TypeScript/JavaScript de UPLC
+
+##### Esfuerzo Estimado
+
+1.5 FTE
+
+### Mantenimiento de Hard Fork ━ Resumen
+
+- total de recursos estimados: `1.5 FTE`
 
 ---
 
-## 2. Motivación: Quiénes Somos
+# Retrospectiva 2025
 
-### Blink Labs
+## Descripción General
 
-Somos una empresa de ingeniería especializada exclusivamente en software
-blockchain integrado con Cardano. Desarrollamos en Go porque es el
-lenguaje idóneo para sistemas de red de alto rendimiento y porque Cardano
-se beneficia de contar con infraestructura central que millones de
-desarrolladores pueden efectivamente leer y utilizar. Nuestro equipo
-incluye un ingeniero de documentación a tiempo parcial y seis
-colaboradores remunerados de código abierto a tiempo parcial que
-colaboran en el mantenimiento y la expansión del ecosistema.
+En 2025, Harmonic Laboratories recibió su primera financiación del Tesoro de Cardano a través de los Intersect Treasury Contracts para el proyecto **Gerolamo** (EC-0014-25). El proyecto tenía como objetivo crear un nodo de datos de Cardano que pueda ejecutarse en el navegador, implementado completamente en TypeScript.
 
-Llevamos construyendo sobre Cardano desde 2021. A continuación, nuestros
-proyectos entregados:
+A pesar de que se suponía que la financiación cubriría 73 épocas, el despliegue del contrato en cadena fue efectivo recién a mediados de agosto, cubriendo por lo tanto un período desde el **12 de agosto de 2025 hasta el 30 de marzo de 2026**.
 
-| Proyecto | Descripción | Madurez |
-|----------|-------------|---------|
-| [Dingo](https://github.com/blinklabs-io/dingo) | Nuestro nodo Cardano en Go: ChainSync, primitivas de forja de bloques VRF/KES, evaluación Plutus, mempool, gobernanza, UTxO RPC, Mini-Blockfrost y APIs Mesh (Rosetta) | Aún no preparado para mainnet, pero más de 300 PRs integrados y 314/314 pruebas de conformidad |
-| [gOuroboros](https://github.com/blinklabs-io/gouroboros) | Biblioteca de mini-protocolos Ouroboros con soporte completo de eras desde Byron hasta Conway | Más de 2.200 pruebas, utilizado por proyectos derivados |
-| [Plutigo](https://github.com/blinklabs-io/plutigo) | Nuestro evaluador de scripts Plutus: V1, V2, V3 con conformidad del 100% frente al conjunto de pruebas de Plutus | Integrado en Dingo |
-| [ouroboros-mock](https://github.com/blinklabs-io/ouroboros-mock) | Marco de pruebas de conformidad con 314 vectores de prueba de Amaru y simulación de estado del ledger | Infraestructura compartida |
-| [Adder](https://github.com/blinklabs-io/adder) | Pipeline de indexación de cadena y notificación de eventos con salidas configurables | En producción |
-| [nview](https://github.com/blinklabs-io/nview) | Monitoreo de nodos basado en terminal | Entregado |
-| [TxSubmit API](https://github.com/blinklabs-io/tx-submit-api) | Servicio de envío de transacciones | En producción, basado en Docker |
-| Imágenes Docker | Contenedores para nodo Cardano y herramientas asociadas | Ampliamente adoptados por SPOs |
+La financiación total para el proyecto fue de **₳578,571 ADA**; debido a diversas fallas de comunicación con la parte administradora durante la fase de presentación de la propuesta, la tasa de conversión fue de aproximadamente `0.7 ADA/USD`; la fuerte caída en el precio del activo con el que se nos paga desde entonces, actualmente por debajo de `0.3 ADA/USD`, causó que la valoración del proyecto fuera significativamente inferior a lo justo.
 
-Además de nuestros proyectos propios, co-mantenemos diversas bibliotecas
-Go dentro del ecosistema Cardano, incluyendo Apollo, Ogmigo, Kugo y el
-SDK Go de UTxO RPC.
+Harmonic Laboratories se enorgullece enormemente de decir que seguimos cumpliendo nuestra palabra a pesar de las condiciones extremadamente adversas.
 
-Nuestro financiamiento previo en Cardano proviene de Project Catalyst (que
-financió el desarrollo de gOuroboros y el trabajo inicial de Dingo) y de
-autofinanciamiento. Somos miembros de PRAGMA; sin embargo, no hemos
-recibido fondos de la propuesta de tesorería de Amaru ni de ningún otro
-retiro de tesorería, a pesar de nuestra membresía. Esta propuesta se
-presenta para su evaluación en función de sus propios méritos.
+## Comparación de Hoja de Ruta
 
-### Personal Clave
+| Planificado | Estado | Notas |
+| :--- | :---: | :--- |
+| Mini-protocolos Ouroboros | ✅ | Handshake, ChainSync, BlockFetch funcionando |
+| Sincronización de cadena multi-era | ✅ | Eras entre Shelley y Conway soportadas |
+| Análisis de bloques/encabezados | ✅ | Usando `@harmoniclabs/cardano-ledger-ts` |
+| Validación de encabezados | ✅ | Verificación VRF y comprobación de tipo de era |
+| Envío de transacciones | ✅ | Endpoint `/txsubmit` retransmitiendo a pares |
+| Validación de bloques | ✅ | Aplicación de bloques con actualizaciones del estado del libro mayor |
+| Manejo de reversiones | ✅ | Soporte de reversión de cadena implementado |
+| Almacenamiento completo | ✅ | Fragmentos volátiles + inmutables, concurrencia WAL |
+| API HTTP de Bloques | ✅ | Endpoint `/block/{slot}` sirviendo CBOR hex |
+| Gestión de pares P2P | 🟡 | El nodo ya es capaz de manejar múltiples pares, la selección dinámica de pares es lo siguiente |
+| Gestión de mempool | ✅ | Se implementó un mempool con soporte multi-hilo |
+| Integración con Mithril | 🟡 | En progreso - el soporte inicial ya está integrado y seguimos mejorándolo |
+| Compatibilidad con navegadores | 🟡 | En progreso - se han tomado varias decisiones de diseño para facilitar la integración de un nodo compatible con navegadores |
 
-- Chris Gianelloni, Arquitecto Principal. Diseñó y lidera el desarrollo
-  de Dingo, gOuroboros y la infraestructura Go en su conjunto.
-  Responsable de las decisiones de arquitectura, la implementación de
-  protocolos y la dirección técnica.
+## Logros Clave
 
-- Christina Gianelloni, Directora de Operaciones. Responsable de
-  marketing, divulgación comunitaria, relacionamiento con DReps, sesiones de
-  preguntas y respuestas (AMA), redes sociales y comunicaciones de
-  gobernanza. Su gestión permite que el equipo de ingeniería mantenga su
-  enfoque en el desarrollo.
+### Validación y Aplicación de Bloques
+Pipeline completo de validación de bloques implementado, incluyendo verificación de encabezados y aplicación del cuerpo del bloque al estado del libro mayor. El nodo ahora valida los bloques entrantes contra las reglas del protocolo antes de aplicarlos al estado local de la cadena, asegurando la integridad de los datos.
 
----
+### Validación de Encabezados con Verificación VRF
+Lógica completa de validación de encabezados con verificación criptográfica VRF (Función Aleatoria Verificable). Esto asegura que los productores de bloques sean correctamente elegidos de acuerdo con su stake y que los encabezados sean auténticos.
 
-## 3. Motivación: Por Qué Dingo
+### Manejo de Reversiones
+Soporte robusto de reversión de cadena que permite al nodo manejar reorganizaciones de cadena de manera elegante. Cuando la red experimenta una bifurcación, Gerolamo puede revertir hasta un ancestro común y re-sincronizar a lo largo de la cadena ganadora.
 
-### La Diversidad de Nodos Es Resiliencia de Red
+### Arquitectura de Almacenamiento
+Sistema de almacenamiento de doble capa con fragmentos volátiles e inmutables:
+- **Almacenamiento volátil**: Bloques recientes mantenidos en almacenamiento de acceso rápido para posibles reversiones
+- **Fragmentos inmutables**: Bloques más antiguos y finalizados archivados en fragmentos comprimidos
+- **Concurrencia WAL**: Write-Ahead Logging para acceso concurrente seguro a la base de datos
 
-Cardano opera actualmente con una única implementación de nodo para la
-producción de bloques. Cada productor de bloques en la red ejecuta el
-mismo código. Un defecto crítico en un solo punto —ya sea un error de
-consenso, una fuga de memoria bajo carga o una vulnerabilidad en
-producción— afecta a todos simultáneamente. No existe un respaldo
-alternativo.
+### APIs HTTP
+Endpoints RESTful para integraciones externas:
+- `/block/{slot|hash}` - Recuperar bloques por número de slot o hash (CBOR hex)
+- `/utxo/{txhash:index}` - Consultar UTxOs específicos
+- `/txsubmit` - Enviar transacciones a la red
 
-La diversidad de nodos transforma esta situación. Amaru está desarrollando
-una implementación en Rust, y Dingo aporta Go. Múltiples implementaciones
-independientes significan que un error en una de ellas no compromete toda
-la red. Ethereum aprendió esta lección de manera empírica: su arquitectura
-multi-cliente les ha protegido en repetidas ocasiones cuando clientes
-individuales presentaron errores que, de otro modo, habrían provocado
-interrupciones generalizadas.
+### Soporte Multi-Era
+Soporte completo de análisis y validación para todas las eras de Cardano desde Shelley hasta Conway, utilizando `@harmoniclabs/cardano-ledger-ts` para el manejo de bloques y transacciones con seguridad de tipos.
 
-### Accesibilidad del Ecosistema Go
+### Interfaz de Terminal y Registro
+TUI interactiva que muestra el progreso de sincronización, conexiones de pares y estado del nodo. Registro estructurado en JSONL con niveles configurables (debug/info/warn/error) para monitoreo en producción.
 
-La infraestructura central de Cardano está escrita en Haskell. Go cuenta
-con más de 5 millones de desarrolladores activos y ocupa el séptimo lugar
-en el índice TIOBE. Es el lenguaje que la industria ya eligió para nodos
-blockchain: Geth (Ethereum), btcd (Bitcoin), CometBFT (más de 50 cadenas
-Cosmos), AvalancheGo, Algorand y Filecoin. Un nodo Cardano en Go no
-representa una novedad; es una necesidad largamente pendiente.
+## Desafíos y Aprendizajes
 
-Go es también el lenguaje predilecto de los principales proveedores de
-infraestructura cripto. Coinbase desarrolló su estándar de integración
-blockchain Rosetta/Mesh íntegramente en Go. Tanto Binance como Kraken
-emplean Go como lenguaje central para su infraestructura de negociación.
-La mayoría de las cadenas EVM distribuyen clientes en Go (derivados de
-Geth), lo que significa que los exchanges y proveedores de infraestructura
-que integran múltiples cadenas ya poseen una sólida experiencia en Go. Un
-nodo Cardano en Go reduce la fricción de integración y simplifica la
-incorporación de las empresas que Cardano necesita atraer.
+- **Compatibilidad con Navegadores**: Asegurar que el nodo pueda ejecutarse en entornos de navegador requirió una consideración cuidadosa de varios backends de almacenamiento abstraídos y la arquitectura de hilos de trabajo.
 
-Dingo abre las interioridades del nodo Cardano a esos más de 5 millones de
-desarrolladores. Ingenieros en Google, Cloudflare o Docker pueden leer
-este código, auditarlo y contribuir sin necesidad de aprender un nuevo
-lenguaje. No se trata de reemplazar Haskell, sino de hacer Cardano
-accesible a los desarrolladores que efectivamente existen en la industria.
+- **Soporte Multi-Era**: Soportar todas las eras de Cardano desde Shelley hasta Conway añadió una complejidad significativa pero es esencial para una implementación completa del nodo.
 
-### Trayectoria de Entrega y Eficiencia en Costos
+- **Ritmo de Hitos**: El calendario agresivo de hitos requirió sprints de desarrollo intensos, particularmente evidente en los commits de enero de 2026 preparando para el cierre.
 
-Contamos con una trayectoria documentada. En Dingo, gOuroboros y Plutigo,
-hemos integrado 1.290 PRs sin dependencias en los últimos doce meses y 593
-en el último trimestre, con una tendencia acelerada. Con 2 a 3 ingenieros
-a tiempo parcial. Esto equivale a aproximadamente 36 PRs por persona por
-mes, con más de 304.000 líneas de código agregadas.
+- **Devaluación de la Financiación**: Debido a la fuerte caída en el precio de ADA desde ~`0.7 ADA/USD` al momento de la presentación de la propuesta hasta ~`0.3 ADA/USD` actualmente, la financiación efectiva recibida es menos de la mitad del valor en USD originalmente anticipado. A pesar de esto, continuamos entregando todos los compromisos.
 
-Estas cifras son retrospectivas, no compromisos a futuro. El trabajo
-transiciona de la implementación de protocolos al endurecimiento del
-consenso, que es un esfuerzo cualitativamente diferente. Sin embargo, la
-cultura de ingeniería que produjo estos resultados es la misma que
-respaldará esta propuesta.
-
-#### Disciplina de Desarrollo
-
-Producimos PRs de tamaño reducido, aproximadamente 236 líneas cada uno.
-Deliberadamente. PRs más pequeños implican revisiones más ágiles, menor
-riesgo en la integración y ciclos de retroalimentación más cortos. El
-resultado acumulado: 304.000 líneas de código nuevo en doce meses.
-
-#### Eficiencia en Costos
-
-El costo de personal asciende a $1.250.000 USD para cinco empleados a
-tiempo completo ($250.000 por persona). El resto corresponde a una
-auditoría única ($500.000), infraestructura en la nube ($50.000) y contingencia del 15%.
-Otras implementaciones de nodos financiadas utilizaron un precio de
-$0,50/ADA durante el ciclo 2025. A ese mismo precio, nuestro total de
-$2.070.000 equivaldría a aproximadamente 4.140.000 ADA. Buscamos
-presentar una solicitud prudente y plenamente justificable.
-
-### Escalabilidad Mediante Leios
-
-CIP-0164 Linear Leios representa el próximo salto significativo en el
-rendimiento de Cardano: un incremento de 30 a 50 veces mediante una
-arquitectura de dos tipos de bloque (Endorser Blocks y Ranking Blocks)
-con votación basada en sorteo y certificados. Ya estamos colaborando
-directamente con IO Engineering en este desarrollo, y el modelo de
-concurrencia de Go (goroutines y canales) está prácticamente diseñado
-para el tipo de concurrencia de pipeline que Leios requiere.
-Desarrollarlo en Go en paralelo con la referencia en Haskell fortalece
-además la especificación: las ambigüedades se identifican con mayor
-rapidez cuando dos equipos implementan el mismo protocolo en dos lenguajes
-distintos.
-
-### Sostenibilidad a Través del Código Abierto
-
-Todo lo que desarrollamos se publica bajo licencia Apache 2.0. Siempre
-ha sido así, y siempre lo será. Este trabajo constituye un bien público
-permanente. No desaparece si Blink Labs deja de existir.
-
-### Lo Que el Ecosistema Pierde Sin Financiamiento
-
-Sin financiamiento, Dingo continúa avanzando con los recursos limitados
-que podamos destinar. En términos concretos:
-
-- La producción de bloques se limita exclusivamente a devnet local. El
-  trabajo de consenso para redes activas no se realiza.
-- No existe una propuesta para operadores de pools (SPOs). Los operadores
-  de pools no podrán ejecutarlo como productor de bloques. La diversidad
-  de nodos permanece como un concepto teórico, no una realidad operativa.
-- El soporte para Dijkstra se implementará eventualmente, pero en plazos
-  significativamente más extensos.
-- Leios en Go se restringe exclusivamente al lado del cliente. Los
-  beneficios de fortalecimiento de la especificación que aporta una
-  segunda implementación completa no se materializan.
-- No se realiza auditoría de seguridad. Esto requiere una inversión
-  considerable.
-
-La comunidad de Cardano ya ha invertido en esta plataforma tecnológica
-a través de Catalyst y de años de nuestro propio tiempo y recursos
-financieros. Sin este financiamiento, dicha inversión no alcanzará su
-máximo potencial.
-
----
-
-## 4. Justificación: Resumen Ejecutivo de Costos
-
-Se solicita un único retiro del tesoro para cubrir doce meses de
-desarrollo. Todos los montos se expresan en USD con conversión a ADA al
-momento de la acción de gobernanza, más un margen de contingencia para la
-volatilidad del precio.
-
-| Categoría | Costo Estimado (USD) |
-|-----------|---------------------:|
-| Ingeniería (4 ingenieros Go a tiempo completo × 12 meses) | $1.000.000 |
-| Operaciones (1 persona a tiempo completo × 12 meses: infraestructura, Dirección de Operaciones, marketing y divulgación) | $250.000 |
-| Auditoría de seguridad (firma de primer nivel) | $500.000 |
-| Hospedaje de infraestructura y CI/CD | $50.000 |
-| Subtotal | $1.800.000 |
-| Contingencia (~15% por incertidumbre de alcance) | $270.000 |
-| Total | $2.070.000 |
-
-Monto solicitado: 6.900.000 ADA (a $0,30/ADA)
-
-### Notas Sobre el Presupuesto
-
-- La ingeniería constituye el costo principal: cuatro ingenieros Go a
-  tiempo completo durante doce meses. Los $250.000 por persona incluyen
-  la totalidad de conceptos: salarios, prestaciones y equipo. Son
-  empleados de Blink Labs, no contratistas externos. Será necesario
-  contratar tres desarrolladores Go para alcanzar capacidad plena, y es
-  posible que promovamos desde nuestro equipo actual de colaboradores
-  remunerados de código abierto.
-
-- Operaciones se distribuye entre un ingeniero de infraestructura (CI/CD,
-  operación de nodos en testnet y mainnet, despliegue y monitoreo) y la
-  Directora de Operaciones (marketing, divulgación comunitaria,
-  comunicaciones de gobernanza, relacionamiento con DReps y redes sociales).
-  La partida de $50.000 para infraestructura corresponde exclusivamente a
-  servicios de infraestructura en la nube; el esfuerzo humano se contempla en la línea de
-  operaciones.
-
-- La auditoría de seguridad se presupuesta en aproximadamente $500.000
-  para una revisión exhaustiva por parte de una firma de primer nivel
-  (Trail of Bits, NCC Group o equivalente). Antes de recomendar que
-  alguien ejecute Dingo como productor de bloques, queremos que
-  profesionales especializados intenten vulnerarlo.
-
-- Base de precio del ADA. Utilizamos $0,30/ADA porque es
-  aproximadamente el precio actual del mercado. Otras implementaciones
-  financiadas por el tesoro utilizaron $0,50 durante el ciclo 2025. A ese
-  precio, nuestros $2.070.000 equivaldrían a aproximadamente 4.140.000
-  ADA. Preferimos establecer un precio honesto y permitir que las cifras
-  hablen por sí mismas.
-
-- La contingencia es de aproximadamente el 15%. La auditoría podría
-  revelar hallazgos que requieran corrección. Dado que hemos fijado el
-  precio cercano al mercado en lugar de $0,50, la volatilidad del precio
-  representa una preocupación menor. Nuestra estrategia de cobertura
-  consiste en la conversión a stablecoins o moneda fiduciaria al momento
-  de la recepción.
-
-- Retiro único. El monto total en un solo retiro del tesoro, con hitos
-  sujetos a cumplimiento mediante contrato inteligente de custodia y
-  revisión del comité de supervisión (véase la Sección 5).
-
-### Estimación de Esfuerzo y Capacidad de Reserva
-
-Consideramos fundamental ser transparentes respecto a cómo el trabajo
-estimado se corresponde con la capacidad financiada. La siguiente tabla
-presenta nuestra evaluación de ingeniería en meses-ingeniero:
-
-| Categoría | Esfuerzo Estimado |
-|-----------|------------------:|
-| Producción de bloques en mainnet | 6 |
-| Hard fork Dijkstra | 5 |
-| CIP-0164 Linear Leios | 6 |
-| Endurecimiento operativo | 6 |
-| Paridad de funcionalidades | 8 |
-| Integración con el ecosistema | 6 |
-| **Total de trabajo estimado** | **37** |
-| **Capacidad del equipo (4 ingenieros × 12 meses)** | **48** |
-| **Reserva** | **11 (25%)** |
-
-Nuestra velocidad medida durante el último año es de aproximadamente 36
-PRs sin dependencias por persona por mes en Dingo, gOuroboros y Plutigo,
-considerablemente superior a la demostrada por otros equipos de nodos
-Cardano. Hemos ajustado nuestras estimaciones para contemplar la
-transición de la implementación de protocolos al trabajo más complejo de
-endurecimiento del consenso y preparación operativa.
-
-#### Justificación de la Reserva
-
-Las especificaciones no están finalizadas, la auditoría podría revelar
-hallazgos significativos, y Leios es un objetivo en constante evolución.
-Si las circunstancias son favorables, la capacidad adicional se destinará
-a elementos priorizados por la comunidad. Los ADA no utilizados retornan
-automáticamente al tesoro al vencimiento del contrato. Esto se garantiza
-a nivel contractual, no mediante una promesa.
-
----
-
-## 5. Justificación: Administración del Presupuesto
-
-### Custodia Mediante Contrato Inteligente
-
-Los fondos se custodian y liberan a través de los
-[SundaeSwap treasury-contracts](https://github.com/SundaeSwap-finance/treasury-contracts),
-un marco probado con dos validadores:
-
-- treasury.ak: Custodia la totalidad de los ADA retirados del tesoro de
-  Cardano. Todos los fondos se bloquean aquí cuando la acción de
-  gobernanza entra en vigor.
-- vendor.ak: Gestiona la liberación basada en hitos para Blink Labs.
-  Calendario de pagos, fechas de liberación y condiciones de entrega.
-
-Ambos contratos han sido auditados de forma independiente por TxPipe y
-MLabs, y se encuentran en uso productivo en mainnet.
-
-### Blink Labs como Proveedor Único
-
-Blink Labs es el único proveedor. Todo el trabajo es realizado por nuestro
-equipo. No se subcontrata. Si algún entregable no se cumple, la
-responsabilidad es inequívoca.
-
-### Comité de Supervisión Independiente
-
-Un comité de supervisión independiente proporciona gobernanza por parte de
-terceros:
-
-- **Pi Lanningham** (SundaeSwap)
-- **Santiago Carmuega** (TxPipe)
-- **Lucas Rosa** (Aiken, Midnight)
-
-Los miembros del comité no tienen participación en Blink Labs. Co-firman
-los desembolsos, revisan los hitos y tienen la facultad de suspender el
-financiamiento en caso de incumplimiento.
-
-### Esquema de Permisos
-
-Utilizamos un modelo de permisos de mínima fricción: sin cuellos de
-botella, pero con supervisión efectiva:
-
-| Acción | Firmas Requeridas |
-|--------|-------------------|
-| Desembolso (liberación periódica) | Blink Labs inicia + cualquier miembro del comité co-firma |
-| Devolución anticipada (retorno de fondos no utilizados) | Blink Labs + cualquier miembro del comité |
-| Reorganización (ajuste del calendario de hitos) | Solo Blink Labs |
-| Configuración inicial del proveedor | Mayoría del comité |
-| Suspensión de hito | Cualquier miembro individual del comité |
-| Reanudación de hito | Mayoría del comité |
-| Modificación del proyecto | Blink Labs + mayoría del comité |
-
-Las operaciones cotidianas requieren una firma del comité. Los cambios
-estructurales requieren la aprobación del comité en pleno. Cualquier
-miembro individual puede activar una suspensión si detecta alguna
-irregularidad.
-
-### Política de Delegación
-
-El contrato del tesoro establece la delegación automática como DRep
-abstencionista y prohíbe la delegación a SPOs para todos los fondos en
-custodia. Los fondos del tesoro no influyen en las votaciones de
-gobernanza ni en el staking.
-
-### Mecanismo de Devolución Automática
-
-Los fondos que permanezcan en el contrato después de su vencimiento se
-devuelven automáticamente al tesoro de Cardano. Esto se ejecuta a nivel
-contractual y no puede ser anulado.
-
-### Liberaciones Periódicas Fijas
-
-Los fondos se liberan según un calendario fijo establecido en el contrato
-del proveedor, sujeto a la co-firma del comité. Esto garantiza un flujo
-de caja predecible para nuestro equipo y capacidad de suspensión para el
-comité. El calendario se alinea con los hitos trimestrales detallados en
-la Sección 8.
-
----
-
-## 6. Justificación: Informes de Rendición de Cuentas
-
-### Actualizaciones Mensuales
-
-Al cierre de cada mes, publicamos una actualización de estado:
-
-- Entregables completados
-- PRs clave, funcionalidades e hitos relevantes
-- Riesgos o impedimentos identificados
-- Plan para el período siguiente
-
-Las actualizaciones se publican en el
-[repositorio treasury-proposal](https://github.com/blinklabs-io/treasury-proposal)
-y en los canales comunitarios.
-
-### Informes Trimestrales Detallados
-
-Cada trimestre, se elabora un informe completo:
-
-- Avance respecto a cada hito
-- Resumen financiero: fondos recibidos, ejecutados por categoría y
-  remanentes
-- Análisis de variaciones para desviaciones presupuestarias
-- Registro actualizado de riesgos
-- Plan para el trimestre siguiente
-
-Los informes trimestrales coinciden con las solicitudes de desembolso,
-proporcionando al comité la información necesaria para autorizar las
-liberaciones.
-
-### Diario Público de Transacciones
-
-Cada transacción en cadena (desembolsos, solicitudes de liberación, devoluciones,
-reorganizaciones) se registra en un
-[diario público de transacciones](https://github.com/blinklabs-io/treasury-proposal/tree/main/journal).
-Hash de la transacción, tipo de acción, monto, firmantes, justificación y
-hash de metadatos en cadena. Estándar de metadatos de SundaeSwap.
-Cualquier persona puede verificarlo contra la cadena.
-
-### Sesiones de Código en Vivo y Demostraciones
-
-Realizamos sesiones periódicas de programación en vivo y demostraciones
-para que la comunidad pueda observar directamente el avance del trabajo:
-desarrollo activo, decisiones arquitectónicas y capacidades de Dingo a
-medida que se construyen. Se anuncian en X/Twitter y en el Foro de
-Cardano, y se graban para consulta posterior.
-
----
-
-## 7. Justificación: Lista de Verificación de Constitucionalidad
-
-Esta sección evalúa la propuesta frente a la Constitución de Cardano
-(v2.4), siguiendo el
-[formato PRAGMA mnemos](https://github.com/pragma-org/mnemos).
-
-### Propósito
-
-Esta propuesta solicita un retiro del tesoro para financiar el desarrollo
-de Dingo hasta alcanzar preparación para producción: un segundo nodo
-completo de Cardano capaz de brindar servicio de datos y producción de
-bloques, con soporte para Dijkstra e implementación de Leios.
-
-### Artículo III, Sección 5: Acciones de Gobernanza en Cadena
-
-> *Las acciones de gobernanza deberán seguir un formato estandarizado y
-> legible, incluyendo una URL y hash de cualquier contenido fuera de
-> cadena.*
-
-Evaluación: CONFORME.
-
-Metadatos CIP-108. La acción en cadena referencia metadatos fuera de
-cadena mediante URL (fijada a hash de commit en GitHub, espejo IPFS vía
-Blockfrost) con hash blake2b-256. Autocontenido, legible y conforme con
-CIP-108.
-
-### Artículo IV, Sección 1: Presupuesto para el Ecosistema Blockchain de Cardano
-
-> *Se adoptará un presupuesto para el ecosistema blockchain de Cardano de
-> manera anual mediante una acción de gobernanza en cadena.*
-
-Evaluación: CONFORME.
-
-Duración de doce meses (~73 épocas), alineado con el ciclo anual.
-Presupuesto completamente especificado: ingeniería, auditoría,
-infraestructura y contingencia.
-
-### Artículo IV, Sección 2: Administración de Fondos
-
-> *Los presupuestos del ecosistema blockchain de Cardano serán
-> administrados por uno o más administradores de presupuesto seleccionados
-> mediante un proceso transparente.*
-
-Evaluación: CONFORME.
-
-Contratos inteligentes SundaeSwap auditados con un comité de supervisión
-independiente: Pi Lanningham (SundaeSwap), Santiago Carmuega (TxPipe) y
-Lucas Rosa (Aiken, Midnight). Los miembros del comité no son partes
-interesadas de Blink Labs. Los permisos, el calendario de desembolsos y
-la supervisión están completamente especificados. Se incluye la facultad
-de suspensión de emergencia y autoridad para resolución de controversias.
-
-### Artículo IV, Sección 3: Límite de Cambio Neto
-
-> *El Límite de Cambio Neto deberá ser observado por todos los retiros del
-> tesoro durante el período presupuestario aplicable.*
-
-Evaluación: CONFORME.
-
-No contraviene el Límite de Cambio Neto (NCL) vigente al momento de la
-presentación. Operaremos dentro del NCL que se encuentre en efecto.
-
-En caso de que no exista un NCL cuando esta acción sea evaluada,
-sugerimos: el retiro no deberá exceder 6.900.000 ADA, evaluado por
-sus méritos en relación con el saldo del tesoro y otras solicitudes.
-Esto constituye una orientación, no un sustituto de un NCL debidamente
-promulgado.
-
-### Artículo IV, Sección 4: Auditor
-
-> *Deberá ser posible una auditoría independiente de todas las
-> transacciones financiadas con recursos del tesoro de Cardano.*
-
-Evaluación: CONFORME.
-
-Diario público de transacciones con trazabilidad completa: hashes,
-montos, firmantes y justificaciones. Los contratos SundaeSwap garantizan
-los flujos de fondos en cadena. Cualquier persona puede verificar.
-Se publican estados financieros trimestrales con detalle por categoría.
-
-### Salvaguarda TREASURY-04a
-
-> *Los retiros del tesoro para propuestas presupuestarias requieren que
-> más del 50% del stake de votación activo de DReps vote a favor.*
-
-Evaluación: RECONOCIDA.
-
-Requiere más del 50% del stake de votación activo de DReps. Estamos
-realizando actividades de divulgación, participación comunitaria y
-sesiones de preguntas y respuestas (AMA) para que los delegados dispongan
-de información completa sobre lo que estamos desarrollando, su costo y
-los mecanismos de rendición de cuentas.
-
----
-
-## 8. Alcance del Trabajo
-
-Doce meses, cuatro trimestres, entregables concretos vinculados a los
-hitos del contrato del proveedor. Todo el trabajo se realiza sobre las
-bases de código existentes:
-[Dingo](https://github.com/blinklabs-io/dingo),
-[gOuroboros](https://github.com/blinklabs-io/gouroboros),
-[Plutigo](https://github.com/blinklabs-io/plutigo) y
-[ouroboros-mock](https://github.com/blinklabs-io/ouroboros-mock).
-Licencia Apache 2.0.
-
-#### Punto de Partida
-
-Dingo actualmente sincroniza desde el génesis a través de todas las eras
-(Byron a Conway), cuenta con primitivas de forja de bloques VRF/KES,
-aprueba 314 pruebas de conformidad de Amaru (mediante el marco
-ouroboros-mock), evalúa Plutus V1/V2/V3 con conformidad del 100% frente
-al conjunto de pruebas de Plutus, gestiona mempool y transacciones de
-gobernanza, soporta redes P2P y opera sobre múltiples backends de
-almacenamiento (Badger para bloques, SQLite para metadatos, en memoria
-para pruebas). Lo que aún no puede hacer: producir bloques en un entorno
-de consenso activo. Ese es el objetivo del segundo trimestre.
-
-### T2: Producción de Bloques en Testnet y Prototipo de Leios
-
-#### Objetivo
-
-Completar el consenso Ouroboros Praos lo suficiente para que Dingo
-produzca bloques en una red de pruebas, e iniciar el prototipo de Leios.
-Este es el trimestre de mayor complejidad, dado que concentra los retos
-técnicos más exigentes del ciclo.
-
-#### Entregables
-
-- Consenso Ouroboros Praos completo: transiciones de época, verificación
-  de elección de líder de slot, selección de cadena y los comportamientos
-  restantes necesarios para que Dingo produzca y valide bloques como
-  participante pleno.
-- Combinador de hard forks: negociación de versión de protocolo y
-  transición de eras para que Dingo gestione bifurcaciones sin necesidad
-  de reinicio.
-- Bootstrap de génesis: el mecanismo Ouroboros Genesis para nodos que
-  se incorporan desde cero, incluyendo selección de pares y validación
-  de cadena durante la sincronización inicial.
-- ChainSync estable desde el génesis hasta la punta en preview y
-  preprod. Manejo adecuado de interrupciones, desconexiones y
-  reorganizaciones.
-- Prototipo de CIP-0164 Linear Leios, desarrollado en colaboración con
-  IO Engineering. Arquitectura de dos tipos de bloque (Endorser Blocks
-  y Ranking Blocks) con votación basada en sorteo y certificados para
-  un incremento de rendimiento de 30 a 50 veces. Nuevos tipos de bloque,
-  serialización, validación de votos, temporización del pipeline y
-  mini-protocolos para la difusión de EBs y votos. Seguimos la
-  especificación y retroalimentamos las ambigüedades al equipo de
-  investigación. En eso radica gran parte del valor de una segunda
-  implementación.
-- Ampliación de pruebas de conformidad más allá de los 314 vectores
-  actuales para cubrir casos límite de consenso y transiciones de época.
-
-### T3: Endurecimiento Operativo y Escalabilidad de Almacenamiento
-
-#### Objetivo
-
-Fortalecer a Dingo para estabilidad en operación prolongada y abordar
-los riesgos conocidos de almacenamiento a volúmenes de datos de mainnet.
-
-#### Entregables
-
-- Endurecimiento operativo: perfilado bajo cargas de trabajo realistas.
-  Identificación de fugas de memoria, optimización de rutas críticas y
-  establecimiento de líneas base de rendimiento.
-- Escalabilidad de almacenamiento: nuestros backends actuales (Badger,
-  SQLite) no han sido sometidos a pruebas a escala de mainnet (~100M
-  UTxOs, ~500 GB de cadena). Benchmarking, identificación de cuellos de
-  botella, optimizaciones o migraciones según sea necesario.
-- Gestión del conjunto UTxO a cardinalidad de mainnet: latencia de
-  consulta y huella de memoria aceptables.
-- Pruebas a escala de mainnet: Dingo operando contra ~100M UTxOs, ~500
-  GB de cadena y volúmenes realistas. Sincronización, consumo de
-  recursos, producción de bloques bajo carga y recuperación ante fallos.
-- Estabilidad en operación prolongada: semanas de operación continua.
-  Sin fugas, sin corrupción, sin degradación.
-- Validación cruzada entre nodos: ejecución paralela automatizada contra
-  el nodo Haskell, comparación bloque por bloque para detectar
-  discrepancias en el estado del ledger.
-- Inicio de la auditoría de seguridad con una firma de primer nivel
-  (Trail of Bits, NCC Group o equivalente). Corrección del consenso,
-  criptografía, manejo de red y resistencia a ataques de denegación de
-  servicio.
-
-### T4: Preparación para el Hard Fork Dijkstra e Integración de Leios
-
-#### Objetivo
-
-Alcanzar preparación completa para Dijkstra (incluyendo Plutus V4).
-Se espera que Leios y Dijkstra se desplieguen en el mismo hard fork,
-por lo que el trabajo de prototipo del T2 alimenta directamente la
-integración final en este período.
-
-#### Entregables
-
-- Cambios del protocolo Dijkstra: reglas del ledger, nuevos parámetros
-  y modificaciones de gobernanza. Dingo procesará bloques Dijkstra desde
-  el momento en que ocurra la bifurcación.
-- Plutigo V4: nuevos builtins, modelos de costo actualizados y cualquier
-  cambio en el evaluador UPLC.
-- Integración del consenso de Leios: llevar el prototipo del T2 a una
-  integración completa con el consenso y los cambios del protocolo
-  Dijkstra.
-- Mini-protocolos pendientes: completar las brechas Node-to-Client y
-  LocalStateQuery para lograr paridad de funcionalidades con el nodo
-  Haskell. Las herramientas del ecosistema dependen de esto.
-
-### T1 2027: Preparación para Mainnet, Finalización de Auditoría e Integración con el Ecosistema
-
-#### Objetivo
-
-Completar la auditoría, alcanzar la preparación para mainnet y entregar
-el trabajo de integración con el ecosistema que haga de Dingo una
-herramienta genuinamente útil.
-
-#### Entregables
-
-- Finalización de la auditoría de seguridad. Todos los hallazgos
-  atendidos. Los problemas de severidad crítica y alta resueltos antes de
-  cualquier recomendación para mainnet. Informe completo publicado.
-- Preparación para producción de bloques en mainnet. Aquí converge todo
-  el trabajo: consenso, endurecimiento y auditoría. "Preparado" significa
-  probado a escala, auditado, estable y capaz de cumplir con todo lo que
-  un SPO necesita.
-- Integración con el ecosistema: los aspectos prácticos: gestión de
-  claves y rotación de KES, compatibilidad con db-sync o indexación
-  equivalente, paridad de APIs para wallets, exploradores y dApps.
-- Integración con Mithril. Arranque rápido, sincronización en minutos
-  en lugar de horas.
-- Documentación para operadores: despliegue, configuración, monitoreo y
-  resolución de problemas. Lo que se necesita para ejecutar esto en
-  producción.
-- Endurecimiento P2P: descubrimiento de pares, gestión de conexiones y
-  optimización de topología.
-
----
-
-## 9. Conclusión
-
-Dingo se encuentra más avanzado que la mayoría de las implementaciones
-alternativas de nodos al momento de su primera solicitud al tesoro: más
-de 300 PRs, 314 pruebas de conformidad aprobadas y Plutus al 100% en
-tres versiones. Sin embargo, aún no está preparado para mainnet. Esta
-propuesta financia el trabajo necesario para alcanzar ese estado:
-completar el consenso, endurecer la operación, realizar una auditoría
-rigurosa, implementar soporte para Dijkstra y desarrollar Leios.
-
-Los riesgos son reales: almacenamiento a escala de mainnet, una
-especificación de Leios en evolución y los hallazgos que la auditoría
-pueda revelar. Hemos planificado para cada uno de ellos: alcance
-dedicado, colaboración con IO Engineering, contingencia, custodia
-mediante contrato inteligente y supervisión independiente.
-
-#### Después de Doce Meses
-
-- Dingo produce bloques en mainnet.
-- Los SPOs cuentan con una alternativa real como productor de bloques.
-- Dijkstra funciona desde el primer día.
-- Leios existe en Go junto a la referencia en Haskell.
-- El informe de auditoría es público.
-- Cada ADA se encuentra contabilizado en cadena.
-
-Hemos dedicado años a construir esto. Esta propuesta es lo que convierte
-ese esfuerzo en algo de lo que la red pueda depender.
-
----
-
-## 10. Plan de Participación Comunitaria
-
-Estamos comprometidos con la transparencia y la participación activa de
-la comunidad durante todo el ciclo de vida de la propuesta y el período
-de desarrollo de doce meses. Christina Gianelloni lidera todas las
-actividades de participación comunitaria y operaciones para que el equipo
-de ingeniería pueda mantener su enfoque en el desarrollo.
-
-- Foro de Cardano: Hilo dedicado a la propuesta para consultas,
-  retroalimentación y debate.
-- GovTool: Propuesta publicada con metadatos completos para revisión y
-  votación por parte de los DReps.
-- Vinculación con DReps: Acercamiento directo con DReps activos para
-  presentar la propuesta, responder consultas y atender inquietudes.
-- Sesiones de Preguntas y Respuestas (AMA): Sesiones programadas donde
-  la comunidad puede formular preguntas sobre detalles técnicos,
-  presupuesto y cronogramas.
-- X/Twitter: Actualizaciones periódicas sobre avances, hitos y
-  discusiones comunitarias.
-- Sesiones de Código en Vivo: Sesiones públicas periódicas que
-  demuestran el desarrollo activo de Dingo, brindando a la comunidad
-  visibilidad directa sobre el trabajo realizado.
-
-Si esta propuesta no es aprobada en primera instancia, incorporaremos la
-retroalimentación recibida, realizaremos los ajustes pertinentes y
-presentaremos una nueva versión. Agradeceremos su evaluación y su voto
-favorable con base en estos avances y compromisos.
-
----
-
-*Todo el software se publica bajo licencia Apache 2.0. Todo se encuentra
-en el
-[repositorio treasury-proposal](https://github.com/blinklabs-io/treasury-proposal),
-de acceso público.*
+**Treasury Contract**: [EC-0014-25](https://treasury.sundae.fi/instances/9e65e4ed7d6fd86fc4827d2b45da6d2c601fb920e8bfd794b8ecc619/project/EC-0014-25)

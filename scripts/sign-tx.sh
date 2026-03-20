@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # sign-tx.sh - Sign the built transaction with the payment signing key.
-# Usage: NETWORK=preview scripts/sign-tx.sh
+# Usage: NETWORK=preprod scripts/sign-tx.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -17,10 +17,10 @@ fi
 
 # ── Network flag (sign uses --testnet-magic N) ───────────────────────────────
 
-case "${NETWORK:-preview}" in
+case "${NETWORK:-preprod}" in
     mainnet) NETWORK_FLAG=(--mainnet) ;;
-    preprod) NETWORK_FLAG=(--testnet-magic 1) ;;
-    *)       NETWORK_FLAG=(--testnet-magic 2) ;;
+    preview) NETWORK_FLAG=(--testnet-magic 2) ;;
+    *)       NETWORK_FLAG=(--testnet-magic 1) ;;
 esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────

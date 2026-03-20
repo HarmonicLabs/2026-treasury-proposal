@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -d /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/*/)"
+    ]
+  }
+}
