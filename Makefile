@@ -17,6 +17,9 @@ check-prereqs: ## Run prerequisite checks
 generate-test-keys: ## Generate a fresh wallet for preprod testnet
 	NETWORK=$(NETWORK) scripts/generate-test-keys.sh
 
+metadata: ## Generate proposal metadata
+	scripts/generate-metadata.sh
+
 register-stake: ## Register the stake key on-chain (required once)
 	NETWORK=$(NETWORK) scripts/register-stake.sh
 
