@@ -49,6 +49,13 @@ check_tool jq jq --version
 # basenc (GNU coreutils)
 check_tool basenc basenc --version
 
+# cardano-hw-cli (optional, for hardware wallet signing)
+if command -v cardano-hw-cli >/dev/null 2>&1; then
+    check_tool cardano-hw-cli cardano-hw-cli version
+else
+    echo "  [SKIP]  cardano-hw-cli not installed (optional, needed for hardware wallet signing)"
+fi
+
 # make
 check_tool make make --version
 

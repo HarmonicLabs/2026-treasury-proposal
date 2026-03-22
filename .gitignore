@@ -2,6 +2,8 @@
 keys/
 *.skey
 *.vkey
+# hardware wallet signing files
+*.hwsfile
 
 # Configuration with secrets
 config.env

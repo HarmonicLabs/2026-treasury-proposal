@@ -35,26 +35,50 @@ if [[ "$STAKE_VKEY" != /* ]]; then
     STAKE_VKEY="${REPO_ROOT}/${STAKE_VKEY}"
 fi
 
-STAKE_SKEY="${STAKE_VKEY%.vkey}.skey"
-
 if [[ ! -f "$STAKE_VKEY" ]]; then
     echo "Error: Stake verification key not found: ${STAKE_VKEY}" >&2
     exit 1
 fi
 
-if [[ ! -f "$STAKE_SKEY" ]]; then
-    echo "Error: Stake signing key not found: ${STAKE_SKEY}" >&2
-    exit 1
-fi
+# Determine signing mode: hardware wallet or file-based
+USE_HW=false
+if [[ -n "${PAYMENT_HW_SIGNING_FILE:-}" ]]; then
+    USE_HW=true
+    PAY_HW_PATH="$PAYMENT_HW_SIGNING_FILE"
+    if [[ "$PAY_HW_PATH" != /* ]]; then
+        PAY_HW_PATH="${REPO_ROOT}/${PAY_HW_PATH}"
+    fi
+    if [[ ! -f "$PAY_HW_PATH" ]]; then
+        echo "Error: Payment hardware signing file not found: ${PAY_HW_PATH}" >&2
+        exit 1
+    fi
 
-if [[ -z "${PAYMENT_SKEY:-}" ]]; then
-    echo "Error: PAYMENT_SKEY is not set." >&2
-    exit 1
-fi
+    STAKE_HW_PATH="${DEPOSIT_RETURN_STAKE_HW_SIGNING_FILE:-}"
+    if [[ -z "$STAKE_HW_PATH" ]]; then
+        echo "Error: DEPOSIT_RETURN_STAKE_HW_SIGNING_FILE is not set." >&2
+        exit 1
+    fi
+    if [[ "$STAKE_HW_PATH" != /* ]]; then
+        STAKE_HW_PATH="${REPO_ROOT}/${STAKE_HW_PATH}"
+    fi
+    if [[ ! -f "$STAKE_HW_PATH" ]]; then
+        echo "Error: Stake hardware signing file not found: ${STAKE_HW_PATH}" >&2
+        exit 1
+    fi
+elif [[ -n "${PAYMENT_SKEY:-}" ]]; then
+    PAY_SKEY="${PAYMENT_SKEY}"
+    if [[ "$PAY_SKEY" != /* ]]; then
+        PAY_SKEY="${REPO_ROOT}/${PAY_SKEY}"
+    fi
 
-PAY_SKEY="${PAYMENT_SKEY}"
-if [[ "$PAY_SKEY" != /* ]]; then
-    PAY_SKEY="${REPO_ROOT}/${PAY_SKEY}"
+    STAKE_SKEY="${STAKE_VKEY%.vkey}.skey"
+    if [[ ! -f "$STAKE_SKEY" ]]; then
+        echo "Error: Stake signing key not found: ${STAKE_SKEY}" >&2
+        exit 1
+    fi
+else
+    echo "Error: Neither PAYMENT_HW_SIGNING_FILE nor PAYMENT_SKEY is set." >&2
+    exit 1
 fi
 
 if [[ -z "${PAYMENT_ADDRESS:-}" ]]; then
@@ -114,12 +138,37 @@ echo "Transaction built: ${TX_RAW}"
 
 TX_SIGNED="${REPO_ROOT}/stake-reg.signed"
 
-cardano-cli conway transaction sign \
-    "${NETWORK_FLAG[@]}" \
-    --tx-body-file "$TX_RAW" \
-    --signing-key-file "$PAY_SKEY" \
-    --signing-key-file "$STAKE_SKEY" \
-    --out-file "$TX_SIGNED"
+if [[ "$USE_HW" == true ]]; then
+    PAY_WITNESS="${TX_RAW}.pay.witness"
+    STAKE_WITNESS="${TX_RAW}.stake.witness"
+
+    cardano-hw-cli transaction witness \
+        "${NETWORK_FLAG[@]}" \
+        --tx-file "$TX_RAW" \
+        --hw-signing-file "$PAY_HW_PATH" \
+        --out-file "$PAY_WITNESS"
+
+    cardano-hw-cli transaction witness \
+        "${NETWORK_FLAG[@]}" \
+        --tx-file "$TX_RAW" \
+        --hw-signing-file "$STAKE_HW_PATH" \
+        --out-file "$STAKE_WITNESS"
+
+    cardano-cli conway transaction assemble \
+        --tx-body-file "$TX_RAW" \
+        --witness-file "$PAY_WITNESS" \
+        --witness-file "$STAKE_WITNESS" \
+        --out-file "$TX_SIGNED"
+
+    rm -f "$PAY_WITNESS" "$STAKE_WITNESS"
+else
+    cardano-cli conway transaction sign \
+        "${NETWORK_FLAG[@]}" \
+        --tx-body-file "$TX_RAW" \
+        --signing-key-file "$PAY_SKEY" \
+        --signing-key-file "$STAKE_SKEY" \
+        --out-file "$TX_SIGNED"
+fi
 
 echo "Transaction signed: ${TX_SIGNED}"
 

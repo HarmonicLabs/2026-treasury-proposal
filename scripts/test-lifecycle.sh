@@ -93,12 +93,18 @@ export GOVERNANCE_ACTION_DEPOSIT ANCHOR_URL TRANSFER_AMOUNT
 # Validate that key files and payment address are set
 MISSING=0
 
-for var in DEPOSIT_RETURN_STAKE_VKEY RECEIVING_STAKE_VKEY PAYMENT_SKEY PAYMENT_ADDRESS; do
+for var in DEPOSIT_RETURN_STAKE_VKEY RECEIVING_STAKE_VKEY PAYMENT_ADDRESS; do
     if [[ -z "${!var:-}" ]]; then
         echo "Error: ${var} is not set in config.env" >&2
         MISSING=$((MISSING + 1))
     fi
 done
+
+# Require either hardware wallet signing file or file-based signing key
+if [[ -z "${PAYMENT_HW_SIGNING_FILE:-}" && -z "${PAYMENT_SKEY:-}" ]]; then
+    echo "Error: Neither PAYMENT_HW_SIGNING_FILE nor PAYMENT_SKEY is set in config.env" >&2
+    MISSING=$((MISSING + 1))
+fi
 
 if [[ "$MISSING" -gt 0 ]]; then
     echo "" >&2

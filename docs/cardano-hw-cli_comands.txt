@@ -1,0 +1,98 @@
+cardano-hw-cli
+usage: cardano-hw-cli [-h] {version,device,key,address,transaction,node,vote,message} ...
+
+Command line tool for ledger/trezor/keystone transaction signing
+
+positional arguments:
+  {version,device,key,address,transaction,node,vote,message}
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+---------------------------------------------------------------------------  
+
+cardano-hw-cli key verification-key -h
+usage: cardano-hw-cli key verification-key [-h] --hw-signing-file HWSIGNINGFILEDATA --verification-key-file VERIFICATIONKEYFILE {} ...
+
+positional arguments:
+  {}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --hw-signing-file HWSIGNINGFILEDATA
+                        Input filepath of the hardware wallet signing file.
+  --verification-key-file VERIFICATIONKEYFILE
+                        Output filepath of the verification key.
+
+---------------------------------------------------------------------------  
+
+
+ cardano-hw-cli address -h
+usage: cardano-hw-cli address [-h] {key-gen,show} ...
+
+positional arguments:
+  {key-gen,show}
+
+optional arguments:
+  -h, --help      show this help message and exit
+michele@ThinkPad:~/hlabs/treasury-proposals/2026-treasury-proposal$ cardano-hw-cli address key-gen -h
+usage: cardano-hw-cli address key-gen [-h] --path PATHS --hw-signing-file HWSIGNINGFILES --verification-key-file VERIFICATIONKEYFILES [--derivation-type DERIVATIONTYPE] {} ...
+
+positional arguments:
+  {}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --path PATHS          Derivation path to the key to sign with.
+  --hw-signing-file HWSIGNINGFILES
+                        Output filepath of the verification key.
+  --verification-key-file VERIFICATIONKEYFILES
+                        Output filepath of the hardware wallet signing file.
+  --derivation-type DERIVATIONTYPE
+                        Derivation type - currently applies only to Trezor. Options: LEDGER, ICARUS or ICARUS_TREZOR (default).
+michele@ThinkPad:~/hlabs/treasury-proposals/2026-treasury-proposal$ cardano-hw-cli address show -h
+usage: cardano-hw-cli address show [-h] (--payment-path PAYMENTPATH | --payment-script-hash PAYMENTSCRIPTHASH) (--staking-path STAKINGPATH | --staking-script-hash STAKINGSCRIPTHASH)
+                                   --address-file ADDRESS [--derivation-type DERIVATIONTYPE]
+                                   {} ...
+
+positional arguments:
+  {}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --payment-path PAYMENTPATH
+                        Payment derivation path. Either this or payment script hash has to be specified.
+  --payment-script-hash PAYMENTSCRIPTHASH
+                        Payment derivation script hash in hex format.
+  --staking-path STAKINGPATH
+                        Stake derivation path. Either this or staking script hash has to be specified.
+  --staking-script-hash STAKINGSCRIPTHASH
+                        Stake derivation script hash in hex format
+  --address-file ADDRESS
+                        Input filepath of the address.
+  --derivation-type DERIVATIONTYPE
+                        Derivation type - currently applies only to Trezor. Options: LEDGER, ICARUS or ICARUS_TREZOR (default).
+
+-----------------------------------------------------------------------------------------
+
+cardano-hw-cli transaction witness -h
+usage: cardano-hw-cli transaction witness [-h] [--mainnet [NETWORK]] [--testnet-magic [NETWORK]] --tx-file TXFILEDATA --hw-signing-file HWSIGNINGFILEDATA
+                                          [--change-output-key-file CHANGEOUTPUTKEYFILEDATA] [--derivation-type DERIVATIONTYPE] --out-file OUTFILES
+                                          {} ...
+
+positional arguments:
+  {}
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --mainnet [NETWORK]   NETWORK.
+  --testnet-magic [NETWORK]
+                        Protocol magic number.
+  --tx-file TXFILEDATA  Input filepath of the tx. Use --cddl-format when building transactions with cardano-cli.
+  --hw-signing-file HWSIGNINGFILEDATA
+                        Input filepath of the hardware wallet signing file.
+  --change-output-key-file CHANGEOUTPUTKEYFILEDATA
+                        Input filepath of change output file.
+  --derivation-type DERIVATIONTYPE
+                        Derivation type - currently applies only to Trezor. Options: LEDGER, ICARUS or ICARUS_TREZOR (default).
+  --out-file OUTFILES   Output filepath.

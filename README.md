@@ -13,11 +13,14 @@ This repository contains everything needed to create, test, and submit a Cardano
 
 - `cardano-cli` (Conway-era, v8.x+)
 - `cardano-node` (preprod testnet and mainnet access)
+- `cardano-hw-cli` (for hardware wallet signing)
 - `jq` >= 1.5
 - `basenc` (GNU coreutils) >= 9.1
 - `make`
 
 ## Quick Start
+
+if you are using an hardware wallet, you can generate the necessary files as shown in the [`cardano-hw-cli` docs](https://github.com/vacuumlabs/cardano-hw-cli/blob/develop/docs/transaction-example.md#verification-payment-key-and-hardware-wallet-signing-file)
 
 ```bash
 make help              # Show all available targets

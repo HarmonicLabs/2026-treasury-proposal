@@ -39,13 +39,26 @@ if [[ ! -f "$TREASURY_SCRIPT" ]]; then
     exit 1
 fi
 
-if [[ -z "${PAYMENT_SKEY:-}" ]]; then
-    echo "Error: PAYMENT_SKEY is not set." >&2
+# Determine signing mode: hardware wallet or file-based
+USE_HW=false
+if [[ -n "${PAYMENT_HW_SIGNING_FILE:-}" ]]; then
+    USE_HW=true
+    PAY_HW_PATH="$PAYMENT_HW_SIGNING_FILE"
+    if [[ "$PAY_HW_PATH" != /* ]]; then
+        PAY_HW_PATH="${REPO_ROOT}/${PAY_HW_PATH}"
+    fi
+    if [[ ! -f "$PAY_HW_PATH" ]]; then
+        echo "Error: Hardware signing file not found: ${PAY_HW_PATH}" >&2
+        exit 1
+    fi
+elif [[ -n "${PAYMENT_SKEY:-}" ]]; then
+    PAY_SKEY="${PAYMENT_SKEY}"
+    if [[ "$PAY_SKEY" != /* ]]; then
+        PAY_SKEY="${REPO_ROOT}/${PAY_SKEY}"
+    fi
+else
+    echo "Error: Neither PAYMENT_HW_SIGNING_FILE nor PAYMENT_SKEY is set." >&2
     exit 1
-fi
-PAY_SKEY="${PAYMENT_SKEY}"
-if [[ "$PAY_SKEY" != /* ]]; then
-    PAY_SKEY="${REPO_ROOT}/${PAY_SKEY}"
 fi
 
 if [[ -z "${PAYMENT_ADDRESS:-}" ]]; then
@@ -148,11 +161,28 @@ echo "Transaction built: ${TX_RAW}"
 
 TX_SIGNED="${REPO_ROOT}/vote-deleg.signed"
 
-cardano-cli conway transaction sign \
-    "${NETWORK_FLAG[@]}" \
-    --tx-body-file "$TX_RAW" \
-    --signing-key-file "$PAY_SKEY" \
-    --out-file "$TX_SIGNED"
+if [[ "$USE_HW" == true ]]; then
+    WITNESS_FILE="${TX_RAW}.witness"
+
+    cardano-hw-cli transaction witness \
+        "${NETWORK_FLAG[@]}" \
+        --tx-file "$TX_RAW" \
+        --hw-signing-file "$PAY_HW_PATH" \
+        --out-file "$WITNESS_FILE"
+
+    cardano-cli conway transaction assemble \
+        --tx-body-file "$TX_RAW" \
+        --witness-file "$WITNESS_FILE" \
+        --out-file "$TX_SIGNED"
+
+    rm -f "$WITNESS_FILE"
+else
+    cardano-cli conway transaction sign \
+        "${NETWORK_FLAG[@]}" \
+        --tx-body-file "$TX_RAW" \
+        --signing-key-file "$PAY_SKEY" \
+        --out-file "$TX_SIGNED"
+fi
 
 echo "Transaction signed: ${TX_SIGNED}"
 

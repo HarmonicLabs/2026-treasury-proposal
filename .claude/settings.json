@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(ls -d /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/*/)",
-      "Bash(bash scripts/generate-metadata.sh)"
+      "Bash(bash scripts/generate-metadata.sh)",
+      "Bash(bash -n scripts/sign-tx.sh)",
+      "Bash(bash -n scripts/delegate-always-abstain.sh)",
+      "Bash(bash -n scripts/register-stake.sh)"
     ]
   }
 }

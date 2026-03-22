@@ -1,13 +1,6 @@
 # Presupuesto del Tesoro 2026 de Harmonic Laboratories
 
-> [!NOTE]
-> El siguiente documento es una propuesta para sostener los esfuerzos de Harmonic Laboratories (HLabs) en el mantenimiento y la evolución de la infraestructura de código abierto de Cardano.
->
-> Está concebido como punto de partida para la discusión sobre retiros del tesoro de Cardano.
->
-> Por lo tanto, invitamos a cualquier persona interesada a comentar este documento y compartir su retroalimentación con nosotros.
-
-## Visión
+## Resumen
 
 Harmonic Laboratories (HLabs para abreviar) es una empresa de I+D nacida y enfocada exclusivamente en el ecosistema de Cardano.
 
@@ -15,41 +8,31 @@ Harmonic Laboratories apoya y mantiene una porción considerable de las herramie
 
 La misión de HLabs es que la verdadera descentralización se convierta en la base del desarrollo de aplicaciones, no solo una característica deseable.
 
-Lo hacemos desarrollando y manteniendo infraestructura y herramientas fundamentales.
-
-## Resumen Ejecutivo
-
-Antes de profundizar en los detalles y el desglose de costos, aquí presentamos una vista de alto nivel de la solicitud, algunas suposiciones que estamos haciendo y la dirección general de este presupuesto.
-
-#### Retrospectiva 2025
-
-Proporcionamos una [retrospectiva completa de nuestra hoja de ruta 2025](#2025-Retrospective) en el anexo de este documento. Esto incluye una comparación directa con los elementos de la hoja de ruta presentados el año pasado junto con sus entregas correspondientes.
-
-#### Duración y Hitos
+### Duración y Hitos
 
 Esta propuesta abarca **12 meses**, durante los cuales habrá varias entregas y demostraciones. Entre las entregas clave, destacamos:
 
-- un mantenimiento de hard fork próximo;
-- un nodo con capacidad de relay (Gerolamo);
-- un lenguaje de programación para smart contracts completamente maduro, imperativo y eficiente (Pebble).
+- mantenimiento para un próximo hard fork;
+- un nodo ligero listo para producción ([Gerolamo](https://github.com/HarmonicLabs/gerolamo));
+- un lenguaje de programación para smart contracts listo para producción, imperativo y eficiente ([pebble](https://github.com/HarmonicLabs/pebble)).
+
+### Solicitud de Presupuesto Total
+
+El presupuesto estimado en USD es de **`$2,250,000`** (o **`₳6,428,571`**) + 25% en contingencia reembolsable (**`₳1,607,143`**); para una solicitud total de **`8,035,714 ADA`**.
+
+## Motivación
 
 ### Beneficios para el ecosistema
 
-Gerolamo, Pebble y el mantenimiento continuo de herramientas sirven cada uno a distintos grupos de interés mientras fortalecen colectivamente la infraestructura, la experiencia del desarrollador y la sostenibilidad a largo plazo de Cardano.
+Gerolamo, Pebble y el mantenimiento continuo de herramientas sirven cada uno a distintos grupos de interés mientras fortalecen colectivamente la infraestructura, la experiencia del desarrollador y del usuario, y la sostenibilidad a largo plazo de Cardano.
 
 #### ¿Quién se beneficiará de Gerolamo?
 
 ##### TL;DR
 
-- SPOs para nodos relay
 - dApps para aplicaciones con mínima confianza
 - wallets para seguridad similar a Daedalus
-
-##### SPOs
-
-Los Operadores de Stake Pools pueden usar Gerolamo como un nodo relay adicional junto a su infraestructura existente. La producción de bloques continúa en su configuración actual, mientras que los relays de Gerolamo añaden diversidad y resiliencia a su pool.
-
-Un panorama diverso de implementaciones de nodos fortalece la resiliencia de la red. Al proporcionar una base de código alternativa para relays, Gerolamo reduce el riesgo de problemas a nivel de toda la red derivados de errores en una sola implementación; un factor crítico para la salud a largo plazo y la descentralización de la red.
+- SPOs para nodos relay
 
 ##### dApps
 
@@ -64,6 +47,12 @@ Esto significa que las dApps pueden verificar estados de UTxO, validar transacci
 Las wallets ligeras actuales deben confiar en servidores externos para proporcionar datos precisos de la cadena. Esto crea un compromiso de seguridad: los usuarios ganan comodidad pero sacrifican la capacidad de verificar independientemente sus saldos e historial de transacciones.
 
 Con Gerolamo, los desarrolladores de wallets pueden integrar un nodo ligero directamente en sus aplicaciones, ofreciendo a los usuarios garantías de seguridad similares a Daedalus sin la sobrecarga de ejecutar un nodo completo. Los usuarios pueden verificar sus propios UTxOs, validar transacciones entrantes y mantener plena soberanía sobre sus fondos, todo mientras disfrutan de la experiencia de usuario de una wallet ligera.
+
+##### SPOs
+
+Los Operadores de Stake Pools pueden usar Gerolamo como un nodo relay adicional junto a su infraestructura existente. La producción de bloques continúa en su configuración actual, mientras que los relays de Gerolamo añaden diversidad y resiliencia a su pool.
+
+Un panorama diverso de implementaciones de nodos fortalece la resiliencia de la red. Al proporcionar una base de código alternativa para relays, Gerolamo reduce el riesgo de problemas a nivel de toda la red derivados de errores en una sola implementación; un factor crítico para la salud a largo plazo y la descentralización de la red.
 
 #### ¿Quién se beneficiará de Pebble?
 
@@ -151,13 +140,9 @@ Para proporcionar visibilidad sobre cómo esta propuesta contribuye a los result
 | Completitud de documentación | 100% de cobertura    | Todas las características del lenguaje documentadas con ejemplos |
 | Completitud de tutoriales  | ≥3 tutoriales de extremo a extremo | Guías publicadas cubriendo patrones comunes |
 
-## Desglose del Presupuesto
+## Justificación
 
-### Solicitud de Presupuesto Total
-
-La solicitud total para 2026 es de **`₳8,035,714`**, cubriendo un presupuesto en USD de **`$2,250,000`** (o **`₳6,428,571`**) + 25% en contingencia reembolsable (**`₳1,607,143`**).
-
-Esta cifra incluye los costos estimados, así como una contingencia reembolsable, que nos permitirá operar con cierto grado de independencia respecto a la volatilidad del mercado. La contingencia será reembolsada total o parcialmente al tesoro en caso de no ser utilizada.
+### Desglose del Presupuesto
 
 El desglose completo del presupuesto se presenta a continuación.
 
@@ -165,19 +150,17 @@ Para una valoración justa de la propuesta, seguiremos un proceso similar al uti
 
 Utilizamos una tasa de conversión de `0.35` ADA [`₳`] por USD [`$`].
 
-### Vista Completa
+#### Vista Completa
 
 | Alcance                                                   | Estimado (FTEs) | Total del Proyecto ($) |
-| :---                                                      | ---:            | ---:                   |
-| Gerolamo (nodo Cardano en TypeScript)                     | 5               | `$1,125,000`           |
-| Pebble (lenguaje de programación + herramientas de desarrollo de dApps) | 3.5 | `$785,500`          |
-| Mantenimiento de hard fork                                | 1.5             | `$337,500`             |
-|                                                           |                 |                        |
-| **Total**                                                 | **10 FTEs**     | `$2,250,000`           |
+| :---                                                      | ---:             | ---:               |
+| Gerolamo (nodo Cardano en TypeScript)                     | 5                | `$1,125,000`       |
+| Pebble (lenguaje de programación + herramientas de desarrollo de dApps) | 3.5              | `$787,500`         |
+| Mantenimiento de hard fork                                | 1.5              | `$337,500`         |
+|                                                           |                  |                    |
+| **Total**                                                 | **10 FTEs**      | `$2,250,000`       |
 
-El costo fijo estimado incluye:
-
-#### Justificación
+#### Justificación de Costos
 
 La solicitud total para el proyecto es de `10 FTEs`.
 
@@ -187,19 +170,63 @@ Además, somos conscientes de nuestro sesgo de suposición/optimismo (nuestra pr
 
 Esto nos deja con el siguiente total: `(10 x $225k) x 1.25 = $2,812,500`
 
-Finalmente, utilizando una tasa de conversión de `0.35` ADA por USD, formulamos una solicitud de presupuesto de **`₳8,035,714`**. Un [desglose completo de este presupuesto][detailed-scopes] está disponible a continuación.
+Finalmente, utilizando una tasa de conversión de `0.35` ADA por USD, formulamos una solicitud de presupuesto de **`₳8,035,714`**. Un [desglose completo de este presupuesto](#vista-detallada-del-presupuesto) está disponible a continuación.
 
-> **NOTA** ¿Es `0.35 ADA/USD` una tasa de conversión justa?
->
-> Aprendiendo de nuestra experiencia de financiación en 2025, reconocemos la importancia de tener en cuenta la volatilidad del mercado al planificar entregas a largo plazo.
->
-> Al momento de escribir, el precio de ADA es aproximadamente `0.3 USD` por ADA. Proponemos una tasa de conversión de `0.35 ADA/USD`, que tiene en cuenta el mercado actual al tiempo que proporciona un margen razonable.
->
-> Combinado con la contingencia reembolsable del 25%, este enfoque busca asegurar una entrega segura e ininterrumpida de los proyectos sin solicitar en exceso al tesoro.
+### Hitos
 
-## Administración del Presupuesto y Supervisión de Gobernanza
+Esta propuesta abarca del Q2 2026 al Q1 2027, con hitos organizados por trimestre.
 
-### Custodia Mediante Smart Contract
+#### Q2 2026 (Abr–Jun): Preparación para Hard Fork y Fundamentos
+
+- Mantenimiento de hard fork: todas las bibliotecas TypeScript actualizadas para el próximo hard fork
+- Gerolamo: mejorar almacenamiento y redes para entornos de navegador;
+- Pebble: completar el sistema de tipos; soporte para los cambios del próximo hard fork
+
+**Evidencia de cumplimiento:**
+
+- Todas las bibliotecas relevantes mantenidas por HLabs soportan el hard fork
+- Gerolamo se sincroniza hasta la punta en la red de prueba pública
+- Múltiples (≥3) contratos en Pebble de diversa complejidad compilados de extremo a extremo a código válido en cadena
+
+#### Q3 2026 (Jul–Sep): Entrega Principal
+
+- Gerolamo: versión inicial con capacidad de relay del lado del servidor
+- Pebble: características clave adicionales del lenguaje, como espacios de nombres, pruebas y una biblioteca estándar más completa
+
+**Evidencia de cumplimiento:**
+
+- El relay del lado del servidor de Gerolamo se sincroniza y sigue la punta de la cadena en la red de prueba pública
+- El relay de Gerolamo publicado como versión instalable
+- Nuevas características del lenguaje implementadas (ej. espacios de nombres, pruebas, biblioteca estándar)
+
+#### Q4 2026 (Oct–Nov): Integración y Soporte de Navegador
+
+- Gerolamo: nodo ligero en navegador capaz de sincronizar y servir datos de la cadena; compatibilidad con herramientas existentes de Cardano
+- Pebble: integración completa con IDE y CLI + impulso para la incorporación de desarrolladores
+
+**Evidencia de cumplimiento:**
+
+- Demostración en navegador sincronizando y consultando datos de la cadena sin un servidor backend
+- Herramienta estándar de Cardano (cardano-cli o cardano-db-sync) conectada exitosamente a Gerolamo
+- Extensión de IDE para Pebble publicada con resaltado de sintaxis y errores en línea
+- Comando `build` de CLI de Pebble funcionando en múltiples proyectos
+
+#### Q1 2027 (Dic–Mar): Preparación para Producción, Documentación y Adopción
+
+- Gerolamo: nodo ligero en navegador listo para producción; validación de rendimiento
+- Pebble: consola interactiva, documentación, tutoriales
+
+**Evidencia de cumplimiento:**
+
+- Principales navegadores donde Gerolamo funciona como nodo ligero (Chromium etc.)
+- El nodo de navegador de Gerolamo alcanza una punta "sin confianza", eventualmente a lo largo de múltiples sesiones
+- Gerolamo mantiene conexiones estables con pares durante ≥24 horas
+- Características del lenguaje Pebble documentadas con ejemplos
+- Tutoriales de extremo a extremo publicados
+
+### Administración del Presupuesto y Supervisión de Gobernanza
+
+#### Custodia Mediante Smart Contract
 
 Los fondos se mantienen y liberan a través de los treasury-contracts de SundaeLabs (https://github.com/SundaeSwap-finance/treasury-contracts), un marco probado con dos validadores:
 
@@ -238,7 +265,7 @@ El contrato del tesoro establece la delegación automática como DRep abstencion
 
 Los fondos que permanezcan en el contrato después de su vencimiento se devuelven automáticamente al tesoro de Cardano. Esto se ejecuta a nivel contractual. No puede ser anulado.
 
-## Lista de verificación de constitucionalidad
+### Lista de Verificación de Constitucionalidad
 
 En un esfuerzo por convencernos de la constitucionalidad de la propuesta, consideramos relevante incluir una lista de verificación de los puntos que cubrimos y, para cada uno, nuestra interpretación de la Constitución de Cardano.
 
@@ -266,82 +293,76 @@ En un esfuerzo por convencernos de la constitucionalidad de la propuesta, consid
 
 - [x] Se han definido indicadores de adopción medibles para proporcionar visibilidad sobre las contribuciones a los KPIs a nivel de ecosistema (TVL, transacciones mensuales, MAU).
 
-## Vista Detallada del Presupuesto
+### Vista Detallada del Presupuesto
 
-<!---------------------------------------------------------------------------------------------->
-<!---------------------------------------------------------------------------------------------->
-<!------------------------------------------ gerolamo ------------------------------------------>
-<!---------------------------------------------------------------------------------------------->
-<!---------------------------------------------------------------------------------------------->
-
-### Gerolamo (nodo Cardano en TypeScript)
+#### Gerolamo (nodo Cardano en TypeScript)
 
 [repo](https://github.com/HarmonicLabs/gerolamo)
 
-| 🎯 Objetivo Principal                |
-| ---                                  |
-| nodo de datos con mínima confianza para dApps |
+| Objetivo Principal                                  |
+| ---                                             |
+| nodo ligero listo para producción para dApps y wallets |
 
 Gerolamo es una implementación en TypeScript del nodo de Cardano diseñada para:
 - **Compatibilidad con navegadores**: Servir como base para nodos que se ejecutan en navegadores
 - **Extensibilidad**: Ser la base para nodos con propósitos específicos (nodos ligeros, nodos solo-UTxO, indexadores de cadena)
 
-#### Cobertura Completa de Reglas del Libro Mayor
+##### Cobertura Completa de Reglas del Libro Mayor
 
-##### Objetivo
+###### Objetivo
 
 Implementar las reglas completas de validación del libro mayor para permitir que Gerolamo valide completamente bloques y transacciones de acuerdo con las especificaciones del protocolo Cardano.
 
-##### Resultados Clave
+###### Resultados Clave
 
 - Gestión completa del estado del libro mayor utilizando LMDB (o IndexedDB para navegadores) para mejoras de rendimiento.
 - Implementación de consenso (Praos) con selección de cadena y manejo de reversiones
 - Base de datos volátil para gestionar bifurcaciones de cadena
 - Validación de bloques y transacciones cubriendo todas las eras
 
-##### Esfuerzo Estimado
+###### Esfuerzo Estimado
 
 2.5 FTEs
 
-#### APIs del Nodo
+##### APIs del Nodo
 
-##### Objetivo
+###### Objetivo
 
 Proporcionar APIs completas para desarrolladores de dApps y operadores de infraestructura para interactuar con la red de Cardano a través de Gerolamo.
 
-##### Resultados Clave
+###### Resultados Clave
 
 - Endpoints RPC de UTxO para consultas eficientes de UTxO
 - Soporte de socket local para protocolos node-to-client (compatibilidad con cardano-db-sync, cardano-cli)
 - API de navegador para uso de dApps
 
-##### Esfuerzo Estimado
+###### Esfuerzo Estimado
 
 2 FTEs
 
-#### Mejoras de la Máquina Plutus
+##### Mejoras de la Máquina Plutus
 
-##### Objetivo
+###### Objetivo
 
 Mejorar continuamente el intérprete CEK de [plutus-machine](https://github.com/HarmonicLabs/plutus-machine) para mejor rendimiento y conformidad total con la especificación de Plutus.
 
-##### Resultados Clave
+###### Resultados Clave
 
 - Optimizaciones de rendimiento para la evaluación de scripts
 - Seguimiento de presupuesto y mejoras en la precisión del modelo de costos
 - Soporte de sourcemaps para depuración
 
-##### Esfuerzo Estimado
+###### Esfuerzo Estimado
 
 0.5 FTEs
 
-### Gerolamo ━ Resumen
+##### Resumen de Gerolamo
 
 - total de recursos estimados: `5 FTEs`
 
-#### Criterios de Preparación para Producción
+##### Criterios de Preparación para Producción
 
-Gerolamo se considerará listo para producción para despliegue como relay cuando cumpla los siguientes criterios objetivos:
+Gerolamo se considerará listo para producción como nodo ligero en navegador cuando cumpla los siguientes criterios objetivos:
 
 | Criterio                 | Requisito                                                      | Método de Verificación  |
 | :----------------------- | :------------------------------------------------------------- | :---------------------- |
@@ -351,7 +372,7 @@ Gerolamo se considerará listo para producción para despliegue como relay cuand
 | **Propagación de bloques** | Latencia de retransmisión de bloques dentro de 2x de la línea base del nodo Haskell | Benchmarks comparativos |
 | **Manejo de reversiones** | Recuperación exitosa de reversiones de hasta k=2160 bloques    | Escenarios adversos     |
 
-#### Propuesta de Valor vs. Otras Implementaciones de Nodo
+##### Propuesta de Valor vs. Otras Implementaciones de Nodo
 
 | Dimensión            | Nodo Haskell                 | Amaru                                    | Gerolamo                       | Beneficio de Gerolamo                             |
 | :------------------- | :------------------------- | :--------------------------------------- | :----------------------------- | :------------------------------------------------ |
@@ -359,12 +380,12 @@ Gerolamo se considerará listo para producción para despliegue como relay cuand
 | **Soporte de navegador** | No                       | Soporte limitado planeado (WASM, finales 2026) | Sí (IndexedDB + WebWorkers) | Soporte de navegador listo para producción antes |
 | **Acceso para desarrolladores** | Requiere experiencia en Haskell | Requiere experiencia en Rust       | TypeScript/JavaScript          | Mayor grupo de contribuidores (17M+ desarrolladores JS/TS) |
 | **Extensibilidad**   | Específico de Cardano        | Ecosistema de crates de Rust             | Integración con ecosistema npm | Integración fluida con herramientas web/dApp      |
-| **Casos de uso**     | Producción completa de bloques | Producción completa de bloques         | Relay, nodo de datos, nodo de navegador | Complementario; capacidad nativa de navegador JS/TS |
+| **Casos de uso**     | Producción completa de bloques | Producción completa de bloques         | Nodo ligero en navegador, nodo de datos, relay | Complementario; capacidad nativa de navegador JS/TS |
 
 > [!NOTE]
->  Gerolamo está diseñado como una **implementación complementaria** para casos de uso de relay y nodo de datos, no como un reemplazo para nodos productores de bloques aún. La producción de bloques hasta ahora permanece en el nodo Haskell.
+>  Gerolamo está diseñado como una **implementación complementaria** enfocada en casos de uso de nodo ligero en navegador y nodo de datos, no como un reemplazo para nodos productores de bloques aún. La producción de bloques hasta ahora permanece en el nodo Haskell.
 >
-> Llegar a un punto donde el nodo pueda considerarse seriamente como relay, en cuanto a funcionalidad, debería acercarnos bastante a un punto donde también pueda usarse para producción de bloques.
+> Llegar a un punto donde el nodo pueda considerarse seriamente como un nodo ligero listo para producción, en cuanto a funcionalidad, debería acercarnos bastante a un punto donde también pueda usarse para producción de bloques.
 >
 > sin embargo, habilitar la producción de bloques en un entorno de mainnet incurriría en un aumento serio en los fondos que necesitaríamos solicitar
 >
@@ -376,47 +397,42 @@ Gerolamo se considerará listo para producción para despliegue como relay cuand
 >
 > dado el entorno actual, decidimos que sería mejor recortar esos esfuerzos para contener los costos.
 
-<!---------------------------------------------------------------------------------------------->
-<!---------------------------------------------------------------------------------------------->
-<!------------------------------------------- pebble ------------------------------------------->
-<!---------------------------------------------------------------------------------------------->
-<!---------------------------------------------------------------------------------------------->
-
-### Pebble (lenguaje de programación para smart contracts)
+#### Pebble (lenguaje de programación para smart contracts)
 
 [repo](https://github.com/HarmonicLabs/pebble)
 
-| 🎯 Objetivo Principal              |
-| ---                                |
+| Objetivo Principal                    |
+| ---                               |
 | lenguaje y herramientas listos para producción |
 
 Pebble es un lenguaje funcional simple, pero sólido como una roca, con sesgo imperativo, que compila a UPLC (Untyped Plutus Core). Proporciona a los desarrolladores una sintaxis intuitiva mientras compila a código en cadena altamente optimizado.
 
-#### Estabilidad del Compilador
+##### Estabilidad del Compilador
 
-##### Objetivo
+###### Objetivo
 
 Alcanzar estabilidad de compilador de nivel producción con generación de código optimizado.
 
-##### Resultados Clave
+###### Resultados Clave
 
 - Sistema de tipos completo con inferencia de tipos total
 - Generación de código UPLC optimizado con tamaños de script mínimos
 - Reporte de errores completo con mensajes accionables
 - Soporte para Plutus V4
+- Características clave del lenguaje: espacios de nombres, soporte integrado de pruebas, biblioteca estándar completa
 - Documentación y tutoriales para la incorporación de nuevos desarrolladores
 
-##### Esfuerzo Estimado
+###### Esfuerzo Estimado
 
 2 FTEs
 
-#### Herramientas para Desarrolladores
+##### Herramientas para Desarrolladores
 
-##### Objetivo
+###### Objetivo
 
 Proporcionar una experiencia de desarrollo completa para desarrolladores de Pebble con integración de IDE, herramientas de depuración y soporte del sistema de compilación.
 
-##### Resultados Clave
+###### Resultados Clave
 
 - Implementación del **Language Server Protocol (LSP)**:
   - Resaltado de sintaxis
@@ -431,15 +447,15 @@ Proporcionar una experiencia de desarrollo completa para desarrolladores de Pebb
   - REPL para desarrollo interactivo
 - **Generación de blueprints** para metadatos de contratos
 
-##### Esfuerzo Estimado
+###### Esfuerzo Estimado
 
 1.5 FTEs
 
-### Pebble ━ Resumen
+##### Resumen de Pebble
 
 - total de recursos estimados: `3.5 FTEs`
 
-#### Diferenciación respecto a Aiken
+##### Diferenciación respecto a Aiken
 
 Pebble y Aiken sirven a diferentes perfiles de desarrolladores y son **complementarios** dentro del ecosistema de Cardano, no competitivos.
 
@@ -450,7 +466,7 @@ Pebble y Aiken sirven a diferentes perfiles de desarrolladores y son **complemen
 | **Familiaridad de sintaxis** | Rust, Gleam                | TypeScript, JavaScript, Solidity       | Menor barrera para los 17M+ desarrolladores JS/TS a nivel global |
 | **Curva de aprendizaje** | Requiere fundamentos de PF     | Patrones imperativos familiares        | Incorporación más rápida para la mayoría de desarrolladores |
 
-##### Por qué ambos importan
+###### Por qué ambos importan
 
 Cardano necesita múltiples vías de acceso para desarrolladores:
 - Desarrolladores con experiencia en Rust/Haskell/PF gravitan hacia Aiken
@@ -459,25 +475,19 @@ Cardano necesita múltiples vías de acceso para desarrolladores:
 
 Al financiar Pebble, el Tesoro amplía el embudo de desarrolladores de Cardano sin fragmentarlo.
 
-<!---------------------------------------------------------------------------------------------->
-<!---------------------------------------------------------------------------------------------->
-<!--------------------------------------- hf maintenance --------------------------------------->
-<!---------------------------------------------------------------------------------------------->
-<!---------------------------------------------------------------------------------------------->
+#### Mantenimiento de hard fork
 
-### Mantenimiento de hard fork
-
-| 🎯 Objetivo Principal          |
-| ---                            |
+| Objetivo Principal                |
+| ---                           |
 | garantizar estabilidad del ecosistema |
 
-#### Próximo Hard Fork Intra-Era
+##### Próximo Hard Fork Intra-Era
 
-##### Objetivo
+###### Objetivo
 
 Asegurar que todas las bibliotecas TypeScript de HLabs estén actualizadas y sean totalmente compatibles con el próximo hard fork, incluyendo los cambios de Plutus V4 y los nuevos parámetros del protocolo.
 
-##### Resultados Clave
+###### Resultados Clave
 
 Mantenimiento de los repositorios afectados para soportar nuevas características del protocolo:
 
@@ -486,83 +496,10 @@ Mantenimiento de los repositorios afectados para soportar nuevas característica
 - **[plutus-machine](https://github.com/HarmonicLabs/plutus-machine)**: Implementación de la máquina CEK para evaluación de UPLC
 - **[uplc](https://github.com/HarmonicLabs/uplc)**: Representación en TypeScript/JavaScript de UPLC
 
-##### Esfuerzo Estimado
+###### Esfuerzo Estimado
 
 1.5 FTE
 
-### Mantenimiento de Hard Fork ━ Resumen
+##### Resumen de Mantenimiento de Hard Fork
 
 - total de recursos estimados: `1.5 FTE`
-
----
-
-# Retrospectiva 2025
-
-## Descripción General
-
-En 2025, Harmonic Laboratories recibió su primera financiación del Tesoro de Cardano a través de los Intersect Treasury Contracts para el proyecto **Gerolamo** (EC-0014-25). El proyecto tenía como objetivo crear un nodo de datos de Cardano que pueda ejecutarse en el navegador, implementado completamente en TypeScript.
-
-A pesar de que se suponía que la financiación cubriría 73 épocas, el despliegue del contrato en cadena fue efectivo recién a mediados de agosto, cubriendo por lo tanto un período desde el **12 de agosto de 2025 hasta el 30 de marzo de 2026**.
-
-La financiación total para el proyecto fue de **₳578,571 ADA**; debido a diversas fallas de comunicación con la parte administradora durante la fase de presentación de la propuesta, la tasa de conversión fue de aproximadamente `0.7 ADA/USD`; la fuerte caída en el precio del activo con el que se nos paga desde entonces, actualmente por debajo de `0.3 ADA/USD`, causó que la valoración del proyecto fuera significativamente inferior a lo justo.
-
-Harmonic Laboratories se enorgullece enormemente de decir que seguimos cumpliendo nuestra palabra a pesar de las condiciones extremadamente adversas.
-
-## Comparación de Hoja de Ruta
-
-| Planificado | Estado | Notas |
-| :--- | :---: | :--- |
-| Mini-protocolos Ouroboros | ✅ | Handshake, ChainSync, BlockFetch funcionando |
-| Sincronización de cadena multi-era | ✅ | Eras entre Shelley y Conway soportadas |
-| Análisis de bloques/encabezados | ✅ | Usando `@harmoniclabs/cardano-ledger-ts` |
-| Validación de encabezados | ✅ | Verificación VRF y comprobación de tipo de era |
-| Envío de transacciones | ✅ | Endpoint `/txsubmit` retransmitiendo a pares |
-| Validación de bloques | ✅ | Aplicación de bloques con actualizaciones del estado del libro mayor |
-| Manejo de reversiones | ✅ | Soporte de reversión de cadena implementado |
-| Almacenamiento completo | ✅ | Fragmentos volátiles + inmutables, concurrencia WAL |
-| API HTTP de Bloques | ✅ | Endpoint `/block/{slot}` sirviendo CBOR hex |
-| Gestión de pares P2P | 🟡 | El nodo ya es capaz de manejar múltiples pares, la selección dinámica de pares es lo siguiente |
-| Gestión de mempool | ✅ | Se implementó un mempool con soporte multi-hilo |
-| Integración con Mithril | 🟡 | En progreso - el soporte inicial ya está integrado y seguimos mejorándolo |
-| Compatibilidad con navegadores | 🟡 | En progreso - se han tomado varias decisiones de diseño para facilitar la integración de un nodo compatible con navegadores |
-
-## Logros Clave
-
-### Validación y Aplicación de Bloques
-Pipeline completo de validación de bloques implementado, incluyendo verificación de encabezados y aplicación del cuerpo del bloque al estado del libro mayor. El nodo ahora valida los bloques entrantes contra las reglas del protocolo antes de aplicarlos al estado local de la cadena, asegurando la integridad de los datos.
-
-### Validación de Encabezados con Verificación VRF
-Lógica completa de validación de encabezados con verificación criptográfica VRF (Función Aleatoria Verificable). Esto asegura que los productores de bloques sean correctamente elegidos de acuerdo con su stake y que los encabezados sean auténticos.
-
-### Manejo de Reversiones
-Soporte robusto de reversión de cadena que permite al nodo manejar reorganizaciones de cadena de manera elegante. Cuando la red experimenta una bifurcación, Gerolamo puede revertir hasta un ancestro común y re-sincronizar a lo largo de la cadena ganadora.
-
-### Arquitectura de Almacenamiento
-Sistema de almacenamiento de doble capa con fragmentos volátiles e inmutables:
-- **Almacenamiento volátil**: Bloques recientes mantenidos en almacenamiento de acceso rápido para posibles reversiones
-- **Fragmentos inmutables**: Bloques más antiguos y finalizados archivados en fragmentos comprimidos
-- **Concurrencia WAL**: Write-Ahead Logging para acceso concurrente seguro a la base de datos
-
-### APIs HTTP
-Endpoints RESTful para integraciones externas:
-- `/block/{slot|hash}` - Recuperar bloques por número de slot o hash (CBOR hex)
-- `/utxo/{txhash:index}` - Consultar UTxOs específicos
-- `/txsubmit` - Enviar transacciones a la red
-
-### Soporte Multi-Era
-Soporte completo de análisis y validación para todas las eras de Cardano desde Shelley hasta Conway, utilizando `@harmoniclabs/cardano-ledger-ts` para el manejo de bloques y transacciones con seguridad de tipos.
-
-### Interfaz de Terminal y Registro
-TUI interactiva que muestra el progreso de sincronización, conexiones de pares y estado del nodo. Registro estructurado en JSONL con niveles configurables (debug/info/warn/error) para monitoreo en producción.
-
-## Desafíos y Aprendizajes
-
-- **Compatibilidad con Navegadores**: Asegurar que el nodo pueda ejecutarse en entornos de navegador requirió una consideración cuidadosa de varios backends de almacenamiento abstraídos y la arquitectura de hilos de trabajo.
-
-- **Soporte Multi-Era**: Soportar todas las eras de Cardano desde Shelley hasta Conway añadió una complejidad significativa pero es esencial para una implementación completa del nodo.
-
-- **Ritmo de Hitos**: El calendario agresivo de hitos requirió sprints de desarrollo intensos, particularmente evidente en los commits de enero de 2026 preparando para el cierre.
-
-- **Devaluación de la Financiación**: Debido a la fuerte caída en el precio de ADA desde ~`0.7 ADA/USD` al momento de la presentación de la propuesta hasta ~`0.3 ADA/USD` actualmente, la financiación efectiva recibida es menos de la mitad del valor en USD originalmente anticipado. A pesar de esto, continuamos entregando todos los compromisos.
-
-**Treasury Contract**: [EC-0014-25](https://treasury.sundae.fi/instances/9e65e4ed7d6fd86fc4827d2b45da6d2c601fb920e8bfd794b8ecc619/project/EC-0014-25)
