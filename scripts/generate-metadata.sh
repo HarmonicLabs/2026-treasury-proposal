@@ -40,11 +40,27 @@ if [[ -f "$PROPOSAL_MD" ]]; then
     : "${MOTIVATION:=TODO: Write motivation}"
     : "${RATIONALE:=TODO: Write rationale}"
 
+    # Extract references from markdown links: [label](url) and bare https:// URLs
+    # Deduplicate by URL, keeping the first label seen for each.
+    REFERENCES_JSON=$(grep -oP '\[([^\]]+)\]\((https?://[^\)]+)\)|(https?://[^\s\)<>]+)' "$PROPOSAL_MD" \
+        | sed -n '
+            /^\[/ {
+                s/\[\([^]]*\)\](\([^)]*\))/\1\t\2/p
+                b
+            }
+            { s|^\(https\?://[^ ]*\)$|\1\t\1|p }
+        ' | awk -F'\t' '!seen[$2]++ { print $1 "\t" $2 }' \
+        | jq -R -s '
+            [split("\n")[] | select(length > 0) | split("\t") |
+             {"@type": "Other", "label": .[0], "uri": .[1]}]
+        ')
+
     jq -n \
         --arg title "$TITLE" \
         --arg abstract "$ABSTRACT" \
         --arg motivation "$MOTIVATION" \
         --arg rationale "$RATIONALE" \
+        --argjson references "$REFERENCES_JSON" \
         '{
             "@context": {
                 "@language": "en-us",
@@ -68,7 +84,7 @@ if [[ -f "$PROPOSAL_MD" ]]; then
                 "abstract": $abstract,
                 "motivation": $motivation,
                 "rationale": $rationale,
-                "references": []
+                "references": $references
             }
         }' > "$METADATA_JSON"
 
