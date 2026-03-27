@@ -1,3 +1,0 @@
-[submodule "contracts/treasury-contracts"]
-	path = contracts/treasury-contracts
-	url = https://github.com/SundaeSwap-finance/treasury-contracts.git
