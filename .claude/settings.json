@@ -5,7 +5,27 @@
       "Bash(bash scripts/generate-metadata.sh)",
       "Bash(bash -n scripts/sign-tx.sh)",
       "Bash(bash -n scripts/delegate-always-abstain.sh)",
-      "Bash(bash -n scripts/register-stake.sh)"
+      "Bash(bash -n scripts/register-stake.sh)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(aiken --version)",
+      "Bash(cardano-cli conway:*)",
+      "Bash(aiken build:*)",
+      "Bash(aiken check:*)",
+      "Bash(aikup --help)",
+      "Bash(aikup install:*)",
+      "Bash(curl -sL \"https://github.com/aiken-lang/aiken/releases/download/v1.1.19/aiken-x86_64-unknown-linux-gnu.tar.gz\" -o /tmp/aiken.tar.gz)",
+      "Read(//tmp/**)",
+      "Bash(curl -sL \"https://api.github.com/repos/aiken-lang/aiken/releases/tags/v1.1.19\")",
+      "Bash(curl -sL \"https://github.com/aiken-lang/aiken/releases/download/v1.1.19/aiken-x86_64-unknown-linux-musl.tar.gz\" -o /tmp/aiken.tar.gz)",
+      "Bash(tar -xzf /tmp/aiken.tar.gz -C /tmp/)",
+      "Bash(ls /tmp/aiken*)",
+      "Bash(chmod +x /home/michele/.aiken/bin/aiken)"
+    ],
+    "additionalDirectories": [
+      "/home/michele/.claude/plans",
+      "/tmp",
+      "/home/michele/.aiken/bin"
     ]
   }
 }

@@ -5,7 +5,7 @@ NETWORK       ?= preprod
 METADATA_FILE ?= metadata/proposal-metadata.json
 
 .PHONY: help check-prereqs generate-test-keys metadata register-stake delegate-always-abstain fetch-guardrails sign-metadata upload-ipfs hash \
-        governance-action build-tx sign-tx submit-testnet submit-mainnet test-lifecycle report journal-entry clean
+        governance-action build-tx sign-tx submit-testnet submit-mainnet test-lifecycle report journal-entry build-contract clean
 
 help: ## Show all available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -54,6 +54,9 @@ submit-testnet: sign-tx ## Submit transaction to preprod testnet
 submit-mainnet: NETWORK = mainnet
 submit-mainnet: sign-tx ## Submit transaction to mainnet (with confirmation)
 	NETWORK=$(NETWORK) scripts/submit-tx.sh --confirm
+
+build-contract: ## Build treasury contract with oversight members
+	NETWORK=$(NETWORK) scripts/build-contract.sh
 
 test-lifecycle: ## Run the full test lifecycle
 	NETWORK=$(NETWORK) METADATA_FILE=$(METADATA_FILE) scripts/test-lifecycle.sh
