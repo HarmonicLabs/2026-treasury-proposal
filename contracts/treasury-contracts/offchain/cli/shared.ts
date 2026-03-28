@@ -561,7 +561,10 @@ export async function transactionDialog(
   expanded: boolean,
   allowSubmitToApi: boolean = true,
 ): Promise<void> {
-  const choices = [{ name: "Copy tx cbor", value: "copy" }];
+  const choices = [
+    { name: "Copy tx cbor", value: "copy" },
+    { name: "Save to file", value: "save" },
+  ];
   if (allowSubmitToApi) {
     choices.push({ name: "Submit to API", value: "submit" });
   }
@@ -593,6 +596,21 @@ export async function transactionDialog(
             console.log("Failed to copy to clipboard; expand the cbor instead");
             expanded = true;
           }
+          break;
+        case "save":
+          const fs = await import("fs/promises");
+          const path = await import("path");
+          const filePath = await input({
+            message: "Enter file path to save the transaction",
+            default: "tx.unsigned",
+          });
+          const envelope = JSON.stringify({
+            type: "Unwitnessed Tx ConwayEra",
+            description: "",
+            cborHex: txCbor,
+          }, null, 2);
+          await fs.writeFile(path.resolve(filePath), envelope);
+          console.log(`Transaction saved to ${path.resolve(filePath)}`);
           break;
         case "submit":
           const url =
@@ -658,12 +676,12 @@ export async function getProvider(): Promise<Provider> {
       const bfKey = await inputOrEnv({
         message: "Enter the Blockfrost project ID",
         env: BLOCKFROST_VAR,
-        validate: (s) => s.startsWith("preview") || s.startsWith("mainnet"),
+        validate: (s) => s.startsWith("preprod") || s.startsWith("mainnet"),
       });
-      const bfNetwork: "cardano-mainnet" | "cardano-preview" = bfKey.startsWith(
-        "preview",
+      const bfNetwork: "cardano-mainnet" | "cardano-preprod" = bfKey.startsWith(
+        "preprod",
       )
-        ? "cardano-preview"
+        ? "cardano-preprod"
         : "cardano-mainnet";
       return new Blockfrost({
         network: bfNetwork,

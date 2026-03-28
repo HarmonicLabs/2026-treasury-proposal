@@ -69,24 +69,73 @@ echo "Network:  ${NETWORK_FLAG[*]}"
 echo "Input:    ${TX_RAW}"
 
 if [[ "$USE_HW" == true ]]; then
-    echo "Mode:     hardware wallet"
-    echo "HW file:  ${HW_PATH}"
-    echo ""
+    # Check if the transaction contains features unsupported by hardware wallets
+    # (e.g. proposal_procedures for governance actions)
+    HW_UNSUPPORTED=false
+    if ! cardano-hw-cli transaction validate --tx-file "$TX_RAW" 2>/dev/null; then
+        HW_UNSUPPORTED=true
+    fi
 
-    WITNESS_FILE="${TX_RAW}.witness"
+    if [[ "$HW_UNSUPPORTED" == true ]]; then
+        echo "Mode:     proposal key (tx has governance features unsupported by HW wallet)"
 
-    cardano-hw-cli transaction witness \
-        "${NETWORK_FLAG[@]}" \
-        --tx-file "$TX_RAW" \
-        --hw-signing-file "$HW_PATH" \
-        --out-file "$WITNESS_FILE"
+        if [[ -z "${PROPOSAL_SKEY:-}" ]]; then
+            echo "Error: Transaction contains governance features unsupported by cardano-hw-cli." >&2
+            echo "Set PROPOSAL_SKEY in config.env (dedicated key for governance transactions)." >&2
+            exit 1
+        fi
 
-    cardano-cli conway transaction assemble \
-        --tx-body-file "$TX_RAW" \
-        --witness-file "$WITNESS_FILE" \
-        --out-file "$TX_SIGNED"
+        SKEY_PATH="$PROPOSAL_SKEY"
+        if [[ "$SKEY_PATH" != /* ]]; then
+            SKEY_PATH="${REPO_ROOT}/${SKEY_PATH}"
+        fi
+        if [[ ! -f "$SKEY_PATH" ]]; then
+            echo "Error: Proposal signing key not found: ${SKEY_PATH}" >&2
+            echo "Run 'make fund-proposal' to generate the key and fund its address." >&2
+            exit 1
+        fi
 
-    rm -f "$WITNESS_FILE"
+        echo "Key:      ${SKEY_PATH}"
+        echo ""
+
+        WITNESS_FILE="${TX_RAW}.witness"
+
+        cardano-cli conway transaction witness \
+            "${NETWORK_FLAG[@]}" \
+            --tx-body-file "$TX_RAW" \
+            --signing-key-file "$SKEY_PATH" \
+            --out-file "$WITNESS_FILE"
+
+        cardano-cli conway transaction assemble \
+            --tx-body-file "$TX_RAW" \
+            --witness-file "$WITNESS_FILE" \
+            --out-file "$TX_SIGNED"
+
+        rm -f "$WITNESS_FILE"
+    else
+        echo "Mode:     hardware wallet"
+        echo "HW file:  ${HW_PATH}"
+        echo ""
+
+        cardano-hw-cli transaction transform \
+            --tx-file "$TX_RAW" \
+            --out-file "$TX_RAW"
+
+        WITNESS_FILE="${TX_RAW}.witness"
+
+        cardano-hw-cli transaction witness \
+            "${NETWORK_FLAG[@]}" \
+            --tx-file "$TX_RAW" \
+            --hw-signing-file "$HW_PATH" \
+            --out-file "$WITNESS_FILE"
+
+        cardano-cli conway transaction assemble \
+            --tx-body-file "$TX_RAW" \
+            --witness-file "$WITNESS_FILE" \
+            --out-file "$TX_SIGNED"
+
+        rm -f "$WITNESS_FILE"
+    fi
 else
     echo "Mode:     file-based key"
     echo "Key:      ${SKEY_PATH}"

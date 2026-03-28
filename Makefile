@@ -4,8 +4,8 @@
 NETWORK       ?= preprod
 METADATA_FILE ?= metadata/proposal-metadata.json
 
-.PHONY: help check-prereqs generate-test-keys metadata register-stake delegate-always-abstain fetch-guardrails sign-metadata upload-ipfs hash \
-        governance-action build-tx sign-tx submit-testnet submit-mainnet test-lifecycle report journal-entry build-contract clean
+.PHONY: help check-prereqs generate-test-keys metadata register-stake register-receiving-stake delegate-always-abstain fetch-guardrails sign-metadata upload-ipfs hash \
+        governance-action fund-proposal build-tx sign-tx submit-testnet submit-mainnet test-lifecycle report journal-entry ensure-aiken build-contract clean
 
 help: ## Show all available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -22,6 +22,9 @@ metadata: ## Generate proposal metadata
 
 register-stake: ## Register the stake key on-chain (required once)
 	NETWORK=$(NETWORK) scripts/register-stake.sh
+
+register-receiving-stake: ## Register the receiving script stake credential on-chain (required once)
+	NETWORK=$(NETWORK) scripts/register-receiving-stake.sh
 
 delegate-always-abstain: ## Delegate treasury stake credential to always_abstain DRep
 	NETWORK=$(NETWORK) scripts/delegate-always-abstain.sh
@@ -41,6 +44,9 @@ hash: ## Hash the proposal metadata JSON
 governance-action: hash ## Create the governance action (depends on hash)
 	NETWORK=$(NETWORK) scripts/create-governance-action.sh
 
+fund-proposal: ## Fund the proposal signing address from HW wallet
+	NETWORK=$(NETWORK) scripts/fund-proposal.sh
+
 build-tx: governance-action ## Build the transaction (depends on governance-action)
 	NETWORK=$(NETWORK) scripts/build-tx.sh
 
@@ -55,6 +61,9 @@ submit-mainnet: NETWORK = mainnet
 submit-mainnet: sign-tx ## Submit transaction to mainnet (with confirmation)
 	NETWORK=$(NETWORK) scripts/submit-tx.sh --confirm
 
+ensure-aiken: ## Ensure the correct aiken compiler version is installed
+	scripts/ensure-aiken.sh
+
 build-contract: ## Build treasury contract with oversight members
 	NETWORK=$(NETWORK) scripts/build-contract.sh
 
@@ -68,4 +77,4 @@ journal-entry: ## Create a new journal entry
 	scripts/journal-entry.sh
 
 clean: ## Remove generated transaction and action files
-	rm -f *.action *.raw *.signed tx.* stake-reg.* vote-deleg.* keys/stake-reg.cert keys/treasury-vote-deleg.cert scripts/guardrails.plutus
+	rm -f *.action *.raw *.signed tx.* stake-reg.* receiving-stake-reg.* fund-proposal.* vote-deleg.* keys/stake-reg.cert keys/receiving-stake-reg.cert keys/treasury-vote-deleg.cert scripts/guardrails.plutus

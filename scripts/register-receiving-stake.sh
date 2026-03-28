@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# delegate-always-abstain.sh - Delegate treasury contract stake credential to always_abstain DRep.
-# Required by Cardano Constitution Article IV, Section 5.
-# Usage: NETWORK=mainnet scripts/delegate-always-abstain.sh
+# register-receiving-stake.sh - Register the receiving (script-based) stake credential on-chain.
+# Required before submitting a treasury withdrawal that sends funds to a script stake address.
+# Usage: NETWORK=preprod scripts/register-receiving-stake.sh
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -26,16 +26,20 @@ esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────
 
-TREASURY_SCRIPT="${RECEIVING_STAKE_SCRIPT_FILE:-}"
-if [[ -z "$TREASURY_SCRIPT" ]]; then
-    echo "Error: RECEIVING_STAKE_SCRIPT_FILE is not set in config.env." >&2
+if [[ -z "${RECEIVING_STAKE_SCRIPT_FILE:-}" ]]; then
+    echo "Error: RECEIVING_STAKE_SCRIPT_FILE is not set." >&2
+    echo "This script registers script-based receiving stake credentials." >&2
+    echo "If using a key-based credential, use register-stake.sh instead." >&2
     exit 1
 fi
-if [[ "$TREASURY_SCRIPT" != /* ]]; then
-    TREASURY_SCRIPT="${REPO_ROOT}/${TREASURY_SCRIPT}"
+
+SCRIPT_PATH="${RECEIVING_STAKE_SCRIPT_FILE}"
+if [[ "$SCRIPT_PATH" != /* ]]; then
+    SCRIPT_PATH="${REPO_ROOT}/${SCRIPT_PATH}"
 fi
-if [[ ! -f "$TREASURY_SCRIPT" ]]; then
-    echo "Error: Treasury script file not found: ${TREASURY_SCRIPT}" >&2
+
+if [[ ! -f "$SCRIPT_PATH" ]]; then
+    echo "Error: Script file not found: ${SCRIPT_PATH}" >&2
     exit 1
 fi
 
@@ -48,13 +52,17 @@ if [[ -n "${PAYMENT_HW_SIGNING_FILE:-}" ]]; then
         PAY_HW_PATH="${REPO_ROOT}/${PAY_HW_PATH}"
     fi
     if [[ ! -f "$PAY_HW_PATH" ]]; then
-        echo "Error: Hardware signing file not found: ${PAY_HW_PATH}" >&2
+        echo "Error: Payment hardware signing file not found: ${PAY_HW_PATH}" >&2
         exit 1
     fi
 elif [[ -n "${PAYMENT_SKEY:-}" ]]; then
     PAY_SKEY="${PAYMENT_SKEY}"
     if [[ "$PAY_SKEY" != /* ]]; then
         PAY_SKEY="${REPO_ROOT}/${PAY_SKEY}"
+    fi
+    if [[ ! -f "$PAY_SKEY" ]]; then
+        echo "Error: Payment signing key not found: ${PAY_SKEY}" >&2
+        exit 1
     fi
 else
     echo "Error: Neither PAYMENT_HW_SIGNING_FILE nor PAYMENT_SKEY is set." >&2
@@ -66,24 +74,44 @@ if [[ -z "${PAYMENT_ADDRESS:-}" ]]; then
     exit 1
 fi
 
-echo "=== Delegate Treasury to Always Abstain ==="
+# ── Compute script stake address and check registration ─────────────────────
+
+STAKE_ADDR=$(cardano-cli conway stake-address build \
+    --stake-script-file "$SCRIPT_PATH" \
+    "${NETWORK_FLAG[@]}")
+
+echo "=== Register Receiving Stake Credential (Script) ==="
 echo ""
-echo "Network: ${NETWORK_FLAG[*]}"
-echo "Script:  ${TREASURY_SCRIPT}"
+echo "Network:       ${NETWORK_FLAG[*]}"
+echo "Script file:   ${SCRIPT_PATH}"
+echo "Stake address: ${STAKE_ADDR}"
 echo ""
 
-# ── Create vote delegation certificate ──────────────────────────────────────
+STAKE_INFO=$(cardano-cli conway query stake-address-info \
+    "${NETWORK_FLAG[@]}" \
+    --address "$STAKE_ADDR" \
+    --out-file /dev/stdout)
 
-CERT_FILE="${REPO_ROOT}/keys/treasury-vote-deleg.cert"
+if [[ $(echo "$STAKE_INFO" | jq 'length') -gt 0 ]]; then
+    echo "Script stake credential is already registered."
+    echo "$STAKE_INFO" | jq '.[0]'
+    exit 0
+fi
 
-cardano-cli conway stake-address vote-delegation-certificate \
-    --stake-script-file "$TREASURY_SCRIPT" \
-    --always-abstain \
+echo "Script stake credential is not registered. Proceeding..."
+
+# ── Create registration certificate ─────────────────────────────────────────
+
+CERT_FILE="${REPO_ROOT}/keys/receiving-stake-reg.cert"
+
+cardano-cli conway stake-address registration-certificate \
+    --stake-script-file "$SCRIPT_PATH" \
+    --key-reg-deposit-amt 2000000 \
     --out-file "$CERT_FILE"
 
-echo "Vote delegation certificate created: ${CERT_FILE}"
+echo "Registration certificate created: ${CERT_FILE}"
 
-# ── Query UTxOs ──────────────────────────────────────────────────────────────
+# ── Query UTxO ───────────────────────────────────────────────────────────────
 
 echo "Querying UTxOs..."
 
@@ -92,56 +120,16 @@ UTXO_OUTPUT=$(cardano-cli conway query utxo \
     --address "$PAYMENT_ADDRESS" \
     --out-file /dev/stdout)
 
-# Need enough for fees + collateral; 10 ADA is generous
-REQUIRED_LOVELACE=10000000
+TX_IN=$(echo "$UTXO_OUTPUT" | jq -r 'to_entries | sort_by(.value.value.lovelace) | reverse | .[0].key // empty')
 
-readarray -t UTXO_ENTRIES < <(echo "$UTXO_OUTPUT" | jq -r '
-    [to_entries[] | {key: .key, lovelace: .value.value.lovelace}]
-    | sort_by(-.lovelace)
-    | .[]
-    | "\(.key) \(.lovelace)"
-')
-
-if [[ ${#UTXO_ENTRIES[@]} -eq 0 ]]; then
+if [[ -z "$TX_IN" ]]; then
     echo "Error: No UTxOs found at ${PAYMENT_ADDRESS}" >&2
     exit 1
 fi
 
-TX_INS=()
-TOTAL_LOVELACE=0
-
-for entry in "${UTXO_ENTRIES[@]}"; do
-    utxo=$(echo "$entry" | awk '{print $1}')
-    lovelace=$(echo "$entry" | awk '{print $2}')
-    TX_INS+=("$utxo")
-    TOTAL_LOVELACE=$((TOTAL_LOVELACE + lovelace))
-    if [[ "$TOTAL_LOVELACE" -ge "$REQUIRED_LOVELACE" ]]; then
-        break
-    fi
-done
-
-TOTAL_ADA=$(echo "scale=6; $TOTAL_LOVELACE / 1000000" | bc)
-REQUIRED_ADA=$(echo "scale=6; $REQUIRED_LOVELACE / 1000000" | bc)
-
-if [[ "$TOTAL_LOVELACE" -lt "$REQUIRED_LOVELACE" ]]; then
-    echo "Error: Insufficient funds." >&2
-    echo "  Available: ${TOTAL_ADA} ADA (${#UTXO_ENTRIES[@]} UTxOs)" >&2
-    echo "  Required:  ${REQUIRED_ADA} ADA (fees + collateral)" >&2
-    exit 1
-fi
-
-echo "Selected ${#TX_INS[@]} UTxO(s) totaling ${TOTAL_ADA} ADA:"
-for utxo in "${TX_INS[@]}"; do
-    echo "  ${utxo}"
-done
-echo ""
+echo "Using UTxO: ${TX_IN}"
 
 # ── Build transaction ────────────────────────────────────────────────────────
-
-TX_IN_FLAGS=()
-for utxo in "${TX_INS[@]}"; do
-    TX_IN_FLAGS+=(--tx-in "$utxo")
-done
 
 # Use reference input if available, otherwise include script inline
 if [[ -n "${TREASURY_SCRIPT_REF_UTXO:-}" ]]; then
@@ -153,44 +141,53 @@ if [[ -n "${TREASURY_SCRIPT_REF_UTXO:-}" ]]; then
     echo "Using reference script input: ${TREASURY_SCRIPT_REF_UTXO}"
 else
     CERT_SCRIPT_FLAGS=(
-        --certificate-script-file "$TREASURY_SCRIPT"
+        --certificate-script-file "$SCRIPT_PATH"
         --certificate-redeemer-value '{}'
     )
     echo "Warning: TREASURY_SCRIPT_REF_UTXO not set, including script inline." >&2
 fi
 
-TX_RAW="${REPO_ROOT}/vote-deleg.raw"
+TX_RAW="${REPO_ROOT}/receiving-stake-reg.raw"
 
 cardano-cli conway transaction build \
     "${NETWORK_FLAG[@]}" \
-    "${TX_IN_FLAGS[@]}" \
-    --tx-in-collateral "${TX_INS[0]}" \
+    --tx-in "$TX_IN" \
     --change-address "$PAYMENT_ADDRESS" \
     --certificate-file "$CERT_FILE" \
     "${CERT_SCRIPT_FLAGS[@]}" \
+    --tx-in-collateral "$TX_IN" \
     --out-file "$TX_RAW"
 
 echo "Transaction built: ${TX_RAW}"
 
-# ── Sign transaction ─────────────────────────────────────────────────────────
-
-TX_SIGNED="${REPO_ROOT}/vote-deleg.signed"
+# ── Canonicalize CBOR (required by cardano-hw-cli) ──────────────────────────
 
 if [[ "$USE_HW" == true ]]; then
-    WITNESS_FILE="${TX_RAW}.witness"
+    cardano-hw-cli transaction transform \
+        --tx-file "$TX_RAW" \
+        --out-file "$TX_RAW"
+    echo "Transaction CBOR canonicalized."
+fi
+
+# ── Sign transaction ─────────────────────────────────────────────────────────
+
+TX_SIGNED="${REPO_ROOT}/receiving-stake-reg.signed"
+
+if [[ "$USE_HW" == true ]]; then
+    PAY_WITNESS="${TX_RAW}.pay.witness"
 
     cardano-hw-cli transaction witness \
         "${NETWORK_FLAG[@]}" \
         --tx-file "$TX_RAW" \
         --hw-signing-file "$PAY_HW_PATH" \
-        --out-file "$WITNESS_FILE"
+        --out-file "$PAY_WITNESS"
 
     cardano-cli conway transaction assemble \
         --tx-body-file "$TX_RAW" \
-        --witness-file "$WITNESS_FILE" \
+        --witness-file "$PAY_WITNESS" \
         --out-file "$TX_SIGNED"
 
-    rm -f "$WITNESS_FILE"
+    rm -f "$PAY_WITNESS"
 else
     cardano-cli conway transaction sign \
         "${NETWORK_FLAG[@]}" \
@@ -210,7 +207,7 @@ cardano-cli conway transaction submit \
 TX_HASH=$(cardano-cli conway transaction txid --tx-file "$TX_SIGNED")
 
 echo ""
-echo "Treasury stake credential delegated to always_abstain."
+echo "Script stake credential registered successfully."
 echo "Transaction hash: ${TX_HASH}"
 echo ""
-echo "Clean up: rm -f vote-deleg.raw vote-deleg.signed keys/treasury-vote-deleg.cert"
+echo "Clean up: rm -f receiving-stake-reg.raw receiving-stake-reg.signed keys/receiving-stake-reg.cert"

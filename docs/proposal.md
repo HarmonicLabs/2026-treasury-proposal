@@ -1,4 +1,4 @@
-# Harmonic Laboratories 2026 Treasury Budget
+# Pebble + Gerolamo - HLabs 2026 Budget
 
 ## Abstract
 

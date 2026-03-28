@@ -27,3 +27,5 @@ metadata/metadata-hash.txt
 # Editor
 .vscode/
 .idea/
+
+.claude/

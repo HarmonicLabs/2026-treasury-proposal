@@ -43,10 +43,7 @@ for cmd in aiken cardano-cli jq python3; do
     fi
 done
 
-AIKEN_VERSION=$(aiken --version 2>&1 | grep -oP 'v\K[0-9]+\.[0-9]+\.[0-9]+')
-if [[ "$AIKEN_VERSION" != "1.1.19" ]]; then
-    echo "Warning: aiken v1.1.19 expected, but found v${AIKEN_VERSION}." >&2
-fi
+"${REPO_ROOT}/scripts/ensure-aiken.sh"
 
 for var in PAYMENT_ADDRESS OVERSIGHT_SANTIAGO_CARMUEGA OVERSIGHT_CHRIS_GIANELLONI OVERSIGHT_LUCAS_ROSA; do
     if [[ -z "${!var:-}" ]]; then
@@ -69,15 +66,32 @@ HLABS_KEY_HASH=$(cardano-cli conway address key-hash \
 
 echo "Hlabs key hash: ${HLABS_KEY_HASH}"
 
-# ── Timestamps (from config.env, defaults after 2030) ────────────────────────
+# ── Timestamps (from config.env, converted to POSIX milliseconds) ────────────
 
-TREASURY_EXPIRATION="${TREASURY_EXPIRATION:-1893456000000}"
-PAYOUT_UPPERBOUND="${PAYOUT_UPPERBOUND:-1896134400000}"
-VENDOR_EXPIRATION="${VENDOR_EXPIRATION:-1898812800000}"
+date_to_ms() {
+    local input="$1"
+    local name="$2"
+    local ms
+    ms=$(node -e "const d = new Date('${input}'); if (isNaN(d)) { process.exit(1); } console.log(d.valueOf())" 2>/dev/null)
+    if [[ -z "$ms" ]]; then
+        echo "Error: Invalid date for ${name}: '${input}'" >&2
+        echo "Must be a valid input to JavaScript's new Date() constructor." >&2
+        exit 1
+    fi
+    echo "$ms"
+}
 
-echo "Treasury expiration: ${TREASURY_EXPIRATION}"
-echo "Payout upperbound:   ${PAYOUT_UPPERBOUND}"
-echo "Vendor expiration:   ${VENDOR_EXPIRATION}"
+TREASURY_EXPIRATION_INPUT="${TREASURY_EXPIRATION:-2030-01-01T00:00:00Z}"
+PAYOUT_UPPERBOUND_INPUT="${PAYOUT_UPPERBOUND:-2030-02-01T00:00:00Z}"
+VENDOR_EXPIRATION_INPUT="${VENDOR_EXPIRATION:-2030-03-04T00:00:00Z}"
+
+TREASURY_EXPIRATION=$(date_to_ms "$TREASURY_EXPIRATION_INPUT" "TREASURY_EXPIRATION")
+PAYOUT_UPPERBOUND=$(date_to_ms "$PAYOUT_UPPERBOUND_INPUT" "PAYOUT_UPPERBOUND")
+VENDOR_EXPIRATION=$(date_to_ms "$VENDOR_EXPIRATION_INPUT" "VENDOR_EXPIRATION")
+
+echo "Treasury expiration: ${TREASURY_EXPIRATION_INPUT} → ${TREASURY_EXPIRATION}"
+echo "Payout upperbound:   ${PAYOUT_UPPERBOUND_INPUT} → ${PAYOUT_UPPERBOUND}"
+echo "Vendor expiration:   ${VENDOR_EXPIRATION_INPUT} → ${VENDOR_EXPIRATION}"
 
 # ── Query UTxOs and pick seed ─────────────────────────────────────────────────
 
@@ -371,8 +385,233 @@ jq '{
   cborHex: (.validators[] | select(.title == "treasury.treasury.else") | .compiledCode)
 }' plutus.json > "${REPO_ROOT}/scripts/treasury-contract.plutus"
 
+# Extract compiled script CBOR for metadata.json
+TREASURY_COMPILED=$(jq -r '.validators[] | select(.title == "treasury.treasury.else") | .compiledCode' plutus.json)
+VENDOR_COMPILED=$(jq -r '.validators[] | select(.title == "vendor.vendor.else") | .compiledCode' plutus.json)
+
 # Restore clean blueprint
 aiken build 2>&1 > /dev/null
+
+# ── Phase 5: Generate offchain metadata.json ─────────────────────────────────
+
+METADATA_JSON="${REPO_ROOT}/contracts/treasury-contracts/offchain/metadata.json"
+
+echo ""
+echo "Generating offchain metadata.json..."
+
+# Determine network ID (0 = testnet, 1 = mainnet)
+case "${NETWORK:-preprod}" in
+    mainnet) NETWORK_ID=1 ;;
+    *)       NETWORK_ID=0 ;;
+esac
+
+# Preserve label/description/comment from existing metadata if present
+EXISTING_LABEL=""
+EXISTING_DESCRIPTION=""
+EXISTING_COMMENT="null"
+if [[ -f "$METADATA_JSON" ]]; then
+    FIRST_INSTANCE=$(jq -r 'keys[0] // empty' "$METADATA_JSON")
+    if [[ -n "$FIRST_INSTANCE" ]]; then
+        EXISTING_LABEL=$(jq -r --arg k "$FIRST_INSTANCE" '.[$k].metadata.body.label // empty' "$METADATA_JSON")
+        EXISTING_DESCRIPTION=$(jq -r --arg k "$FIRST_INSTANCE" '.[$k].metadata.body.description // empty' "$METADATA_JSON")
+        EXISTING_COMMENT=$(jq --arg k "$FIRST_INSTANCE" '.[$k].metadata.comment // null' "$METADATA_JSON")
+    fi
+fi
+
+LABEL="${EXISTING_LABEL:-Hlabs Treasury}"
+DESCRIPTION="${EXISTING_DESCRIPTION:-Hlabs treasury proposal}"
+
+jq -n \
+    --arg registry "$REGISTRY_POLICY_ID" \
+    --arg hlabs "$HLABS_KEY_HASH" \
+    --arg santiago "$OVERSIGHT_SANTIAGO_CARMUEGA" \
+    --arg chris "$OVERSIGHT_CHRIS_GIANELLONI" \
+    --arg lucas "$OVERSIGHT_LUCAS_ROSA" \
+    --arg treasury_exp "$TREASURY_EXPIRATION" \
+    --arg payout_ub "$PAYOUT_UPPERBOUND" \
+    --arg vendor_exp "$VENDOR_EXPIRATION" \
+    --arg seed_tx "$SEED_TX" \
+    --arg seed_ix "$SEED_IX" \
+    --arg label "$LABEL" \
+    --arg description "$DESCRIPTION" \
+    --argjson comment "$EXISTING_COMMENT" \
+    --arg treasury_cbor "$TREASURY_COMPILED" \
+    --arg vendor_cbor "$VENDOR_COMPILED" \
+    --argjson network "$NETWORK_ID" \
+    '
+{
+  ($registry): {
+    "metadata": {
+      "@context": "https://raw.githubusercontent.com/SundaeSwap-finance/treasury-contracts/refs/heads/main/offchain/src/metadata/context.jsonld",
+      "hashAlgorithm": "blake2b-256",
+      "body": {
+        "event": "publish",
+        "expiration": $treasury_exp,
+        "payoutUpperbound": $payout_ub,
+        "vendorExpiration": $vendor_exp,
+        "label": $label,
+        "description": $description,
+        "permissions": {
+          "reorganize": {
+            "label": "Hlabs",
+            "signature": { "keyHash": $hlabs }
+          },
+          "sweep": {
+            "allOf": {
+              "scripts": [
+                { "label": "Hlabs", "signature": { "keyHash": $hlabs } },
+                { "label": "Any oversight member", "anyOf": {
+                    "scripts": [
+                      { "label": "Santiago Carmuega", "signature": { "keyHash": $santiago } },
+                      { "label": "Chris Gianelloni", "signature": { "keyHash": $chris } },
+                      { "label": "Lucas Rosa", "signature": { "keyHash": $lucas } }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "fund": {
+            "label": "Oversight majority",
+            "atLeast": {
+              "required": "2",
+              "scripts": [
+                { "label": "Santiago Carmuega", "signature": { "keyHash": $santiago } },
+                { "label": "Chris Gianelloni", "signature": { "keyHash": $chris } },
+                { "label": "Lucas Rosa", "signature": { "keyHash": $lucas } }
+              ]
+            }
+          },
+          "disburse": {
+            "allOf": {
+              "scripts": [
+                { "label": "Hlabs", "signature": { "keyHash": $hlabs } },
+                { "label": "Any oversight member", "anyOf": {
+                    "scripts": [
+                      { "label": "Santiago Carmuega", "signature": { "keyHash": $santiago } },
+                      { "label": "Chris Gianelloni", "signature": { "keyHash": $chris } },
+                      { "label": "Lucas Rosa", "signature": { "keyHash": $lucas } }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "pause": {
+            "label": "Any oversight member",
+            "anyOf": {
+              "scripts": [
+                { "label": "Santiago Carmuega", "signature": { "keyHash": $santiago } },
+                { "label": "Chris Gianelloni", "signature": { "keyHash": $chris } },
+                { "label": "Lucas Rosa", "signature": { "keyHash": $lucas } }
+              ]
+            }
+          },
+          "resume": {
+            "label": "Oversight majority",
+            "atLeast": {
+              "required": "2",
+              "scripts": [
+                { "label": "Santiago Carmuega", "signature": { "keyHash": $santiago } },
+                { "label": "Chris Gianelloni", "signature": { "keyHash": $chris } },
+                { "label": "Lucas Rosa", "signature": { "keyHash": $lucas } }
+              ]
+            }
+          },
+          "modify": {
+            "allOf": {
+              "scripts": [
+                { "label": "Hlabs", "signature": { "keyHash": $hlabs } },
+                { "label": "Oversight majority", "atLeast": {
+                    "required": "2",
+                    "scripts": [
+                      { "label": "Santiago Carmuega", "signature": { "keyHash": $santiago } },
+                      { "label": "Chris Gianelloni", "signature": { "keyHash": $chris } },
+                      { "label": "Lucas Rosa", "signature": { "keyHash": $lucas } }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "seedUtxo": {
+          "transaction_id": $seed_tx,
+          "output_index": $seed_ix
+        }
+      },
+      "instance": $registry,
+      "txAuthor": $hlabs,
+      "comment": $comment
+    },
+    "scripts": {
+      "treasuryScript": {
+        "config": {
+          "registry_token": $registry,
+          "permissions": {
+            "reorganize": { "Signature": { "key_hash": $hlabs } },
+            "sweep": { "AllOf": { "scripts": [
+              { "Signature": { "key_hash": $hlabs } },
+              { "AnyOf": { "scripts": [
+                { "Signature": { "key_hash": $santiago } },
+                { "Signature": { "key_hash": $chris } },
+                { "Signature": { "key_hash": $lucas } }
+              ] } }
+            ] } },
+            "fund": { "AtLeast": { "required": "2", "scripts": [
+              { "Signature": { "key_hash": $santiago } },
+              { "Signature": { "key_hash": $chris } },
+              { "Signature": { "key_hash": $lucas } }
+            ] } },
+            "disburse": { "AllOf": { "scripts": [
+              { "Signature": { "key_hash": $hlabs } },
+              { "AnyOf": { "scripts": [
+                { "Signature": { "key_hash": $santiago } },
+                { "Signature": { "key_hash": $chris } },
+                { "Signature": { "key_hash": $lucas } }
+              ] } }
+            ] } }
+          },
+          "expiration": $treasury_exp,
+          "payout_upperbound": $payout_ub
+        },
+        "script": $treasury_cbor,
+        "network": $network
+      },
+      "vendorScript": {
+        "config": {
+          "registry_token": $registry,
+          "permissions": {
+            "pause": { "AnyOf": { "scripts": [
+              { "Signature": { "key_hash": $santiago } },
+              { "Signature": { "key_hash": $chris } },
+              { "Signature": { "key_hash": $lucas } }
+            ] } },
+            "resume": { "AtLeast": { "required": "2", "scripts": [
+              { "Signature": { "key_hash": $santiago } },
+              { "Signature": { "key_hash": $chris } },
+              { "Signature": { "key_hash": $lucas } }
+            ] } },
+            "modify": { "AllOf": { "scripts": [
+              { "Signature": { "key_hash": $hlabs } },
+              { "AtLeast": { "required": "2", "scripts": [
+                { "Signature": { "key_hash": $santiago } },
+                { "Signature": { "key_hash": $chris } },
+                { "Signature": { "key_hash": $lucas } }
+              ] } }
+            ] } }
+          },
+          "expiration": $vendor_exp
+        },
+        "script": $vendor_cbor,
+        "network": $network
+      }
+    }
+  }
+}
+' > "$METADATA_JSON"
+
+echo "Generated: ${METADATA_JSON}"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 
@@ -392,4 +631,5 @@ echo "  Payout upperbound          = ${PAYOUT_UPPERBOUND}"
 echo "  Vendor expiration          = ${VENDOR_EXPIRATION}"
 echo ""
 echo "  Output: scripts/treasury-contract.plutus"
+echo "          contracts/treasury-contracts/offchain/metadata.json"
 echo "============================================================"

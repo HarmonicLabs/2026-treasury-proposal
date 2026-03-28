@@ -86,15 +86,35 @@ if [[ -z "${PAYMENT_ADDRESS:-}" ]]; then
     exit 1
 fi
 
-# ── Create registration certificate ─────────────────────────────────────────
+# ── Check if already registered ──────────────────────────────────────────────
 
-CERT_FILE="${REPO_ROOT}/keys/stake-reg.cert"
+STAKE_ADDR=$(cardano-cli conway stake-address build \
+    --stake-verification-key-file "$STAKE_VKEY" \
+    "${NETWORK_FLAG[@]}")
 
 echo "=== Register Stake Key ==="
 echo ""
-echo "Network:    ${NETWORK_FLAG[*]}"
-echo "Stake key:  ${STAKE_VKEY}"
+echo "Network:       ${NETWORK_FLAG[*]}"
+echo "Stake key:     ${STAKE_VKEY}"
+echo "Stake address: ${STAKE_ADDR}"
 echo ""
+
+STAKE_INFO=$(cardano-cli conway query stake-address-info \
+    "${NETWORK_FLAG[@]}" \
+    --address "$STAKE_ADDR" \
+    --out-file /dev/stdout)
+
+if [[ $(echo "$STAKE_INFO" | jq 'length') -gt 0 ]]; then
+    echo "Stake key is already registered."
+    echo "$STAKE_INFO" | jq '.[0]'
+    exit 0
+fi
+
+echo "Stake key is not registered. Proceeding..."
+
+# ── Create registration certificate ─────────────────────────────────────────
+
+CERT_FILE="${REPO_ROOT}/keys/stake-reg.cert"
 
 cardano-cli conway stake-address registration-certificate \
     --stake-verification-key-file "$STAKE_VKEY" \

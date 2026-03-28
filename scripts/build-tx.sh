@@ -38,18 +38,39 @@ if [[ -z "${PAYMENT_ADDRESS:-}" ]]; then
     exit 1
 fi
 
+# ── Determine funding source address ─────────────────────────────────────────
+# If a proposal key exists, spend from its address (funded by fund-proposal.sh).
+# Change goes back to PAYMENT_ADDRESS (HW wallet).
+# If no proposal key, spend directly from PAYMENT_ADDRESS.
+
+resolve_path() {
+    local p="$1"
+    if [[ "$p" != /* ]]; then echo "${REPO_ROOT}/${p}"; else echo "$p"; fi
+}
+
+FUNDING_ADDRESS="$PAYMENT_ADDRESS"
+if [[ -n "${PROPOSAL_VKEY:-}" ]]; then
+    PROPOSAL_VKEY_PATH=$(resolve_path "$PROPOSAL_VKEY")
+    if [[ -f "$PROPOSAL_VKEY_PATH" ]]; then
+        FUNDING_ADDRESS=$(cardano-cli conway address build \
+            --payment-verification-key-file "$PROPOSAL_VKEY_PATH" \
+            "${NETWORK_FLAG[@]}")
+    fi
+fi
+
 # ── Query UTxOs ──────────────────────────────────────────────────────────────
 
 echo "=== Build Transaction ==="
 echo ""
 echo "Network:  ${NETWORK_FLAG[*]}"
-echo "Address:  ${PAYMENT_ADDRESS}"
+echo "Funding:  ${FUNDING_ADDRESS}"
+echo "Change:   ${PAYMENT_ADDRESS}"
 echo ""
 echo "Querying UTxOs..."
 
 UTXO_OUTPUT=$(cardano-cli conway query utxo \
     "${NETWORK_FLAG[@]}" \
-    --address "$PAYMENT_ADDRESS" \
+    --address "$FUNDING_ADDRESS" \
     --out-file /dev/stdout)
 
 # Deposit is in lovelace; we need enough to cover deposit + fees
@@ -64,20 +85,26 @@ readarray -t UTXO_ENTRIES < <(echo "$UTXO_OUTPUT" | jq -r '
 ')
 
 if [[ ${#UTXO_ENTRIES[@]} -eq 0 ]]; then
-    echo "Error: No UTxOs found at ${PAYMENT_ADDRESS}" >&2
-    echo "Fund this address before building the transaction." >&2
+    echo "Error: No UTxOs found at ${FUNDING_ADDRESS}" >&2
+    if [[ "$FUNDING_ADDRESS" != "$PAYMENT_ADDRESS" ]]; then
+        echo "Run 'make fund-proposal' first." >&2
+    else
+        echo "Fund this address before building the transaction." >&2
+    fi
     exit 1
 fi
 
 TX_INS=()
 TOTAL_LOVELACE=0
 
+# If spending from the proposal address, consume ALL UTxOs (drain it).
+# Otherwise, accumulate until we have enough.
 for entry in "${UTXO_ENTRIES[@]}"; do
     utxo=$(echo "$entry" | awk '{print $1}')
     lovelace=$(echo "$entry" | awk '{print $2}')
     TX_INS+=("$utxo")
     TOTAL_LOVELACE=$((TOTAL_LOVELACE + lovelace))
-    if [[ "$TOTAL_LOVELACE" -ge "$REQUIRED_LOVELACE" ]]; then
+    if [[ "$FUNDING_ADDRESS" == "$PAYMENT_ADDRESS" && "$TOTAL_LOVELACE" -ge "$REQUIRED_LOVELACE" ]]; then
         break
     fi
 done
@@ -86,9 +113,12 @@ TOTAL_ADA=$(echo "scale=6; $TOTAL_LOVELACE / 1000000" | bc)
 REQUIRED_ADA=$(echo "scale=6; $REQUIRED_LOVELACE / 1000000" | bc)
 
 if [[ "$TOTAL_LOVELACE" -lt "$REQUIRED_LOVELACE" ]]; then
-    echo "Error: Insufficient funds." >&2
+    echo "Error: Insufficient funds at ${FUNDING_ADDRESS}." >&2
     echo "  Available: ${TOTAL_ADA} ADA (${#UTXO_ENTRIES[@]} UTxOs)" >&2
     echo "  Required:  ${REQUIRED_ADA} ADA (deposit + fees)" >&2
+    if [[ "$FUNDING_ADDRESS" != "$PAYMENT_ADDRESS" ]]; then
+        echo "Run 'make fund-proposal' to send enough ADA." >&2
+    fi
     exit 1
 fi
 
@@ -103,8 +133,17 @@ echo ""
 GUARDRAILS_SCRIPT="${GUARDRAILS_SCRIPT:-${REPO_ROOT}/scripts/guardrails.plutus}"
 PROPOSAL_SCRIPT_FLAGS=()
 
-if [[ -f "$GUARDRAILS_SCRIPT" ]]; then
-    echo "Guardrails script: ${GUARDRAILS_SCRIPT}"
+# Use reference input if available, otherwise include script inline
+if [[ -n "${GUARDRAILS_SCRIPT_REF_UTXO:-}" ]]; then
+    echo "Using guardrails reference script input: ${GUARDRAILS_SCRIPT_REF_UTXO}"
+    PROPOSAL_SCRIPT_FLAGS=(
+        --proposal-tx-in-reference "$GUARDRAILS_SCRIPT_REF_UTXO"
+        --proposal-plutus-script-v3
+        --proposal-reference-tx-in-redeemer-value '{}'
+        --tx-in-collateral "${TX_INS[0]}"
+    )
+elif [[ -f "$GUARDRAILS_SCRIPT" ]]; then
+    echo "Warning: GUARDRAILS_SCRIPT_REF_UTXO not set, including guardrails script inline." >&2
     PROPOSAL_SCRIPT_FLAGS=(
         --proposal-script-file "$GUARDRAILS_SCRIPT"
         --proposal-redeemer-value '{}'

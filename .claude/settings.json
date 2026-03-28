@@ -20,7 +20,13 @@
       "Bash(curl -sL \"https://github.com/aiken-lang/aiken/releases/download/v1.1.19/aiken-x86_64-unknown-linux-musl.tar.gz\" -o /tmp/aiken.tar.gz)",
       "Bash(tar -xzf /tmp/aiken.tar.gz -C /tmp/)",
       "Bash(ls /tmp/aiken*)",
-      "Bash(chmod +x /home/michele/.aiken/bin/aiken)"
+      "Bash(chmod +x /home/michele/.aiken/bin/aiken)",
+      "Bash(bun --version)",
+      "Bash(bun install:*)",
+      "Bash(bun run:*)",
+      "Bash(node -e \"console.log\\(new Date\\(''2030-01-01T00:00:00Z''\\).valueOf\\(\\)\\)\")",
+      "Bash(node -e \"console.log\\(new Date\\(''2030-02-01T00:00:00Z''\\).valueOf\\(\\)\\)\")",
+      "Bash(node -e \"console.log\\(new Date\\(''2030-03-01T00:00:00Z''\\).valueOf\\(\\)\\)\")"
     ],
     "additionalDirectories": [
       "/home/michele/.claude/plans",
