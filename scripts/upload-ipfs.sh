@@ -3,6 +3,7 @@ set -euo pipefail
 
 # upload-ipfs.sh - Upload metadata to IPFS via Pinata.
 # Uploads the metadata JSON and outputs the CID and ipfs:// URL.
+# Skips upload if an identical file is already pinned.
 #
 # Usage: scripts/upload-ipfs.sh [metadata-file]
 #   metadata-file  Path to the metadata JSON (default: metadata/proposal-metadata.json)
@@ -36,6 +37,34 @@ if [[ -z "${PINATA_JWT:-}" ]]; then
     echo "Error: PINATA_JWT is not set." >&2
     echo "Set it in config.env or export it." >&2
     exit 1
+fi
+
+# ── Check if already pinned ──────────────────────────────────────────────────
+
+echo "Computing local CID..."
+CID=$(npx --yes ipfs-only-hash "$METADATA_FILE" 2>/dev/null || true)
+
+if [[ -n "$CID" ]]; then
+    EXISTING=$(curl -s --max-time 15 \
+        "https://api.pinata.cloud/data/pinList?status=pinned&hashContains=${CID}" \
+        -H "Authorization: Bearer ${PINATA_JWT}" \
+        | jq -r '.count // 0')
+
+    if [[ "$EXISTING" -gt 0 ]]; then
+        IPFS_URL="ipfs://${CID}"
+        echo ""
+        echo "File already pinned on Pinata. Skipping upload."
+        echo ""
+        echo "CID:      ${CID}"
+        echo "IPFS URL: ${IPFS_URL}"
+        echo "Gateway:  https://gateway.pinata.cloud/ipfs/${CID}"
+        echo ""
+        echo "Set ANCHOR_URL in config.env to:"
+        echo "  ANCHOR_URL=${IPFS_URL}"
+        exit 0
+    fi
+else
+    echo "Warning: Could not compute CID locally, uploading without dedup check." >&2
 fi
 
 # ── Upload ───────────────────────────────────────────────────────────────────

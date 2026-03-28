@@ -31,6 +31,21 @@ make submit-testnet    # Full testnet submission workflow
 make test-lifecycle    # Automated testnet lifecycle test
 ```
 
+## step-by-step Proposal submission
+
+1. `make build-contract`
+2. Submit publish txs using the contract CLI
+3. Update `TREASURY_SCRIPT_REF_UTXO` in config.env with the UTxO from step 2
+4. `make register-stake`
+5. `make register-receiving-stake`
+6. `make fetch-guardrails`
+7. `make metadata`
+8. `make hash`
+9. `make sign-metadata && make upload-ipfs` — then update `ANCHOR_URL` in config.env
+10. `make fund-proposal`
+11. `make submit-testnet`
+
+
 ## Repository Structure
 
 ```

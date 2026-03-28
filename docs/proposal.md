@@ -273,19 +273,28 @@ In an effort to convince ourselves of the proposal's constitutionality, we thoug
 
 - [x] This proposal is for work intended to enhance the security, decentralization and long-term sustainability of Cardano.
 
-#### Article III.5: the process of on-chain governance
+#### Article II, Section 6: Governance Action Standards
 
-- [x] We have submitted this proposal in a standardized, legible format, which includes a URL and hash of all documented off-chain content. We believe our rationale to be detailed and sufficient. The proposal contains a title, abstract, reason for the proposal and relevant supporting materials.
+- [x] We have submitted this proposal in a standardized, legible format, which includes a URL and hash of all documented off-chain content. We believe our rationale to be detailed and sufficient. The proposal contains a title, abstract, justification, and relevant supporting materials.
 
-#### Article IV.1: proposing budgets
+#### Article II, Section 7: "Treasury Withdrawals" Action Standards
 
-- [x] This proposal accords with the provisions of this article as it is intended to cover the maintenance and future development of the Cardano Blockchain.
+- [x] **Section 7.1** — This proposal specifies the purpose of the withdrawal, the 12-month delivery period, the relevant costs and expenses, and the circumstances under which the withdrawal might be refunded to the Cardano Treasury.
 
-- [x] This proposal covers a 12-month (73 epochs) period as recommended by this provision of the Constitution.
+- [x] **Section 7.2** — A full retrospective of past funding and deliverables is available in the [2025 retrospective](https://gateway.pinata.cloud/ipfs/QmZVw82XNXNsgGmBj39R26Mx7jgzWaNjSw4A7JM9Erye9c) document.
 
-#### Article IV.3: Net-Change Limit
+- [x] **Section 7.5** — This proposal designates administrators (the oversight board) responsible for monitoring fund usage and ensuring deliverables are achieved.
 
-- [x] Budgets needs not to be evaluated within the context of a Net-Change Limit, only withdrawals must. However, we recognize that the establishment of a new Net-Change Limit will likely be necessary in order to enact withdrawals pertaining to this budget. We will re-assess the situation in due time, and possibly split withdrawals into multiple ones should it be required.
+- [x] **Section 7.6** — Treasury funds held by the administrator prior to disbursement will be kept in separate auditable accounts, delegated to the predefined `always_abstain` voting option.
+
+#### Treasury Withdrawal Guardrails
+
+- [x] **TREASURY-02a** — This withdrawal shall not exceed the Net Change Limit for the relevant period.
+
+- [x] **TREASURY-03a** — This withdrawal is denominated in ada.
+
+- [x] **TREASURY-04a** — We acknowledge this action requires greater than 50% of DRep active voting stake to be ratified.
+
 
 #### Cardano 2030 Strategic Alignment
 
