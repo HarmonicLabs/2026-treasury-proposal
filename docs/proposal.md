@@ -249,12 +249,19 @@ Board members don't have a stake in HLabs. They co-sign disbursements, review mi
 The actions allowed by the escrow contract are as follows:
 
 Disburse (periodic release): HLabs initiates + any 1 board member co-signs
+
 Sweep early (return unused funds): HLabs + any 1 board member
+
 Reorganize (adjust milestone schedule): HLabs only
+
 Fund (initial vendor setup): Board majority
+
 Pause milestone: Any 1 board member
+
 Resume milestone: Board majority
+
 Modify project: HLabs + board majority
+
 Day-to-day operations need one board signature. Structural changes need the full board. And any single member can hit pause if something looks off.
 
 #### Delegation Policy

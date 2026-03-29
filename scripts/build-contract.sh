@@ -28,8 +28,9 @@ fi
 # ── Network flag ─────────────────────────────────────────────────────────────
 
 case "${NETWORK:-preprod}" in
-    mainnet) NETWORK_MAGIC=() ;;
+    mainnet) NETWORK_MAGIC=(--mainnet) ;;
     preview) NETWORK_MAGIC=(--testnet-magic 2) ;;
+    preprod) NETWORK_MAGIC=(--testnet-magic 1) ;;
     *)       NETWORK_MAGIC=(--testnet-magic 1) ;;
 esac
 
