@@ -10,7 +10,7 @@ The mission of HLabs is for true decentralization to become the baseline of appl
 
 This proposal funds [Gerolamo](https://github.com/HarmonicLabs/gerolamo), the first production-ready Cardano node that runs **in the browser**, at 5 FTE.
 
-Cardano's eUTxO design and low-footprint protocol make it the only major blockchain where a fully-validating, in-browser node is technically realistic — not a research demo, not a stripped-down SPV client, but a real node. Shipping that node turns a latent property of the protocol into a Cardano-specific competitive advantage that no other ecosystem can replicate without redesigning their base layer.
+Cardano's eUTxO design and low-footprint protocol make it the only major blockchain where a fully-validating, in-browser node is technically realistic. This is not a research demo or a stripped-down SPV client; it is a real, fully-validating node. Shipping it turns a latent property of the protocol into a Cardano-specific competitive advantage that no other ecosystem can replicate without redesigning their base layer.
 
 A separate proposal funds [Pebble](https://github.com/HarmonicLabs/pebble) and ongoing TypeScript tooling maintenance at 5 FTE and is voted on independently.
 
@@ -28,16 +28,16 @@ The estimated USD budget is of **`$1,125,000`** (or **`₳4,500,000`**) + 15% in
 
 ### Why a node in the browser is a Cardano-only USP
 
-A "node in the browser" is something every blockchain ecosystem has talked about and almost none have shipped. The reason isn't engineering laziness — it's the base-layer design. Account-based chains with global state, large block sizes, mandatory full-state replay, or heavy proving systems simply cannot fit a validating node into a browser tab without compromising on what "validating" means.
+A "node in the browser" is something every blockchain ecosystem has talked about and almost none have shipped. The reason is the base-layer design of those chains. Account-based chains with global state, large block sizes, mandatory full-state replay, or heavy proving systems simply cannot fit a validating node into a browser tab without compromising on what "validating" means.
 
 Cardano is different by design:
 
 - **eUTxO state stays local to the transaction.** A browser node does not need to maintain a global mutable state of the entire ledger to validate the slice it cares about; it can verify only the inputs it consumes and the outputs it produces.
-- **Block sizes and bandwidth requirements are bounded and modest** compared to high-throughput L1s — well within what a browser can sustain over typical residential connections.
+- **Block sizes and bandwidth requirements are bounded and modest** compared to high-throughput L1s, well within what a browser can sustain over typical residential connections.
 - **Consensus (Praos) is verifiable with light cryptographic checks** rather than requiring resource-heavy proof systems or trusted committees.
 - **Plutus scripts are pure functions over a deterministic CEK machine**, which is straightforward to host in a JavaScript/WebAssembly runtime and run inside a Web Worker without blocking the main thread.
 
-Put together, these properties don't just _allow_ an in-browser node — they make Cardano the **only** major chain where one is realistic today. Ethereum, Solana, and most account-based or high-TPS chains would each have to either cripple validation (effectively reverting to SPV/trusted-RPC) or fundamentally redesign their consensus and state model.
+Together these properties make Cardano the **only** major chain where an in-browser validating node is realistic today. Ethereum, Solana, and most account-based or high-TPS chains would each have to either cripple validation (effectively reverting to SPV/trusted-RPC) or fundamentally redesign their consensus and state model.
 
 Gerolamo is the project that turns that latent advantage into a shipped product. As long as the node lives only in research papers and prototypes, it remains a footnote; once it ships and dApps and wallets adopt it, "trustless on-device validation" becomes something Cardano can credibly market that competitors cannot match.
 
@@ -45,7 +45,7 @@ Gerolamo is the project that turns that latent advantage into a shipped product.
 
 Decentralization narratives are increasingly contested across the L1 landscape. Ethereum's roadmap has spent years on "stateless clients" and "Verkle trees" specifically to shrink the trust surface of light clients; Solana's light clients depend on RPC providers and in practice are not trustless; most "light wallets" across ecosystems silently delegate validation to centralized infrastructure.
 
-Gerolamo, by contrast, is a real node — running consensus, validating headers, evaluating Plutus scripts — that fits inside a browser tab. That is a tangible, demonstrable advantage Cardano can put in front of:
+Gerolamo, by contrast, is a real node that runs consensus, validates headers, and evaluates Plutus scripts, all inside a browser tab. That is a tangible, demonstrable advantage Cardano can put in front of:
 
 - developers evaluating which chain to build trust-minimized apps on,
 - wallet teams designing custody UX without giving up on verification,
@@ -56,14 +56,14 @@ This is the kind of differentiator that compounds: every dApp or wallet that shi
 
 ### Research dividend: advanced validation, trustless bridges, and L2
 
-Engineering a node small enough to run in a browser is not just a packaging exercise. It forces real progress on a class of problems that the broader Cardano ecosystem will need anyway:
+Engineering a node small enough to run in a browser is more than a packaging exercise; it forces real progress on a class of problems the broader Cardano ecosystem will need anyway:
 
 - **Compact / succinct validation.** Building Gerolamo requires rigorously distinguishing what _must_ be revalidated from what can be summarized, witnessed, or checkpointed. The same techniques (Mithril-style certificates, partial state proofs, header-chain verification with cryptographic anchors) are exactly the building blocks of trustless bridges and rollups.
-- **Trustless bridges.** A bridge contract on chain B that needs to verify the state of Cardano needs the same primitive as a browser node: a cheap, succinct, non-interactive way to check Cardano's chain history. Work on Gerolamo's verification path directly produces components — and battle-tests them — that bridge implementations can reuse instead of re-deriving.
+- **Trustless bridges.** A bridge contract on chain B that needs to verify the state of Cardano needs the same primitive as a browser node: a cheap, succinct, non-interactive way to check Cardano's chain history. Work on Gerolamo's verification path produces and battle-tests exactly the components a bridge implementation would otherwise have to re-derive from scratch.
 - **Layer 2 systems.** Optimistic and validity-rollup-style L2s on Cardano need an efficient, embeddable verifier of the L1's state. A light node engineered for the browser is, structurally, the same artifact: minimal trust, minimal footprint, designed to be embedded inside another runtime. Investments in Gerolamo amortize across the L2 ecosystem.
-- **dApp-side verification.** As more value moves on-chain, dApps will increasingly need to verify chain state themselves rather than trust their backend. Gerolamo gives them a drop-in, audited, JavaScript-native verifier — instead of every team rolling its own.
+- **dApp-side verification.** As more value moves on-chain, dApps will increasingly need to verify chain state themselves rather than trust their backend. Gerolamo gives them a drop-in, audited, JavaScript-native verifier instead of every team rolling its own.
 
-In other words: even setting aside the marketing value of "node in the browser," the engineering required to ship Gerolamo is foundational research the Cardano ecosystem needs in order to deliver on its bridges-and-L2 roadmap. Funding Gerolamo is funding that foundation.
+Even setting aside the marketing value of "node in the browser," the engineering required to ship Gerolamo is foundational research the Cardano ecosystem needs in order to deliver on its bridges-and-L2 roadmap. Funding Gerolamo is funding that foundation.
 
 ### Direct user benefits
 
@@ -142,7 +142,7 @@ The total ask for the project is `5 FTEs`.
 
 FTEs are being valued at an annual rate of `$225k`.
 
-Furthermore, we are aware of our assumption/optimism bias (our forecast is subject to underestimating complexity, overlooking challenges, and undervaluing the time and cost required to deliver, as well as our biased expectation of market movements). We therefore add an extra 15% contingency buffer, learning by our past mistakes.
+We are aware of our assumption/optimism bias: our forecast is subject to underestimating complexity, overlooking challenges, and undervaluing the time and cost required to deliver, as well as our biased expectation of market movements. We therefore add a 15% contingency buffer, learning from past mistakes.
 
 This leaves us with the following total: `(5 x $225k) x 1.15 = $1,293,750`
 
@@ -150,43 +150,105 @@ Finally, using a conversion rate of `4` ADA per USD, we formulate a budget ask o
 
 ### Milestones
 
-This proposal spans Q2 2026 through Q1 2027, with milestones organized by quarter.
+This proposal spans Q2 2026 through Q1 2027, organized into four quarterly milestones. Each milestone unlocks a fixed share of the total `₳5,175,000` ask from the `vendor.ak` escrow, and disbursement requires the independent oversight committee to verify the deliverables and acceptance criteria below before co-signing.
 
-#### Q2 2026 (Apr–Jun): Foundations
+The four milestones split the budget evenly: **25% per milestone = ₳1,293,750 each**. Acceptance criteria are written to be objective and inspectable from a public artifact (a tagged release, a committed sync log, a public demo URL, a successful preprod transaction) rather than self-reported.
 
-- Gerolamo: improve storage and networking for browser environments
+#### Milestone 1 (Q2 2026, Apr–Jun): Storage, Networking & Preprod Sync Foundations
 
-**Completion evidence:**
+**Deliverables**
 
-- Gerolamo syncs to tip on public test network
+- Gerolamo storage layer working in both server (LMDB) and browser (IndexedDB) environments, with parity tests showing the same ledger state is produced across both backends on the same chain prefix.
+- Networking layer (Ouroboros mini-protocols over Web Workers / WebSockets) sufficient to maintain peer connections in both environments.
+- A first publicly tagged Gerolamo release on https://github.com/HarmonicLabs/gerolamo with the storage + networking foundations in place.
+- Sync against a public preprod node from genesis to a recent tip, with the run logged and committed to the repo.
 
-#### Q3 2026 (Jul–Sep): Core Delivery
+**Acceptance criteria** (oversight committee verifies)
 
-- Gerolamo: initial server-side relay capable release
+- A new tagged release exists on the Gerolamo repo, dated within the milestone window.
+- A committed sync log shows Gerolamo reaching preprod tip on commodity hardware (≥4 CPU, ≥8 GB RAM). Wall-clock duration is informational rather than gating for this milestone.
+- The storage parity test (server vs. browser backend producing the same ledger state) is part of CI and green on the release commit.
 
-**Completion evidence:**
+**Disbursement on completion**
 
-- Gerolamo server-side relay syncs and follows chain tip on public test network
-- Gerolamo relay published as installable release
+25% of total = **₳1,293,750**.
 
-#### Q4 2026 (Oct–Nov): Integration & Browser Support
+**Dependencies & risks**
 
-- Gerolamo: browser light node capable of syncing and serving chain data; compatibility with existing Cardano tooling
+- *Plutus V4 hard fork timing.* Sync must work across the hard fork boundary; if the hard fork lands inside this milestone window, sync compatibility is rolled forward into Milestone 2's acceptance.
+- *Preprod stability.* If preprod is unavailable for an extended period, the sync log can be reproduced against another public testnet (preview), and the milestone is satisfied by reaching tip on *any* public Cardano testnet.
 
-**Completion evidence:**
+#### Milestone 2 (Q3 2026, Jul–Sep): Server-Side Relay Release
 
-- Browser demo syncing and querying chain data without a backend server
-- Standard Cardano tool (cardano-cli or cardano-db-sync) successfully connects to Gerolamo
+**Deliverables**
 
-#### Q1 2027 (Dec–Mar): Production Readiness
+- Gerolamo server-side relay release (installable via npm and as a standalone Bun/Node binary), able to follow chain tip on a public testnet for an extended run.
+- UTxO RPC endpoints with a documented schema, sufficient for an external client (e.g. a wallet, an indexer prototype) to query chain state.
+- Local socket support compatible with at least one node-to-client consumer (e.g. `cardano-cli query tip` succeeds against Gerolamo's socket).
+- Public release notes describing how to run Gerolamo as a relay, including a quickstart for SPOs evaluating it alongside their Haskell node.
 
-- Gerolamo: production-ready browser light node; performance validation
+**Acceptance criteria** (oversight committee verifies)
 
-**Completion evidence:**
+- A new tagged Gerolamo release is publicly available within the milestone window.
+- A committed run log shows Gerolamo following preprod chain tip for **≥6 hours** without crash or stall (intentionally a low bar; longer-duration testing is covered in Milestone 4).
+- A reproducible quickstart in the Gerolamo README demonstrates `cardano-cli query tip` (or equivalent node-to-client query) succeeding against a Gerolamo socket.
 
-- Major browsers where Gerolamo runs as a light node (Chromium etc.)
-- Gerolamo browser node reaches a "trustless" tip, eventually over multiple sessions
-- Gerolamo maintains stable peer connections for ≥24 hours
+**Disbursement on completion**
+
+25% of total = **₳1,293,750**.
+
+**Dependencies & risks**
+
+- *Node-to-client protocol surface is wide.* Full compatibility with every `cardano-cli` query is not in scope; the milestone is satisfied by `query tip` (or equivalent) plus the UTxO RPC. Broader compatibility is a Milestone 3/4 concern.
+
+#### Milestone 3 (Q4 2026, Oct–Dec): Browser Light Node Demo
+
+**Deliverables**
+
+- Gerolamo running as a light node in a modern Chromium-based browser, syncing and serving chain data from inside a tab, with no backend server required for the verification path.
+- A publicly hosted browser demo URL that loads Gerolamo in the browser and walks the user through a sync + UTxO query flow against a public testnet.
+- Plutus script evaluation working in the browser (CEK machine in WebAssembly / JS) for at least the script subset needed to validate typical dApp transactions.
+- Continued routine fixes / releases of the server-side relay against any in-window protocol changes.
+
+**Acceptance criteria** (oversight committee verifies)
+
+- The browser demo URL is publicly reachable and loads Gerolamo in a current Chromium release without backend dependency for the verification path; the oversight committee verifies by opening the URL.
+- The browser demo successfully queries at least one UTxO on a public testnet during a live walkthrough (a recorded screencast committed to the repo is sufficient).
+- Plutus script evaluation in the browser is demonstrated for ≥1 example contract, with a committed example and a reproducible run.
+
+**Disbursement on completion**
+
+25% of total = **₳1,293,750**.
+
+**Dependencies & risks**
+
+- *Cross-browser compatibility.* This milestone targets Chromium engines (Chrome, Edge, Brave, Arc). Firefox and Safari support is part of Milestone 4. Mobile browsers are explicitly out of scope for this proposal.
+- *Browser API churn.* WebAssembly / IndexedDB / Web Worker APIs are stable, but if a major Chromium release introduces a regression, the milestone is satisfied by demonstrating against the previous stable Chromium release.
+
+#### Milestone 4 (Q1 2027, Jan–Mar): Stability, Wider Browser Reach & Documentation
+
+**Deliverables**
+
+- Stability hardening: the Gerolamo browser node reaches "tip" against a public testnet across multiple sessions, and the server-side relay maintains stable peer connections for an extended run.
+- Browser support extended beyond Chromium-only: Gerolamo runs in **at least one additional major browser engine** (Firefox or WebKit / Safari).
+- Production-readiness documentation: deployment guide for SPOs running Gerolamo as a relay, integration guide for wallet / dApp developers embedding Gerolamo in the browser, and a developer-facing API reference for the UTxO RPC and node-to-client surfaces.
+- Public hand-off / "what's next" report describing the state of Gerolamo at proposal end and the work that remains for full block-production readiness (which is explicitly out of scope for this proposal).
+
+**Acceptance criteria** (oversight committee verifies)
+
+- A committed run log shows the server-side relay maintaining ≥15 stable peer connections for **≥24 hours** on preprod or in a mainnet relay role, measured via peer-list snapshots committed at the start and end of the run.
+- A committed run log shows the browser node reaching a public testnet tip across **≥3 separate browser sessions** (start fresh, reach tip, close, repeat).
+- The browser demo is verified working in **at least one non-Chromium engine** (Firefox or Safari), with a screencast committed to the repo.
+- The deployment, integration, and API docs are published in the Gerolamo repo and discoverable from the README.
+
+**Disbursement on completion**
+
+25% of total = **₳1,293,750**.
+
+**Dependencies & risks**
+
+- *Mainnet sync wall-clock time* (the 48-hour figure in the Production Readiness Criteria table) is a measurement commitment, not a milestone-acceptance criterion; funds release on the inspection criteria above, not on hitting a specific sync wall-clock that depends on hardware HLabs cannot pin for the oversight committee's environment.
+- *Block production is explicitly out of scope* for this proposal and is not gated on this milestone. The hand-off report makes the boundary explicit so the next funding cycle can pick it up cleanly.
 
 ### Budget Administration and Governance Oversight
 
@@ -250,21 +312,23 @@ In an effort to convince ourselves of the proposal's constitutionality, we thoug
 
 #### Article II, Section 7: "Treasury Withdrawals" Action Standards
 
-- [x] **Section 7.1** — This proposal specifies the purpose of the withdrawal, the 12-month delivery period, the relevant costs and expenses, and the circumstances under which the withdrawal might be refunded to the Cardano Treasury.
+- [x] **Section 7.1**: This proposal specifies the purpose of the withdrawal, the 12-month delivery period, the relevant costs and expenses, and the circumstances under which the withdrawal might be refunded to the Cardano Treasury.
 
-- [x] **Section 7.2** — A full retrospective of past funding and deliverables is available in the [2025 retrospective](https://gateway.pinata.cloud/ipfs/QmZVw82XNXNsgGmBj39R26Mx7jgzWaNjSw4A7JM9Erye9c) document.
+- [x] **Section 7.2**: A full retrospective of past funding and deliverables is available in the [2025 retrospective](https://gateway.pinata.cloud/ipfs/QmZVw82XNXNsgGmBj39R26Mx7jgzWaNjSw4A7JM9Erye9c) document.
 
-- [x] **Section 7.5** — This proposal designates administrators (the oversight board) responsible for monitoring fund usage and ensuring deliverables are achieved.
+- [x] **Section 7.4**: Funds for **periodic** independent audits of deliverables are included in this ask. Verification of milestone delivery is performed by the independent oversight committee, and no disbursement of escrowed funds occurs without the committee's review and co-signature. Each milestone is independently audited before payment is released. **Oversight metrics on the use of ada** are implemented through (i) the public on-chain auditability of the SundaeSwap treasury contract, which exposes every disbursement on-chain, (ii) the independent oversight committee's published review of each milestone, and (iii) monthly progress reports and quarterly financial summaries committed by HLabs throughout the funding period.
 
-- [x] **Section 7.6** — Treasury funds held by the administrator prior to disbursement will be kept in separate auditable accounts, delegated to the predefined `always_abstain` voting option.
+- [x] **Section 7.5**: This proposal designates administrators (the oversight board) responsible for monitoring fund usage and ensuring deliverables are achieved.
+
+- [x] **Section 7.6**: Treasury funds held by the administrator prior to disbursement will be kept in separate auditable accounts, delegated to the predefined `always_abstain` voting option.
 
 #### Treasury Withdrawal Guardrails
 
-- [x] **TREASURY-02a** — This withdrawal shall not exceed the Net Change Limit for the relevant period.
+- [x] **TREASURY-02a**: This withdrawal shall not exceed the Net Change Limit for the relevant period.
 
-- [x] **TREASURY-03a** — This withdrawal is denominated in ada.
+- [x] **TREASURY-03a**: This withdrawal is denominated in ada.
 
-- [x] **TREASURY-04a** — We acknowledge this action requires greater than 50% of DRep active voting stake to be ratified.
+- [x] **TREASURY-04a**: We acknowledge this action requires greater than 50% of DRep active voting stake to be ratified.
 
 
 #### Cardano 2030 Strategic Alignment
@@ -308,7 +372,7 @@ Implement complete ledger validation rules to enable Gerolamo to fully validate 
 
 ###### Goal
 
-Provide comprehensive APIs for dApp developers and infrastructure operators to interact with the Cardano network through Gerolamo.
+Provide a full set of APIs for dApp developers and infrastructure operators to interact with the Cardano network through Gerolamo.
 
 ###### Key Results
 
@@ -359,7 +423,7 @@ Gerolamo will be considered production-ready as a browser light node when it mee
 | **Runtime**          | GHC runtime                | Native (Rust)                            | Bun/Node.js/Browser            | Runs anywhere JavaScript runs, including browsers |
 | **Browser support**  | No                         | Limited support planned (WASM, EOY 2026) | Yes (IndexedDB + WebWorkers)   | Production-ready browser support sooner           |
 | **Developer access** | Haskell expertise required | Rust expertise required                  | TypeScript/JavaScript          | Largest contributor pool (17M+ JS/TS developers)  |
-| **Extensibility**    | Cardano-specific           | Rust crates ecosystem                    | npm ecosystem integration      | Seamless integration with web/dApp tooling        |
+| **Extensibility**    | Cardano-specific           | Rust crates ecosystem                    | npm ecosystem integration      | Direct integration with web/dApp tooling          |
 | **Use cases**        | Full block production      | Full block production                    | Browser light node, data node, relay | Complementary; JS/TS native browser capability    |
 
 > [!NOTE]
