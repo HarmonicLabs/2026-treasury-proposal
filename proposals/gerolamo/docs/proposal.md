@@ -1,4 +1,4 @@
-# HLabs 2026 — Gerolamo Light Node
+# The first node in the browser; a Cardano USP
 
 ## Abstract
 
@@ -8,7 +8,9 @@ Harmonic Laboratories supports and maintains a considerable portion of the TypeS
 
 The mission of HLabs is for true decentralization to become the baseline of application development, not only a nice-to-have feature.
 
-This proposal funds the development of a production-ready light node for Cardano, [Gerolamo](https://github.com/HarmonicLabs/gerolamo), at 5 FTE.
+This proposal funds [Gerolamo](https://github.com/HarmonicLabs/gerolamo), the first production-ready Cardano node that runs **in the browser**, at 5 FTE.
+
+Cardano's eUTxO design and low-footprint protocol make it the only major blockchain where a fully-validating, in-browser node is technically realistic — not a research demo, not a stripped-down SPV client, but a real node. Shipping that node turns a latent property of the protocol into a Cardano-specific competitive advantage that no other ecosystem can replicate without redesigning their base layer.
 
 A separate proposal funds [Pebble](https://github.com/HarmonicLabs/pebble) and ongoing TypeScript tooling maintenance at 5 FTE and is voted on independently.
 
@@ -16,7 +18,7 @@ A separate proposal funds [Pebble](https://github.com/HarmonicLabs/pebble) and o
 
 This proposal spans over **12 months**, throughout which there will be several deliveries and demos. The key delivery is:
 
-- a production-ready light node ([Gerolamo](https://github.com/HarmonicLabs/gerolamo)).
+- a production-ready light node that runs in the browser ([Gerolamo](https://github.com/HarmonicLabs/gerolamo)).
 
 ### Total Budget Ask
 
@@ -24,19 +26,50 @@ The estimated USD budget is of **`$1,125,000`** (or **`₳4,500,000`**) + 15% in
 
 ## Motivation
 
-### Ecosystem benefits
+### Why a node in the browser is a Cardano-only USP
 
-Gerolamo strengthens Cardano's infrastructure by providing a second spec-conformant node implementation, native to JavaScript/TypeScript runtimes, that runs in browsers, on servers, and inside dApps and wallets.
+A "node in the browser" is something every blockchain ecosystem has talked about and almost none have shipped. The reason isn't engineering laziness — it's the base-layer design. Account-based chains with global state, large block sizes, mandatory full-state replay, or heavy proving systems simply cannot fit a validating node into a browser tab without compromising on what "validating" means.
 
-#### Who will benefit from Gerolamo?
+Cardano is different by design:
 
-##### TL;DR
+- **eUTxO state stays local to the transaction.** A browser node does not need to maintain a global mutable state of the entire ledger to validate the slice it cares about; it can verify only the inputs it consumes and the outputs it produces.
+- **Block sizes and bandwidth requirements are bounded and modest** compared to high-throughput L1s — well within what a browser can sustain over typical residential connections.
+- **Consensus (Praos) is verifiable with light cryptographic checks** rather than requiring resource-heavy proof systems or trusted committees.
+- **Plutus scripts are pure functions over a deterministic CEK machine**, which is straightforward to host in a JavaScript/WebAssembly runtime and run inside a Web Worker without blocking the main thread.
 
-- dApps for trust-minimized applications
-- wallets for daedalus-like security
-- SPOs for relay nodes
+Put together, these properties don't just _allow_ an in-browser node — they make Cardano the **only** major chain where one is realistic today. Ethereum, Solana, and most account-based or high-TPS chains would each have to either cripple validation (effectively reverting to SPV/trusted-RPC) or fundamentally redesign their consensus and state model.
 
-##### dApps
+Gerolamo is the project that turns that latent advantage into a shipped product. As long as the node lives only in research papers and prototypes, it remains a footnote; once it ships and dApps and wallets adopt it, "trustless on-device validation" becomes something Cardano can credibly market that competitors cannot match.
+
+### Competitive positioning vs. other ecosystems
+
+Decentralization narratives are increasingly contested across the L1 landscape. Ethereum's roadmap has spent years on "stateless clients" and "Verkle trees" specifically to shrink the trust surface of light clients; Solana's light clients depend on RPC providers and in practice are not trustless; most "light wallets" across ecosystems silently delegate validation to centralized infrastructure.
+
+Gerolamo, by contrast, is a real node — running consensus, validating headers, evaluating Plutus scripts — that fits inside a browser tab. That is a tangible, demonstrable advantage Cardano can put in front of:
+
+- developers evaluating which chain to build trust-minimized apps on,
+- wallet teams designing custody UX without giving up on verification,
+- enterprises and regulators who increasingly ask "where does the trust actually live?",
+- governance and ecosystem campaigns highlighting Cardano's commitment to decentralization in concrete, shippable terms rather than aspirational ones.
+
+This is the kind of differentiator that compounds: every dApp or wallet that ships with an embedded Gerolamo instance is a permanent talking point that every competitor has to answer.
+
+### Research dividend: advanced validation, trustless bridges, and L2
+
+Engineering a node small enough to run in a browser is not just a packaging exercise. It forces real progress on a class of problems that the broader Cardano ecosystem will need anyway:
+
+- **Compact / succinct validation.** Building Gerolamo requires rigorously distinguishing what _must_ be revalidated from what can be summarized, witnessed, or checkpointed. The same techniques (Mithril-style certificates, partial state proofs, header-chain verification with cryptographic anchors) are exactly the building blocks of trustless bridges and rollups.
+- **Trustless bridges.** A bridge contract on chain B that needs to verify the state of Cardano needs the same primitive as a browser node: a cheap, succinct, non-interactive way to check Cardano's chain history. Work on Gerolamo's verification path directly produces components — and battle-tests them — that bridge implementations can reuse instead of re-deriving.
+- **Layer 2 systems.** Optimistic and validity-rollup-style L2s on Cardano need an efficient, embeddable verifier of the L1's state. A light node engineered for the browser is, structurally, the same artifact: minimal trust, minimal footprint, designed to be embedded inside another runtime. Investments in Gerolamo amortize across the L2 ecosystem.
+- **dApp-side verification.** As more value moves on-chain, dApps will increasingly need to verify chain state themselves rather than trust their backend. Gerolamo gives them a drop-in, audited, JavaScript-native verifier — instead of every team rolling its own.
+
+In other words: even setting aside the marketing value of "node in the browser," the engineering required to ship Gerolamo is foundational research the Cardano ecosystem needs in order to deliver on its bridges-and-L2 roadmap. Funding Gerolamo is funding that foundation.
+
+### Direct user benefits
+
+Beyond the strategic case, Gerolamo unlocks concrete improvements for the three groups that interact with Cardano most directly:
+
+#### dApps
 
 Decentralized applications benefit immensely from trust-minimized access to blockchain data. Currently, most dApps rely on centralized indexers or third-party APIs to query the chain state, introducing points of failure and trust assumptions that undermine the decentralization ethos.
 
@@ -44,13 +77,13 @@ Gerolamo enables dApps to run their own lightweight nodes; even directly in the 
 
 This means dApps can verify UTxO states, validate transactions, and query chain data without relying on external services. The result is a more resilient, censorship-resistant application architecture that aligns with the core principles of decentralization.
 
-##### Light wallets
+#### Light wallets
 
 Light wallets today must trust external servers to provide accurate chain data. This creates a security trade-off: users gain convenience but sacrifice the ability to independently verify their balances and transaction history.
 
 With Gerolamo, wallet developers can integrate a lightweight node directly into their applications, offering users Daedalus-like security guarantees without the overhead of running a full node. Users can verify their own UTxOs, validate incoming transactions, and maintain full sovereignty over their funds, all while enjoying the user experience of a light wallet.
 
-##### SPOs
+#### SPOs
 
 Stake Pool Operators can use Gerolamo as an additional relay node alongside their existing infrastructure. Block production continues on their current setup, while Gerolamo relays add diversity and resilience to their pool.
 

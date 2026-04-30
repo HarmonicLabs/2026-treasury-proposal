@@ -1,4 +1,4 @@
-# HLabs 2026 — Pebble + Tooling Maintenance
+# Pebble & Ecosystem maintainance: TypeScript core of Cardano
 
 ## Abstract
 
@@ -10,8 +10,8 @@ The mission of HLabs is for true decentralization to become the baseline of appl
 
 This proposal funds two complementary engineering tracks:
 
-- a production-ready, imperative and efficient, programming language for smart contracts ([Pebble](https://github.com/HarmonicLabs/pebble));
-- ongoing maintenance of HLabs' TypeScript tooling, including support for an upcoming intra-era hard fork.
+- **[Pebble](https://github.com/HarmonicLabs/pebble)** — the first imperative smart-contract language on Cardano. Pebble brings to UPLC a programming paradigm Aiken structurally cannot deliver, ships a TypeScript-shaped surface syntax that the largest developer community on earth already uses, and — per HLabs' published benchmarks — produces on-chain code that strictly outperforms Aiken and is competitive with Plutarch, while remaining dramatically more readable than either.
+- **Tooling maintenance** — keeping HLabs' TypeScript stack (`cardano-ledger-ts`, `ouroboros-miniprotocols-ts`, `plutus-machine`, `uplc`, and the foundations underneath them) synchronized with protocol upgrades. This stack is not optional infrastructure: it is what production projects across the ecosystem already depend on, including [Mesh](https://meshjs.dev/), [Lucid Evolution](https://github.com/Anastasia-Labs/lucid-evolution), and L2 systems like [Midgard](https://midgardprotocol.com/). When HLabs ships a hard-fork update, the rest of the TypeScript ecosystem ships with it; when HLabs lags, every downstream project lags.
 
 A separate proposal funds the [Gerolamo light node](https://github.com/HarmonicLabs/gerolamo) at 5 FTE and is voted on independently.
 
@@ -28,51 +28,82 @@ The estimated USD budget is of **`$1,125,000`** (or **`₳4,500,000`**) + 15% in
 
 ## Motivation
 
-### Ecosystem benefits
+### Why Pebble is a strict upgrade over the existing options
 
-Pebble and ongoing tooling maintenance each serve distinct stakeholders while collectively strengthening Cardano's developer experience and long-term sustainability.
+Cardano already has two reasonable smart-contract languages: **Aiken** (functional, ergonomic, the current default) and **Plutarch** (low-level, high-performance, but notoriously hostile to write). Pebble is not a third entry next to them — it is an attempt to dominate them on the dimensions that actually matter to developers shipping production contracts.
 
-#### Who will benefit from Pebble?
+#### A paradigm Aiken structurally cannot deliver
 
-##### TL;DR
+Aiken is functional-first by design. That is a deliberate choice, but it is also a ceiling: algorithms that are naturally imperative — accumulators with mutable state, early-exit control flow, stepwise transformations of complex records, fold-with-side-effect patterns — have to be encoded into a functional shape. Experienced FP developers do this fluently. The vast majority of working developers do not.
 
-Developers who seek an alternative to functional programming without sacrificing efficiency.
+Pebble adds the missing paradigm. It is imperative-first with strong static typing and full type inference, compiling to the same UPLC target. This is not "Aiken with different keywords" — it is a different cognitive model: write the algorithm the way you would write it in TypeScript, Rust, Go, or Solidity, and let the compiler optimize.
 
-The language aims to be as similar as possible to TypeScript, which is a widely adopted language used in Web2, as well as similar to languages used in other, more mature ecosystems, such as Solidity on EVM chains.
+This gap will not close inside Aiken. Retrofitting a real imperative paradigm onto a functional core would mean rewriting Aiken into a different language. Pebble simply ships that language.
 
-##### Onboarding Web2 developers
+#### Performance: strictly better than Aiken, comparable to Plutarch
 
-One of Cardano's greatest challenges is the steep learning curve for smart contract development. Aiken, the most widely adopted smart contract language on Cardano, while a great improvement compared to haskell, still requires familiarity with functional programming paradigms, concepts unfamiliar to the vast majority of developers worldwide. This barrier significantly limits the pool of talent that can contribute to Cardano's dApp ecosystem.
+The tradeoff developers have lived with so far has been "use Aiken and accept overhead, or use Plutarch and accept the cost in development time and bug surface." Pebble's published benchmarks ([HarmonicLabs/pebble](https://github.com/HarmonicLabs/pebble)) show that it:
 
-Pebble bridges this gap by offering a syntax and development experience familiar to TypeScript and JavaScript developers, the largest programming communities in the world. By lowering the barrier to entry, Pebble opens Cardano development to millions of developers who would otherwise be deterred by the functional programming learning curve.
+- produces on-chain UPLC that **strictly outperforms equivalent Aiken contracts** in both CPU and memory budget, with smaller script sizes;
+- comes within range of **hand-tuned Plutarch** on the same workloads;
+- does so without asking the developer to think about UPLC primitives, scopes, or builtin selection — the compiler does that.
 
-##### Efficient on-chain code
+The implication is that Pebble eliminates the "performance vs. ergonomics" tradeoff that has defined Cardano smart-contract development to date. There is no remaining argument of the form "yes Pebble is more pleasant, but you have to give up efficiency": the benchmarks show the opposite.
 
-Despite its imperative syntax, Pebble compiles to highly optimized UPLC (Untyped Plutus Core). Developers don't have to choose between familiarity and efficiency: Pebble delivers both. The compiler performs aggressive optimizations to minimize execution costs, ensuring that contracts written in Pebble are competitive with hand-optimized Plutus code, making them a viable choice for production applications.
+#### The largest developer community on earth, by self-report
 
-##### Professional development experience
+The Cardano Foundation's annual developer surveys consistently show **TypeScript / JavaScript as the most-used language among Cardano developers** — by a wide margin, ahead of every functional language combined. This mirrors the global picture: Stack Overflow's developer surveys have ranked JavaScript and TypeScript at or near the top for over a decade, with a working population in the tens of millions.
 
-Pebble's tooling, including a full Language Server Protocol (LSP) implementation, CLI with watch mode, and integrated debugging via sourcemaps, provides a development experience on par with mature ecosystems. Developers can enjoy auto-completion, inline error reporting, go-to-definition, and all the conveniences they expect from modern IDEs. This professional-grade tooling accelerates development cycles and reduces bugs, ultimately leading to higher-quality dApps on Cardano.
+Pebble's surface syntax is deliberately TypeScript-shaped: the same expression forms, the same type annotations, the same control structures. A working TypeScript developer does not learn "a new language" to write Pebble; they learn a constrained dialect of one they already use every day.
 
-#### Who will benefit from the tooling maintenance?
+This is the largest single onboarding lever Cardano has available to it for smart-contract development, and it is not one Aiken can pull — Aiken's syntax is closer to Rust/Gleam, which is a different audience entirely.
 
-##### TL;DR
+#### A direct on-ramp for Solidity developers
 
-The entire ecosystem can have the guarantee that there will always be up-to-date, easy to use, tools for them to use, without the fear of having to redesign entire applications because of missing support.
+Solidity is, for all its differences from TypeScript, also imperative, statically typed, and C-family in shape. The mental model translates cleanly to Pebble: contracts as procedures, locals as mutable bindings, control flow as explicit branches and loops. Pebble's documentation will lean into this — guiding EVM developers through the eUTxO model in a language whose surface they already recognize.
 
-##### Ecosystem-wide stability
+For an ecosystem competing for developer migration, this matters. The friction in moving from Solidity to Aiken is two simultaneous shifts: the eUTxO model **and** functional programming. With Pebble, the eUTxO shift is the only barrier — a markedly smaller one.
 
-The TypeScript tooling maintained by HLabs underpins a significant portion of Cardano's developer ecosystem. Libraries like `cardano-ledger-ts`, `ouroboros-miniprotocols-ts`, and `uplc` are dependencies for numerous projects—both directly and transitively through other libraries. When a hard fork introduces protocol changes, these foundational libraries must be updated promptly, or downstream projects face breaking changes and potential security vulnerabilities.
+### Why Pebble and Aiken can coexist (and Cardano benefits from both)
 
-By funding ongoing maintenance, the Treasury ensures that the TypeScript ecosystem remains synchronized with protocol upgrades. Developers can trust that their applications will continue to function across hard forks without emergency rewrites or extended downtime.
+This proposal is not a case for replacing Aiken. Aiken is well-supported, well-loved by FP-fluent teams, and has a healthy contributor base. The Cardano ecosystem benefits from having a polished functional option for the developers who want one.
 
-##### Reducing fragmentation risk
+What Cardano does not currently have is a polished imperative option, and that gap is what gates a whole class of developers from contributing. Pebble fills it. Two compilers, both targeting UPLC, optimizing the same bytecode — different on-ramps for different mental models, neither subtracting from the other.
 
-Without dedicated maintenance, critical libraries risk abandonment, a common fate in open-source ecosystems.
+### Tooling maintenance: foundational, in production, non-optional
 
-Abandoned dependencies force teams to either fork and maintain code themselves (duplicating effort across the ecosystem) or migrate to alternative solutions (fragmenting the developer community). Both outcomes are costly and destabilizing.
+The second half of this proposal is the unglamorous but load-bearing work: keeping HLabs' TypeScript stack alive across protocol upgrades.
 
-Sustained funding for HLabs tooling maintenance eliminates this risk, providing the ecosystem with a reliable foundation upon which developers can confidently build long-term projects.
+The libraries in question are not internal HLabs concerns; they are dependencies of the wider TypeScript ecosystem on Cardano:
+
+- **[Mesh](https://meshjs.dev/)** — the most widely-used dApp SDK on Cardano — pulls on HLabs primitives transitively for ledger types, CBOR, and protocol semantics.
+- **[Lucid Evolution](https://github.com/Anastasia-Labs/lucid-evolution)** — the active fork of Lucid maintained by Anastasia Labs and depended on by a large fraction of production wallets and dApps — depends on the same stack.
+- **[Midgard](https://midgardprotocol.com/)** — Anastasia Labs' Layer 2 — runs on top of these libraries in production. When HLabs ships, Midgard ships; when HLabs lags, Midgard lags.
+- Numerous wallet integrations, indexers, and dApp backends pull `cardano-ledger-ts`, `ouroboros-miniprotocols-ts`, `plutus-machine`, and `uplc` directly or transitively.
+
+This is the situation a hard fork creates: the moment the protocol changes, every one of those projects has a hard dependency on whoever maintains the foundation. If that maintenance is reliably funded, the ecosystem ships in lockstep with the protocol. If it is not, the ecosystem fragments — projects fork the libraries, freeze on old versions, or migrate, none of which serves Cardano.
+
+Funding tooling maintenance through this proposal is not "nice to have alongside Pebble." It is the predictable, unglamorous payment that keeps the production TypeScript ecosystem on Cardano coherent through the next protocol upgrade. Skipping it does not save money — it pushes the cost to dozens of downstream teams who each have to absorb it independently and inconsistently.
+
+### Direct user benefits
+
+Beyond the strategic case, this proposal unlocks concrete improvements for the people who build on Cardano daily:
+
+#### For developers writing new contracts
+
+- An imperative, TypeScript-shaped language with full LSP support, autocompletion, go-to-definition, inline diagnostics, and a working watch-mode CLI — a development experience comparable to mature Web2 ecosystems.
+- Performance characteristics that previously required dropping down to Plutarch.
+- Straightforward onboarding for the TypeScript and Solidity developer populations, the two largest pools of working programmers globally.
+
+#### For projects already shipping on Cardano
+
+- A maintained, hard-fork-ready TypeScript foundation under Mesh, Lucid Evolution, Midgard, and the long tail of dApps that depend on them — without any of them having to fund the maintenance themselves.
+- Continuity across protocol upgrades, so applications keep working without emergency rewrites or extended downtime.
+
+#### For the ecosystem as a whole
+
+- A second well-supported smart-contract paradigm targeting UPLC, broadening the developer funnel without fragmenting the runtime.
+- Reduced concentration risk: critical libraries no longer depending on a single team's discretionary capacity to keep up with the protocol.
 
 ### Cardano 2030 Alignment
 
