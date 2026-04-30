@@ -4,16 +4,9 @@ set -euo pipefail
 # build-tx.sh - Build a transaction to submit the treasury withdrawal governance action.
 # Usage: NETWORK=preprod scripts/build-tx.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
 
 # ── Network flag (query/tx commands use --testnet-magic N) ───────────────────
 
@@ -25,7 +18,7 @@ esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────
 
-ACTION_FILE="${REPO_ROOT}/treasury-withdrawal.action"
+ACTION_FILE="${PROPOSAL_DIR}/treasury-withdrawal.action"
 if [[ ! -f "$ACTION_FILE" ]]; then
     echo "Error: Governance action file not found: ${ACTION_FILE}" >&2
     echo "Run 'make governance-action' first." >&2
@@ -157,7 +150,7 @@ echo ""
 
 # ── Build transaction ────────────────────────────────────────────────────────
 
-TX_RAW="${REPO_ROOT}/tx.raw"
+TX_RAW="${PROPOSAL_DIR}/tx.raw"
 
 # Build --tx-in flags for all selected UTxOs
 TX_IN_FLAGS=()

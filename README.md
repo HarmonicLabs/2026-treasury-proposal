@@ -1,13 +1,11 @@
-# Harmonic Labs 2026 Treasury Proposal
+# Harmonic Labs 2026 Treasury Proposals
 
-Cardano Treasury Withdrawal governance action proposal to fund HLabs open source development, 
-including: [Gerolamo](https://github.com/HarmonicLabs/gerolamo), [Pebble](https://github.com/HarmonicLabs/pebble) as well as 2026 Hard Fork(s) maintainance.
+Two independent Cardano Treasury Withdrawal governance actions to fund HLabs open source development:
 
-[Initial draft of the proposal](https://hackmd.io/@HarmonicLabs/HLabs2026Budget)
+- **Pebble + Tooling Maintenance** — 5 FTE, 5,175,000 ADA — see [proposals/pebble-tooling/docs/proposal.md](proposals/pebble-tooling/docs/proposal.md).
+- **Gerolamo Light Node** — 5 FTE, 5,175,000 ADA — see [proposals/gerolamo/docs/proposal.md](proposals/gerolamo/docs/proposal.md).
 
-## Overview
-
-This repository contains everything needed to create, test, and submit a Cardano Treasury Withdrawal governance action for Harmonic Labs to fund open source development, including Gerolamo, Pebble, and 2026 Hard Fork(s) maintenance.
+Each proposal has its own metadata, anchor, and on-chain governance action. They share the same SundaeSwap treasury contract, oversight board (Santiago Carmuega, Lucas Rosa, Chris Gianelloni), and signing infrastructure.
 
 ## Prerequisites
 
@@ -18,80 +16,87 @@ This repository contains everything needed to create, test, and submit a Cardano
 - `basenc` (GNU coreutils) >= 9.1
 - `make`
 
-## Quick Start
-
-if you are using an hardware wallet, you can generate the necessary files as shown in the [`cardano-hw-cli` docs](https://github.com/vacuumlabs/cardano-hw-cli/blob/develop/docs/transaction-example.md#verification-payment-key-and-hardware-wallet-signing-file)
-
-```bash
-make help              # Show all available targets
-make check-prereqs     # Verify tools are installed
-make metadata          # Generate CIP-108 metadata
-make hash              # Hash metadata with blake2b-256
-make submit-testnet    # Full testnet submission workflow
-make test-lifecycle    # Automated testnet lifecycle test
-```
-
-## step-by-step Proposal submission
-
-1. `make build-contract`
-2. Submit publish txs using the contract CLI
-3. Update `TREASURY_SCRIPT_REF_UTXO` in config.env with the UTxO from step 2
-4. `make register-stake`
-5. `make register-receiving-stake`
-6. `make fetch-guardrails`
-7. `make metadata`
-8. `make hash`
-9. `make sign-metadata && make upload-ipfs` — then update `ANCHOR_URL` in config.env
-10. `make fund-proposal`
-11. `make submit-testnet`
-
-
 ## Repository Structure
 
 ```
-metadata/          CIP-108 proposal metadata JSON (self-contained)
-docs/              Proposal narrative and translations (es, ja)
-docs/reports/      Progress report templates
-scripts/           Makefile-driven automation scripts
-journal/           On-chain transaction transparency journal
-contracts/         SundaeSwap treasury contract configuration
-gap-analysis/      Gap analysis documents
+Makefile, scripts/, contracts/, keys/   shared infrastructure
+config.shared.env                       shared values (PINATA_JWT, oversight,
+                                        HW signing files, contract dates, etc.)
+proposals/
+  pebble-tooling/
+    config.env                          per-proposal: TRANSFER_AMOUNT, ANCHOR_URL
+    docs/proposal.md                    proposal narrative
+    metadata/proposal-metadata.json     CIP-108 metadata (generated)
+    mainnet-logs/                       on-chain submission logs
+    tx.{raw,signed}, *.action, ...      generated tx artifacts (gitignored)
+  gerolamo/
+    (same layout)
+  _archive-2026-combined/               artifacts from the prior combined proposal
 ```
 
-## Proposal
+## Quick Start
 
-The full proposal narrative is in [docs/proposal.md](docs/proposal.md). Translations are available in [Spanish](docs/proposal.es.md) and [Japanese](docs/proposal.ja.md). The CIP-108 metadata JSON at [metadata/proposal-metadata.json](metadata/proposal-metadata.json) contains the complete proposal in the format required for on-chain submission.
+Every proposal-specific target requires `PROPOSAL=pebble-tooling` or `PROPOSAL=gerolamo`.
+
+```bash
+make help                                          # Show all available targets
+make check-prereqs                                 # Verify tools are installed
+make metadata          PROPOSAL=pebble-tooling     # Generate CIP-108 metadata
+make hash              PROPOSAL=pebble-tooling     # Hash metadata with blake2b-256
+make submit-testnet    PROPOSAL=pebble-tooling     # Full preprod submission workflow
+make test-lifecycle    PROPOSAL=pebble-tooling     # Automated preprod lifecycle test
+```
+
+Targets without a proposal scope (run once per network):
+
+```bash
+make check-prereqs
+make build-contract
+make register-stake
+make register-receiving-stake
+make delegate-always-abstain
+make fetch-guardrails
+```
+
+## Step-by-step Proposal Submission
+
+For each proposal (`PROPOSAL=pebble-tooling` or `PROPOSAL=gerolamo`):
+
+1. `make build-contract` *(once)*
+2. Submit publish txs using the contract CLI *(once)*
+3. Update `TREASURY_SCRIPT_REF_UTXO` in `config.shared.env` with the UTxO from step 2 *(once)*
+4. `make register-stake` *(once)*
+5. `make register-receiving-stake` *(once)*
+6. `make fetch-guardrails` *(once)*
+7. `make metadata        PROPOSAL=<name>`
+8. `make hash            PROPOSAL=<name>`
+9. `make sign-metadata   PROPOSAL=<name> && make upload-ipfs PROPOSAL=<name>` — then update `ANCHOR_URL` in `proposals/<name>/config.env`
+10. `make fund-proposal  PROPOSAL=<name>`
+11. `make submit-testnet PROPOSAL=<name>` *(or `make submit-mainnet PROPOSAL=<name>`)*
+
+## Configuration
+
+```bash
+cp config.shared.env.example config.shared.env
+# Edit config.shared.env with your keys, PINATA_JWT, node socket, etc.
+
+# Per-proposal config files already exist at:
+#   proposals/pebble-tooling/config.env
+#   proposals/gerolamo/config.env
+# Each holds only TRANSFER_AMOUNT and ANCHOR_URL — fill in ANCHOR_URL after IPFS upload.
+```
 
 ## Smart Contracts
 
-Uses audited [SundaeSwap treasury-contracts](https://github.com/SundaeSwap-finance/treasury-contracts) (treasury.ak + vendor.ak) with an independent oversight board for fund management. See [contracts/README.md](contracts/README.md) for the permission scheme.
-
-## Testnet Workflow
-
-```bash
-# 1. Configure
-cp config.env.example config.env
-# Edit config.env with your keys and addresses
-
-# 2. Test on preprod
-make test-lifecycle
-
-# 3. Or step by step
-make metadata
-make hash
-make governance-action NETWORK=preprod
-make build-tx NETWORK=preprod
-make sign-tx NETWORK=preprod
-make submit-testnet
-```
+Both proposals withdraw to the same audited [SundaeSwap treasury-contracts](https://github.com/SundaeSwap-finance/treasury-contracts) (`treasury.ak` + `vendor.ak`) with the same independent oversight board. See [contracts/README.md](contracts/README.md) for the permission scheme.
 
 ## Reporting
 
-Monthly lightweight updates and quarterly detailed reports are generated via:
+Monthly lightweight updates and quarterly detailed reports are generated per proposal:
 
 ```bash
-make report              # Monthly report
-scripts/generate-report.sh --quarterly  # Quarterly report with financials
+make report PROPOSAL=pebble-tooling                                # Monthly
+PROPOSAL_DIR=proposals/pebble-tooling scripts/generate-report.sh --quarterly  # Quarterly
 ```
 
 ## License

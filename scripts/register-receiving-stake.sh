@@ -5,16 +5,8 @@ set -euo pipefail
 # Required before submitting a treasury withdrawal that sends funds to a script stake address.
 # Usage: NETWORK=preprod scripts/register-receiving-stake.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
 
 # ── Network flag ─────────────────────────────────────────────────────────────
 

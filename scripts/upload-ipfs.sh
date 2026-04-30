@@ -10,18 +10,11 @@ set -euo pipefail
 #
 # Requires PINATA_JWT in config.env or environment.
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
 
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
-
-METADATA_FILE="${1:-${REPO_ROOT}/metadata/proposal-metadata.json}"
+METADATA_FILE="${1:-${PROPOSAL_DIR}/metadata/proposal-metadata.json}"
 
 echo "=== Upload to IPFS (Pinata) ==="
 echo ""
@@ -59,7 +52,7 @@ if [[ -n "$CID" ]]; then
         echo "IPFS URL: ${IPFS_URL}"
         echo "Gateway:  https://gateway.pinata.cloud/ipfs/${CID}"
         echo ""
-        echo "Set ANCHOR_URL in config.env to:"
+        echo "Set ANCHOR_URL in ${PROPOSAL_DIR}/config.env to:"
         echo "  ANCHOR_URL=${IPFS_URL}"
         exit 0
     fi
@@ -96,5 +89,5 @@ echo "CID:      ${CID}"
 echo "IPFS URL: ${IPFS_URL}"
 echo "Gateway:  https://gateway.pinata.cloud/ipfs/${CID}"
 echo ""
-echo "Set ANCHOR_URL in config.env to:"
+echo "Set ANCHOR_URL in ${PROPOSAL_DIR}/config.env to:"
 echo "  ANCHOR_URL=${IPFS_URL}"

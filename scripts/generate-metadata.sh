@@ -7,9 +7,12 @@ set -euo pipefail
 #
 # Usage: scripts/generate-metadata.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PROPOSAL_MD="${REPO_ROOT}/docs/proposal.md"
-METADATA_JSON="${REPO_ROOT}/metadata/proposal-metadata.json"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
+
+PROPOSAL_MD="${PROPOSAL_DIR}/docs/proposal.md"
+METADATA_JSON="${PROPOSAL_DIR}/metadata/proposal-metadata.json"
 
 echo "=== Generate Proposal Metadata ==="
 echo ""
@@ -17,7 +20,7 @@ echo ""
 # ── Case 1: proposal.md exists - assemble metadata from it ─────────────────
 
 if [[ -f "$PROPOSAL_MD" ]]; then
-    echo "Found docs/proposal.md - assembling CIP-108 metadata..."
+    echo "Found ${PROPOSAL_MD} - assembling CIP-108 metadata..."
 
     # Extract sections from proposal.md.
     # Expected structure: # Title, ## Abstract, ## Motivation, ## Rationale
@@ -88,19 +91,19 @@ if [[ -f "$PROPOSAL_MD" ]]; then
             }
         }' > "$METADATA_JSON"
 
-    echo "Metadata assembled from docs/proposal.md"
+    echo "Metadata assembled from ${PROPOSAL_MD}"
     echo "Output: ${METADATA_JSON}"
     exit 0
 fi
 
 # ── Case 2: proposal.md missing, metadata already exists ───────────────────
 
-echo "Warning: docs/proposal.md not found." >&2
+echo "Warning: ${PROPOSAL_MD} not found." >&2
 
 if [[ -f "$METADATA_JSON" ]]; then
     echo "Using existing metadata: ${METADATA_JSON}"
     echo ""
-    echo "To regenerate, create docs/proposal.md and re-run this script."
+    echo "To regenerate, create ${PROPOSAL_MD} and re-run this script."
     exit 0
 fi
 
@@ -143,4 +146,4 @@ echo "Template created: ${METADATA_JSON}"
 echo ""
 echo "Next steps:"
 echo "  1. Edit ${METADATA_JSON} directly, or"
-echo "  2. Create docs/proposal.md and re-run this script."
+echo "  2. Create ${PROPOSAL_MD} and re-run this script."

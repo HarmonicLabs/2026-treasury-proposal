@@ -1,4 +1,4 @@
-# Pebble + Gerolamo - HLabs 2026 Budget
+# HLabs 2026 — Gerolamo Light Node
 
 ## Abstract
 
@@ -8,23 +8,25 @@ Harmonic Laboratories supports and maintains a considerable portion of the TypeS
 
 The mission of HLabs is for true decentralization to become the baseline of application development, not only a nice-to-have feature.
 
+This proposal funds the development of a production-ready light node for Cardano, [Gerolamo](https://github.com/HarmonicLabs/gerolamo), at 5 FTE.
+
+A separate proposal funds [Pebble](https://github.com/HarmonicLabs/pebble) and ongoing TypeScript tooling maintenance at 5 FTE and is voted on independently.
+
 ### Duration & Milestones
 
-This proposal spans over **12 months**, throughout which there will be several deliveries and demos. Amongst the key deliveries, we note:
+This proposal spans over **12 months**, throughout which there will be several deliveries and demos. The key delivery is:
 
-- maintenance for an upcoming hard fork;
-- a production-ready light node ([Gerolamo](https://github.com/HarmonicLabs/gerolamo));
-- a production-ready, imperative and efficient, programming language for smart contracts ([pebble](https://github.com/HarmonicLabs/pebble)).
+- a production-ready light node ([Gerolamo](https://github.com/HarmonicLabs/gerolamo)).
 
 ### Total Budget Ask
 
-The estimated USD budget is of **`$2,250,000`** (or **`₳6,428,571`**) + 25% in refundable contingency (**`₳1,607,143`**); for a total ask of **`8,035,714 ADA`**.
+The estimated USD budget is of **`$1,125,000`** (or **`₳4,500,000`**) + 15% in refundable contingency (**`₳675,000`**); for a total ask of **`5,175,000 ADA`**.
 
 ## Motivation
 
 ### Ecosystem benefits
 
-Gerolamo, Pebble, and ongoing tooling maintenance each serve distinct stakeholders while collectively strengthening Cardano's infrastructure, developer and user experience, and long-term sustainability.
+Gerolamo strengthens Cardano's infrastructure by providing a second spec-conformant node implementation, native to JavaScript/TypeScript runtimes, that runs in browsers, on servers, and inside dApps and wallets.
 
 #### Who will benefit from Gerolamo?
 
@@ -54,48 +56,6 @@ Stake Pool Operators can use Gerolamo as an additional relay node alongside thei
 
 A diverse node implementation landscape strengthens the network's resilience. By providing an alternative codebase for relays, Gerolamo reduces the risk of network-wide issues stemming from bugs in a single implementation; a critical factor for long-term network health and decentralization.
 
-#### Who will benefit from Pebble?
-
-##### TL;DR
-
-Developers who seek an alternative to functional programming without sacrificing efficiency.
-
-The language aims to be as similar as possible to TypeScript, which is a widely adopted language used in Web2, as well as similar to languages used in other, more mature ecosystems, such as Solidity on EVM chains.
-
-##### Onboarding Web2 developers
-
-One of Cardano's greatest challenges is the steep learning curve for smart contract development. Aiken, the most widely adopted smart contract language on Cardano, while a great improvement compared to haskell, still requires familiarity with functional programming paradigms, concepts unfamiliar to the vast majority of developers worldwide. This barrier significantly limits the pool of talent that can contribute to Cardano's dApp ecosystem.
-
-Pebble bridges this gap by offering a syntax and development experience familiar to TypeScript and JavaScript developers, the largest programming communities in the world. By lowering the barrier to entry, Pebble opens Cardano development to millions of developers who would otherwise be deterred by the functional programming learning curve.
-
-##### Efficient on-chain code
-
-Despite its imperative syntax, Pebble compiles to highly optimized UPLC (Untyped Plutus Core). Developers don't have to choose between familiarity and efficiency: Pebble delivers both. The compiler performs aggressive optimizations to minimize execution costs, ensuring that contracts written in Pebble are competitive with hand-optimized Plutus code, making them a viable choice for production applications.
-
-##### Professional development experience
-
-Pebble's tooling, including a full Language Server Protocol (LSP) implementation, CLI with watch mode, and integrated debugging via sourcemaps, provides a development experience on par with mature ecosystems. Developers can enjoy auto-completion, inline error reporting, go-to-definition, and all the conveniences they expect from modern IDEs. This professional-grade tooling accelerates development cycles and reduces bugs, ultimately leading to higher-quality dApps on Cardano.
-
-#### Who will benefit from the tooling maintenance?
-
-##### TL;DR
-
-The entire ecosystem can have the guarantee that there will always be up-to-date, easy to use, tools for them to use, without the fear of having to redesign entire applications because of missing support.
-
-##### Ecosystem-wide stability
-
-The TypeScript tooling maintained by HLabs underpins a significant portion of Cardano's developer ecosystem. Libraries like `cardano-ledger-ts`, `ouroboros-miniprotocols-ts`, and `uplc` are dependencies for numerous projects—both directly and transitively through other libraries. When a hard fork introduces protocol changes, these foundational libraries must be updated promptly, or downstream projects face breaking changes and potential security vulnerabilities.
-
-By funding ongoing maintenance, the Treasury ensures that the TypeScript ecosystem remains synchronized with protocol upgrades. Developers can trust that their applications will continue to function across hard forks without emergency rewrites or extended downtime.
-
-##### Reducing fragmentation risk
-
-Without dedicated maintenance, critical libraries risk abandonment, a common fate in open-source ecosystems.
-
-Abandoned dependencies force teams to either fork and maintain code themselves (duplicating effort across the ecosystem) or migrate to alternative solutions (fragmenting the developer community). Both outcomes are costly and destabilizing.
-
-Sustained funding for HLabs tooling maintenance eliminates this risk, providing the ecosystem with a reliable foundation upon which developers can confidently build long-term projects.
-
 ### Cardano 2030 Alignment
 
 This proposal directly supports the [Cardano 2030 Strategic Framework](https://product.cardano.intersectmbo.org/vision/strategy-2030/), contributing to core KPIs and strategic pillars as outlined below.
@@ -105,21 +65,14 @@ This proposal directly supports the [Cardano 2030 Strategic Framework](https://p
 | KPI / Strategic Priority                   | 2030 Target / Goal             | HLabs Contribution                                                              |
 | :----------------------------------------- | :----------------------------- | :------------------------------------------------------------------------------ |
 | **Alternative full node clients**          | ≥2 spec-conformant             | Gerolamo directly contributes as a second spec-conformant client implementation |
-| **Monthly Uptime**                         | 99.98%                         | Hard-fork maintenance ensures ecosystem stability across protocol upgrades      |
-| **Developer migration pathways** (A.3)     | "More developers can onboard"  | Pebble provides EVM/TS developers a familiar syntax for Cardano smart contracts |
 
-> **Note**: The first two rows are formal Cardano 2030 KPIs. The third row corresponds to Strategic Pillar A.3 (Developer Experience → Education & migration), which is an explicit 2030 priority but not yet a numeric KPI. TVL, monthly transactions, and MAU are ecosystem-level outcomes enabled by infrastructure investments like this proposal; we track adoption indicators (below) as leading metrics that contribute to these outcomes.
+> **Note**: The row above is a formal Cardano 2030 KPI. TVL, monthly transactions, and MAU are ecosystem-level outcomes enabled by infrastructure investments like this proposal; we track adoption indicators (below) as leading metrics that contribute to these outcomes.
 
 #### Alignment with Strategic Pillars
 
 **Pillar 1: Infrastructure & Research Excellence**
 
 - **I.2 Security & Resilience → Client Diversity**: Gerolamo is explicitly aligned with the 2030 goal of "supporting additional full-node and light-client implementations" to achieve "better decentralization" and "reduce single-client risk."
-
-**Pillar 2: Adoption & Utility**
-
-- **A.3 Developer Experience → Open-source incentives**: This proposal directly addresses the strategic priority to "incentivize the maintenance of core Cardano SDKs, frameworks, and infrastructure in line with open-source best practices" for a "sustainable builder ecosystem."
-- **A.3 Developer Experience → Education & migration**: Pebble addresses the goal to "provide materials for EVM/account-based devs moving to Cardano/UTxO" by offering familiar imperative syntax, enabling "more developers to onboard."
 
 #### Measurable Adoption Indicators
 
@@ -132,14 +85,6 @@ To provide visibility into how this proposal contributes to ecosystem-level outc
 | SPOs running Gerolamo as relay   | ≥10 pools         | Public registry + self-reporting       |
 | Browser-based node integrations  | ≥3 wallets/dApps  | dApps/wallets integrations             |
 
-##### Pebble Adoption Targets
-
-| Metric                     | 12-Month Target         | Measurement Method                             |
-| :------------------------- | :---------------------- | :--------------------------------------------- |
-| Developer onboarding       | ≥20 developers          | npm downloads, GitHub stars, Discord members   |
-| Documentation completeness | 100% coverage           | All language features documented with examples |
-| Tutorial completion        | ≥3 e2e tutorials        | Published guides covering common patterns      |
-
 ## Rationale
 
 ### Budget Breakdown
@@ -148,81 +93,67 @@ The full budget breakdown is given below.
 
 For a fair valuation of the proposal, we will follow a similar process to what is used in the Amaru proposal, which we believe is setting a good standard in terms of Treasury budget proposals, and we will estimate the scopes of this proposal in _FTE_ (Full-Time Equivalent), which we will consider to equal a figure of `$225k` yearly rate.
 
-We use a conversion rate of `0.35` ADA [`₳`] per USD [`$`].
+We use a conversion rate of `4` ADA [`₳`] per USD [`$`].
 
 #### Complete View
 
 | Scope                                                     | Estimated (FTEs) | Project Total ($)  |
 | :---                                                      | ---:             | ---:               |
 | Gerolamo (TypeScript Cardano node)                        | 5                | `$1,125,000`       |
-| Pebble (programming language + dApp development tools)    | 3.5              | `$787,500`         |
-| Hard-fork maintenance                                     | 1.5              | `$337,500`         |
 |                                                           |                  |                    |
-| **Total**                                                 | **10 FTEs**      | `$2,250,000`       |
+| **Total**                                                 | **5 FTEs**       | `$1,125,000`       |
 
 #### Cost Rationale
 
-The total ask for the project is `10 FTEs`.
+The total ask for the project is `5 FTEs`.
 
 FTEs are being valued at an annual rate of `$225k`.
 
-Furthermore, we are aware of our assumption/optimism bias (our forecast is subject to underestimating complexity, overlooking challenges, and undervaluing the time and cost required to deliver, as well as our biased expectation of market movements). We therefore add an extra 25% contingency buffer, learning by our past mistakes.
+Furthermore, we are aware of our assumption/optimism bias (our forecast is subject to underestimating complexity, overlooking challenges, and undervaluing the time and cost required to deliver, as well as our biased expectation of market movements). We therefore add an extra 15% contingency buffer, learning by our past mistakes.
 
-This leaves us with the following total: `(10 x $225k) x 1.25 = $2,812,500`
+This leaves us with the following total: `(5 x $225k) x 1.15 = $1,293,750`
 
-Finally, using a conversion rate of `0.35` ADA per USD, we formulate a budget ask of **`₳8,035,714`**. A [complete breakdown of this budget](#budget-detailed-view) is available below.
+Finally, using a conversion rate of `4` ADA per USD, we formulate a budget ask of **`₳5,175,000`**. A [complete breakdown of this budget](#budget-detailed-view) is available below.
 
 ### Milestones
 
 This proposal spans Q2 2026 through Q1 2027, with milestones organized by quarter.
 
-#### Q2 2026 (Apr–Jun): Hard Fork Readiness & Foundations
+#### Q2 2026 (Apr–Jun): Foundations
 
-- Hard-fork maintenance: all TypeScript libraries updated for the upcoming hard fork
-- Gerolamo: improve storage and networking for browser environments;
-- Pebble: complete the type system; support for upcoming hard fork changes
+- Gerolamo: improve storage and networking for browser environments
 
 **Completion evidence:**
 
-- All relevant libraries maintained by HLabs support the Hardfork
 - Gerolamo syncs to tip on public test network
-- Multiple (≥3) pebble contracts of various complexity compiled end-to-end to valid on-chain code
 
 #### Q3 2026 (Jul–Sep): Core Delivery
 
 - Gerolamo: initial server-side relay capable release
-- Pebble: additional key language features, such as namespaces, tests and more comprehensive standard library
 
 **Completion evidence:**
 
 - Gerolamo server-side relay syncs and follows chain tip on public test network
 - Gerolamo relay published as installable release
-- New language features implemented (e.g. namespaces, tests, standard library)
 
 #### Q4 2026 (Oct–Nov): Integration & Browser Support
 
 - Gerolamo: browser light node capable of syncing and serving chain data; compatibility with existing Cardano tooling
-- Pebble: complete IDE integration & CLI + push for developers onboarding
 
 **Completion evidence:**
 
 - Browser demo syncing and querying chain data without a backend server
 - Standard Cardano tool (cardano-cli or cardano-db-sync) successfully connects to Gerolamo
-- Pebble IDE extension published with syntax highlighting and inline errors
-- Pebble CLI `build` command working on multiple projects
 
-#### Q1 2027 (Dec–Mar): Production Readiness, Documentation & Adoption
+#### Q1 2027 (Dec–Mar): Production Readiness
 
 - Gerolamo: production-ready browser light node; performance validation
-- Pebble: interactive console, documentation, tutorials
 
 **Completion evidence:**
 
 - Major browsers where Gerolamo runs as a light node (Chromium etc.)
 - Gerolamo browser node reaches a "trustless" tip, eventually over multiple sessions
 - Gerolamo maintains stable peer connections for ≥24 hours
-- Pebble language features documented with examples
-- End-to-end tutorials published
 
 ### Budget Administration and Governance Oversight
 
@@ -305,7 +236,7 @@ In an effort to convince ourselves of the proposal's constitutionality, we thoug
 
 #### Cardano 2030 Strategic Alignment
 
-- [x] This proposal directly supports the Cardano 2030 Strategic Framework, contributing to the "Alternative full node clients" KPI (Pillar 1: Security & Resilience) and Developer Experience priorities (Pillar 2: Adoption & Utility).
+- [x] This proposal directly supports the Cardano 2030 Strategic Framework, contributing to the "Alternative full node clients" KPI (Pillar 1: Security & Resilience).
 
 - [x] Measurable adoption indicators have been defined to provide visibility into ecosystem-level KPI contributions (TVL, monthly transactions, MAU).
 
@@ -412,110 +343,3 @@ Gerolamo will be considered production-ready as a browser light node when it mee
 > should the condition allow the next year, block production will be strongly considered.
 >
 > given the current environment we decided it would be best to cut those efforts in order to contain the costs.
-
-#### Pebble (smart contract programming language)
-
-[repo](https://github.com/HarmonicLabs/pebble)
-
-| Main Objective                    |
-| ---                               |
-| production-ready language & tools |
-
-Pebble is a simple, yet rock solid, functional language with an imperative bias, targeting UPLC (Untyped Plutus Core). It provides developers with an intuitive syntax while compiling to highly optimized on-chain code.
-
-##### Compiler Stability
-
-###### Goal
-
-Achieve production-grade compiler stability with optimized code generation.
-
-###### Key Results
-
-- Comprehensive type system with full type inference
-- Optimized UPLC code generation with minimal script sizes
-- Complete error reporting with actionable messages
-- Support for Plutus V4
-- Key language features: namespaces, built-in test support, comprehensive standard library
-- Documentation and tutorials for onboarding new developers
-
-###### Estimated Effort
-
-2 FTEs
-
-##### Developer Tooling
-
-###### Goal
-
-Provide a complete development experience for Pebble developers with IDE integration, debugging tools, and build system support.
-
-###### Key Results
-
-- **Language Server Protocol (LSP)** implementation:
-  - Syntax highlighting
-  - Auto-completion
-  - Go-to-definition
-  - Find references
-  - Inline error reporting
-  - Hover documentation
-- **Stable and reliable sourcemaps** for debugging compiled contracts
-- **CLI improvements**:
-  - Build and watch modes
-  - REPL for interactive development
-- **Blueprint generation** for contract metadata
-
-###### Estimated Effort
-
-1.5 FTEs
-
-##### Pebble Summary
-
-- total resources estimated: `3.5 FTEs`
-
-##### Differentiation from Aiken
-
-Pebble and Aiken serve different developer profiles and are **complementary** within the Cardano ecosystem, not competitive.
-
-| Dimension              | Aiken                            | Pebble                                 | Implication                                           |
-| :--------------------- | :------------------------------- | :------------------------------------- | :---------------------------------------------------- |
-| **Paradigm**           | Functional-first (Rust-inspired) | Imperative-first (TypeScript-inspired) | Different mental models for different developers      |
-| **Target audience**    | Developers comfortable with FP   | Web2/EVM developers                    | Expands total addressable developer pool              |
-| **Syntax familiarity** | Rust, Gleam                      | TypeScript, JavaScript, Solidity       | Lower barrier for the 17M+ JS/TS developers globally  |
-| **Learning curve**     | Requires FP fundamentals         | Familiar imperative patterns           | Faster onboarding for majority of developers          |
-
-###### Why both matter
-
-Cardano needs multiple on-ramps for developers:
-- Developers with Rust/Haskell/FP experience gravitate toward Aiken
-- Developers with JS/TS/Solidity experience will find Pebble more accessible
-- Both compile to optimized UPLC; the choice is about developer preference, not runtime performance
-
-By funding Pebble, the Treasury expands Cardano's developer funnel without fragmenting it.
-
-#### Hard-fork maintenance
-
-| Main Objective                |
-| ---                           |
-| guarantee ecosystem stability |
-
-##### Upcoming Intra-Era Hard Fork
-
-###### Goal
-
-Ensure all HLabs TypeScript libraries are updated and fully compatible with the upcoming hard fork, including Plutus V4 changes and new protocol parameters.
-
-###### Key Results
-
-Maintenance of the affected repositories to support new protocol features:
-
-- **[cardano-ledger-ts](https://github.com/HarmonicLabs/cardano-ledger-ts)**: Collection of functions and classes defining the Cardano ledger data structures
-- **[ouroboros-miniprotocols-ts](https://github.com/HarmonicLabs/ouroboros-miniprotocols-ts)**: TypeScript implementation of the Ouroboros networking protocol
-- **[plutus-machine](https://github.com/HarmonicLabs/plutus-machine)**: CEK machine implementation for UPLC evaluation
-- **[uplc](https://github.com/HarmonicLabs/uplc)**: TypeScript/JavaScript representation of UPLC
-
-###### Estimated Effort
-
-1.5 FTE
-
-##### Hard-Fork Maintenance Summary
-
-- total resources estimated: `1.5 FTE`

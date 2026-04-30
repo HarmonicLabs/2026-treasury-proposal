@@ -7,16 +7,9 @@ set -euo pipefail
 #
 # Usage: NETWORK=preprod scripts/fund-proposal.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
 
 # ── Network flag ─────────────────────────────────────────────────────────────
 
@@ -154,7 +147,7 @@ done
 
 # ── Build funding transaction ────────────────────────────────────────────────
 
-TX_RAW="${REPO_ROOT}/fund-proposal.raw"
+TX_RAW="${PROPOSAL_DIR}/fund-proposal.raw"
 
 TX_IN_FLAGS=()
 for utxo in "${TX_INS[@]}"; do
@@ -172,7 +165,7 @@ echo "Transaction built: ${TX_RAW}"
 
 # ── Sign with hardware wallet ───────────────────────────────────────────────
 
-TX_SIGNED="${REPO_ROOT}/fund-proposal.signed"
+TX_SIGNED="${PROPOSAL_DIR}/fund-proposal.signed"
 
 USE_HW=false
 if [[ -n "${PAYMENT_HW_SIGNING_FILE:-}" ]]; then
@@ -232,4 +225,4 @@ echo "Proposal address funded successfully."
 echo "Transaction hash: ${TX_HASH}"
 echo "Proposal address: ${PROPOSAL_ADDRESS}"
 echo ""
-echo "Clean up: rm -f fund-proposal.raw fund-proposal.signed"
+echo "Clean up: rm -f ${PROPOSAL_DIR}/fund-proposal.raw ${PROPOSAL_DIR}/fund-proposal.signed"

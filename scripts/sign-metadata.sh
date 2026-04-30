@@ -9,18 +9,11 @@ set -euo pipefail
 #   metadata-file     Path to the metadata JSON (default: metadata/proposal-metadata.json)
 #   signing-key-file  Path to a Cardano .skey file (default: keys/payment.skey)
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
 
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
-
-METADATA_FILE="${1:-${REPO_ROOT}/metadata/proposal-metadata.json}"
+METADATA_FILE="${1:-${PROPOSAL_DIR}/metadata/proposal-metadata.json}"
 SKEY_FILE="${2:-${REPO_ROOT}/keys/payment.skey}"
 
 echo "=== Sign Metadata ==="

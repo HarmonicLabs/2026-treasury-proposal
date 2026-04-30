@@ -13,17 +13,10 @@ set -euo pipefail
 # Usage: NETWORK=preprod scripts/build-contract.sh
 #   or:  make build-contract
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+
 CONTRACT_DIR="${REPO_ROOT}/contracts/treasury-contracts"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
 
 # ── Network flag ─────────────────────────────────────────────────────────────
 
@@ -48,7 +41,7 @@ done
 
 for var in PAYMENT_ADDRESS OVERSIGHT_SANTIAGO_CARMUEGA OVERSIGHT_CHRIS_GIANELLONI OVERSIGHT_LUCAS_ROSA; do
     if [[ -z "${!var:-}" ]]; then
-        echo "Error: ${var} is not set in config.env." >&2
+        echo "Error: ${var} is not set in config.shared.env." >&2
         MISSING=$((MISSING + 1))
     fi
 done

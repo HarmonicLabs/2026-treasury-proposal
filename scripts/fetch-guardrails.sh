@@ -7,17 +7,10 @@ set -euo pipefail
 #
 # Usage: NETWORK=preprod scripts/fetch-guardrails.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+
 SCRIPTS_DIR="${REPO_ROOT}/scripts"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
 
 # ── Network flags ────────────────────────────────────────────────────────────
 

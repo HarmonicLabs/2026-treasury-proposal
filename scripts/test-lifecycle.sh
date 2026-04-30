@@ -16,17 +16,11 @@ set -euo pipefail
 #   - config.env with preprod testnet values
 #   - Committed metadata JSON file
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
+
 SCRIPTS="${REPO_ROOT}/scripts"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
 
 # ── Mainnet safety check ────────────────────────────────────────────────────
 
@@ -58,7 +52,7 @@ step() {
 
 # ── Resolve metadata file ────────────────────────────────────────────────────
 
-METADATA_FILE="${METADATA_FILE:-metadata/proposal-metadata.json}"
+METADATA_FILE="${METADATA_FILE:-${PROPOSAL_DIR}/metadata/proposal-metadata.json}"
 # Resolve relative paths against REPO_ROOT
 if [[ "$METADATA_FILE" != /* ]]; then
     METADATA_FILE="${REPO_ROOT}/${METADATA_FILE}"
@@ -76,7 +70,7 @@ fi
 echo "Using: ${METADATA_FILE}"
 "${SCRIPTS}/hash-metadata.sh" "$METADATA_FILE"
 
-HASH=$(cat "${REPO_ROOT}/metadata/metadata-hash.txt")
+HASH=$(cat "${PROPOSAL_DIR}/metadata/metadata-hash.txt")
 echo "Metadata hash: ${HASH}"
 
 # ── Step 2: Validate configuration ──────────────────────────────────────────
@@ -146,7 +140,7 @@ step 5 "Sign transaction"
 step 6 "Submit transaction"
 "${SCRIPTS}/submit-tx.sh"
 
-TX_HASH=$(cardano-cli conway transaction txid --tx-file "${REPO_ROOT}/tx.signed")
+TX_HASH=$(cardano-cli conway transaction txid --tx-file "${PROPOSAL_DIR}/tx.signed")
 
 # ── Step 7: Wait for confirmation ───────────────────────────────────────────
 
@@ -209,9 +203,9 @@ echo "Network:          ${NETWORK}"
 echo ""
 echo "Artifacts generated:"
 echo "  ${METADATA_FILE}"
-echo "  metadata/metadata-hash.txt"
-echo "  treasury-withdrawal.action"
-echo "  tx.raw"
-echo "  tx.signed"
+echo "  ${PROPOSAL_DIR}/metadata/metadata-hash.txt"
+echo "  ${PROPOSAL_DIR}/treasury-withdrawal.action"
+echo "  ${PROPOSAL_DIR}/tx.raw"
+echo "  ${PROPOSAL_DIR}/tx.signed"
 echo ""
 echo "Clean up with: make clean"

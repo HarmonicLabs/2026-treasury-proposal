@@ -1,6 +1,0 @@
-NETWORK=mainnet scripts/generate-metadata.sh
-=== Generate Proposal Metadata ===
-
-Found docs/proposal.md - assembling CIP-108 metadata...
-Metadata assembled from docs/proposal.md
-Output: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/metadata/proposal-metadata.json

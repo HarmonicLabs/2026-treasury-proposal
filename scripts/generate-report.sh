@@ -6,9 +6,13 @@ set -euo pipefail
 #   scripts/generate-report.sh              # Monthly report
 #   scripts/generate-report.sh --quarterly  # Quarterly report (includes financials)
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
+
 TEMPLATE="${REPO_ROOT}/docs/reports/TEMPLATE.md"
-REPORTS_DIR="${REPO_ROOT}/docs/reports"
+REPORTS_DIR="${PROPOSAL_DIR}/docs/reports"
+mkdir -p "$REPORTS_DIR"
 
 # ── Parse flags ──────────────────────────────────────────────────────────────
 

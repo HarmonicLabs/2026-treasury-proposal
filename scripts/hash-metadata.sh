@@ -5,9 +5,12 @@ set -euo pipefail
 # Usage: scripts/hash-metadata.sh [metadata-file]
 #   metadata-file  Path to the metadata JSON (default: metadata/proposal-metadata.json)
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-METADATA_FILE="${1:-${REPO_ROOT}/metadata/proposal-metadata.json}"
-HASH_OUTPUT="${REPO_ROOT}/metadata/metadata-hash.txt"
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
+
+METADATA_FILE="${1:-${PROPOSAL_DIR}/metadata/proposal-metadata.json}"
+HASH_OUTPUT="${PROPOSAL_DIR}/metadata/metadata-hash.txt"
 
 echo "=== Hash Proposal Metadata ==="
 echo ""

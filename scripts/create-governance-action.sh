@@ -4,16 +4,9 @@ set -euo pipefail
 # create-governance-action.sh - Create a treasury withdrawal governance action.
 # Usage: NETWORK=preprod scripts/create-governance-action.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
 
 # ── Network flag (governance commands use --testnet/--mainnet) ────────────────
 
@@ -24,7 +17,7 @@ esac
 
 # ── Read metadata hash ──────────────────────────────────────────────────────
 
-HASH_FILE="${REPO_ROOT}/metadata/metadata-hash.txt"
+HASH_FILE="${PROPOSAL_DIR}/metadata/metadata-hash.txt"
 
 if [[ ! -f "$HASH_FILE" ]]; then
     echo "Error: Metadata hash not found at ${HASH_FILE}" >&2
@@ -133,7 +126,7 @@ fi
 
 # ── Create governance action ────────────────────────────────────────────────
 
-OUTPUT_FILE="${REPO_ROOT}/treasury-withdrawal.action"
+OUTPUT_FILE="${PROPOSAL_DIR}/treasury-withdrawal.action"
 
 echo ""
 echo "=== Create Treasury Withdrawal Governance Action ==="

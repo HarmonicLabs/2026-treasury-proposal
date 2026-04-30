@@ -8,16 +8,29 @@ keys/
 # Configuration with secrets
 config.env
 config.env.*
+config.shared.env
+config.shared.env.*
+proposals/*/config.env
 !config.env.example
+!config.shared.env.example
 
-# Build artifacts
-*.action
-*.raw
-*.signed
-tx.*
-stake-reg.*
+# Build artifacts (per-proposal subfolders)
+proposals/*/*.action
+proposals/*/*.raw
+proposals/*/*.signed
+proposals/*/tx.*
+proposals/*/stake-reg.*
+proposals/*/receiving-stake-reg.*
+proposals/*/fund-proposal.*
+proposals/*/fund-publish.*
+proposals/*/vote-deleg.*
+proposals/*/metadata/metadata-hash.txt
+
+# Archived combined-proposal artifacts (kept locally for reference, not tracked)
+proposals/_archive-2026-combined/
+
+# Shared build artifacts
 scripts/guardrails.plutus
-metadata/metadata-hash.txt
 
 # OS
 .DS_Store

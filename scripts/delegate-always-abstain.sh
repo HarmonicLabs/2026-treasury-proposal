@@ -5,16 +5,8 @@ set -euo pipefail
 # Required by Cardano Constitution Article IV, Section 5.
 # Usage: NETWORK=mainnet scripts/delegate-always-abstain.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
 
 # ── Network flag ─────────────────────────────────────────────────────────────
 

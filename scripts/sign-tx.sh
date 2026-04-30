@@ -4,16 +4,9 @@ set -euo pipefail
 # sign-tx.sh - Sign the built transaction with the payment signing key.
 # Usage: NETWORK=preprod scripts/sign-tx.sh
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-
-# ── Source configuration ─────────────────────────────────────────────────────
-
-if [[ -f "${REPO_ROOT}/config.env" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "${REPO_ROOT}/config.env"
-    set +a
-fi
+# shellcheck source=scripts/_lib.sh
+source "$(dirname "$0")/_lib.sh"
+require_proposal_dir
 
 # ── Network flag (sign uses --testnet-magic N) ───────────────────────────────
 
@@ -25,7 +18,7 @@ esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────
 
-TX_RAW="${REPO_ROOT}/tx.raw"
+TX_RAW="${PROPOSAL_DIR}/tx.raw"
 if [[ ! -f "$TX_RAW" ]]; then
     echo "Error: Transaction body not found: ${TX_RAW}" >&2
     echo "Run 'make build-tx' first." >&2
@@ -61,7 +54,7 @@ fi
 
 # ── Sign transaction ─────────────────────────────────────────────────────────
 
-TX_SIGNED="${REPO_ROOT}/tx.signed"
+TX_SIGNED="${PROPOSAL_DIR}/tx.signed"
 
 echo "=== Sign Transaction ==="
 echo ""
