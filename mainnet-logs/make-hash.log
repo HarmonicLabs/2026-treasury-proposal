@@ -1,0 +1,6 @@
+scripts/hash-metadata.sh metadata/proposal-metadata.json
+=== Hash Proposal Metadata ===
+
+Input:  metadata/proposal-metadata.json
+Hash:   09a9d51df80d12097227fc010657f190fb5d71fe75aa020335b04be07b8e3efd
+Saved:  /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/metadata/metadata-hash.txt

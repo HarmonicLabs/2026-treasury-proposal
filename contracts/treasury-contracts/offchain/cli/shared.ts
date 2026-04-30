@@ -859,8 +859,9 @@ export async function deployTransaction<P extends Provider, W extends Wallet>(
   register: boolean = false,
 ): Promise<Transaction> {
   const txBuilder = blazeInstance.newTransaction();
+  const burnAddress = Core.getBurnAddress(blazeInstance.provider.network);
   scripts.forEach((script) => {
-    txBuilder.deployScript(script);
+    txBuilder.deployScript(script, burnAddress);
   });
   if (register) {
     scripts.forEach((script) => {

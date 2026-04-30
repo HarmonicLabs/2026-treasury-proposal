@@ -1,0 +1,29 @@
+NETWORK=mainnet scripts/delegate-always-abstain.sh
+=== Delegate Treasury to Always Abstain ===
+
+Network: --mainnet
+Script:  /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/scripts/treasury-contract.plutus
+
+Vote delegation certificate created: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/keys/treasury-vote-deleg.cert
+Querying UTxOs...
+Selected 1 UTxO(s) totaling 99890.823653 ADA:
+  c158205e0e6eb701c3a8d7c6d703c58e71b761b3c4e69121a3ae8511ac5b45ca#0
+
+Using reference script input: 7f491ff1bd17d911c5ffb15dbd892eec76b5586be0b6c0cd7f27425652de6acd#0
+Estimated transaction fee: 274638 Lovelace
+Transaction built: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/vote-deleg.raw
+The transaction contains following fixable errors:
+- CBOR is not canonical (transaction)
+Transformed transaction will be written to the output file.
+Writing to file '/home/michele/hlabs/treasury-proposals/2026-treasury-proposal/vote-deleg.raw'.
+Transaction CBOR canonicalized.
+Writing to file '/home/michele/hlabs/treasury-proposals/2026-treasury-proposal/vote-deleg.raw.witness'.
+Transaction signed: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/vote-deleg.signed
+{"txhash":"d8c59d31de11d89fd9f6ff6db50cf9e32019985c24e551ce06980e923699ff89"}
+
+Treasury stake credential delegated to always_abstain.
+Transaction hash: {
+    "txhash": "d8c59d31de11d89fd9f6ff6db50cf9e32019985c24e551ce06980e923699ff89"
+}
+
+Clean up: rm -f vote-deleg.raw vote-deleg.signed keys/treasury-vote-deleg.cert

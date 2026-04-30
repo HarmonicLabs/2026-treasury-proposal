@@ -1,0 +1,16 @@
+=== Sign Transaction ===
+
+Network:  --mainnet
+Tx file:  /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/contracts/treasury-contracts/offchain/tx.unsigned
+
+Signing with key file: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/keys/proposal.skey
+Signed transaction: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/contracts/treasury-contracts/offchain/tx.signed
+
+Submitting transaction...
+Transaction successfully submitted. Transaction hash is:
+{"txhash":"9fd6c6f4143a97d07d32aed4ea9e116bd86ef96ad15edd0ebf5699eb933ef2a0"}
+
+Transaction submitted successfully.
+Transaction hash: {
+    "txhash": "9fd6c6f4143a97d07d32aed4ea9e116bd86ef96ad15edd0ebf5699eb933ef2a0"
+}

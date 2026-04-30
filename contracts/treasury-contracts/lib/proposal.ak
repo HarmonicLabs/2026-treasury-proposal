@@ -10,8 +10,8 @@ use types.{
 // Seed UTxO
 fn seed_utxo() -> OutputReference {
   OutputReference {
-    transaction_id: #"4576503345bdcd04f5a2e3205d8f25a022bc340f23ae7dbe2debb12d6b8e3a2b",
-    output_index: 0,
+    transaction_id: #"556cdaebe5c4930e5461a8b6e375eba99a1591b6ccf93cbf44644465846710c0",
+    output_index: 1,
   }
 }
 
@@ -89,7 +89,7 @@ fn modify() -> MultisigScript {
 // Configuration
 
 pub fn registry_token() {
-  #"153fce8a8af5e942133854e1362dd00f732ec098956ebf2476a47c7b"
+  #"ad29afeb1b359ee5088d94c4d6d50c4b81b687493c4d603594dca51e"
 }
 
 pub fn treasury_expiration() {

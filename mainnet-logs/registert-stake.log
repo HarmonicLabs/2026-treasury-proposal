@@ -1,0 +1,16 @@
+NETWORK=mainnet scripts/register-stake.sh
+=== Register Stake Key ===
+
+Network:       --mainnet
+Stake key:     /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/keys/stake.vkey
+Stake address: stake1u949rs3erz72xxsj6uye2k0whkcv909043ld6dnv504eqwc4a60sc
+
+Stake key is already registered.
+{
+  "address": "stake1u949rs3erz72xxsj6uye2k0whkcv909043ld6dnv504eqwc4a60sc",
+  "govActionDeposits": {},
+  "rewardAccountBalance": 0,
+  "stakeDelegation": "pool1en2f7un7v3rjyhqkeg87d27nvsk5arnnva5tzx38t0lpv7hercz",
+  "stakeRegistrationDeposit": 2000000,
+  "voteDelegation": "keyHash-8f2b45094df19c26eeea7d19a7293c6203adc09ddc7bfa7a7db3f372"
+}

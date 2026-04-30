@@ -172,6 +172,15 @@ cardano-cli conway transaction build \
 
 echo "Transaction built: ${TX_RAW}"
 
+# ── Canonicalize CBOR (required by cardano-hw-cli) ──────────────────────────
+
+if [[ "$USE_HW" == true ]]; then
+    cardano-hw-cli transaction transform \
+        --tx-file "$TX_RAW" \
+        --out-file "$TX_RAW"
+    echo "Transaction CBOR canonicalized."
+fi
+
 # ── Sign transaction ─────────────────────────────────────────────────────────
 
 TX_SIGNED="${REPO_ROOT}/vote-deleg.signed"

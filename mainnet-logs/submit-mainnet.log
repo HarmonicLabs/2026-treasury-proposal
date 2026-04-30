@@ -1,0 +1,63 @@
+scripts/hash-metadata.sh metadata/proposal-metadata.json
+=== Hash Proposal Metadata ===
+
+Input:  metadata/proposal-metadata.json
+Hash:   09a9d51df80d12097227fc010657f190fb5d71fe75aa020335b04be07b8e3efd
+Saved:  /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/metadata/metadata-hash.txt
+NETWORK=mainnet scripts/create-governance-action.sh
+Querying on-chain constitution script hash...
+Constitution script hash: fa24fb305126805cf2164c161d852a0e7330cf988f1fe558cf7d4a64
+
+=== Create Treasury Withdrawal Governance Action ===
+
+Network:     --mainnet
+Deposit:     100000000000 lovelace
+Anchor URL:  ipfs://QmNuDfoojLyBNqk7qEXjd4UvZUKRX5aALjRUydrrr1pxWb
+Data Hash:   09a9d51df80d12097227fc010657f190fb5d71fe75aa020335b04be07b8e3efd
+Transfer:    8035714000000 lovelace
+
+Governance action created: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/treasury-withdrawal.action
+NETWORK=mainnet scripts/build-tx.sh
+=== Build Transaction ===
+
+Network:  --mainnet
+Funding:  addr1v8z6s5h9x9yx5heqzf4qzsd55ljhvnfhyxckp6s7dqtgxksehh22z
+Change:   addr1q9lsurm0hq9mltdxu7y8d67lz5dc0kfkxr7cgn8t6nnyrhn228prjx9u5vdp94cfj4v7a0dsc272ltr7m5mxegltjqasw42p4h
+
+Querying UTxOs...
+Selected 2 UTxO(s) totaling 100046.374468 ADA (need 100000.000000):
+  d45554481baaed034431c4c047195b91fa3dcd442d22dbcceb877961bf5354f0#0
+  9fd6c6f4143a97d07d32aed4ea9e116bd86ef96ad15edd0ebf5699eb933ef2a0#1
+
+
+Estimated transaction fee: 316584 Lovelace
+Transaction built: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/tx.raw
+NETWORK=mainnet scripts/sign-tx.sh
+=== Sign Transaction ===
+
+Network:  --mainnet
+Input:    /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/tx.raw
+The transaction contains following unfixable errors:
+- The transaction body entry proposal_procedures must not be included (transaction_body.proposal_procedures)
+The transaction contains following fixable errors:
+- CBOR is not canonical (transaction)
+Mode:     proposal key (tx has governance features unsupported by HW wallet)
+Key:      /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/keys/proposal.skey
+
+Transaction signed: /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/tx.signed
+NETWORK=mainnet scripts/submit-tx.sh --confirm
+=== Submit Transaction ===
+
+Network:  --mainnet
+File:     /home/michele/hlabs/treasury-proposals/2026-treasury-proposal/tx.signed
+
+WARNING: You are about to submit a transaction.
+This action is irreversible once confirmed by the network.
+
+
+{"txhash":"b11527fbcdc9d41e8f497de64a029a18673a5eefc413718459046f0b7a1a6656"}
+
+Transaction submitted successfully.
+Transaction hash: {
+    "txhash": "b11527fbcdc9d41e8f497de64a029a18673a5eefc413718459046f0b7a1a6656"
+}
