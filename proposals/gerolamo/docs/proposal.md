@@ -28,24 +28,24 @@ The estimated USD budget is of **`$1,125,000`** (or **`₳4,500,000`**) + 15% in
 
 ### Why a node in the browser is a Cardano-only USP
 
-A "node in the browser" is something every blockchain ecosystem has talked about and almost none have shipped. The reason is the base-layer design of those chains. Account-based chains with global state, large block sizes, mandatory full-state replay, or heavy proving systems simply cannot fit a validating node into a browser tab without compromising on what "validating" means.
+Distribution of nodes is something every blockchain ecosystem has talked about and almost none have shipped. The reason is the base-layer design of those chains. Account-based chains with global state, large block sizes, mandatory full-state replay, or heavy proving systems simply cannot fit a validating node on low resources environments such as a brower tab without compromising on what "validating" means.
 
 Cardano is different by design:
 
 - **eUTxO state stays local to the transaction.** A browser node does not need to maintain a global mutable state of the entire ledger to validate the slice it cares about; it can verify only the inputs it consumes and the outputs it produces.
 - **Block sizes and bandwidth requirements are bounded and modest** compared to high-throughput L1s, well within what a browser can sustain over typical residential connections.
-- **Consensus (Praos) is verifiable with light cryptographic checks** rather than requiring resource-heavy proof systems or trusted committees.
+- **Consensus (Praos) is verifiable on light resources**
 - **Plutus scripts are pure functions over a deterministic CEK machine**, which is straightforward to host in a JavaScript/WebAssembly runtime and run inside a Web Worker without blocking the main thread.
 
 Together these properties make Cardano the **only** major chain where an in-browser validating node is realistic today. Ethereum, Solana, and most account-based or high-TPS chains would each have to either cripple validation (effectively reverting to SPV/trusted-RPC) or fundamentally redesign their consensus and state model.
 
-Gerolamo is the project that turns that latent advantage into a shipped product. As long as the node lives only in research papers and prototypes, it remains a footnote; once it ships and dApps and wallets adopt it, "trustless on-device validation" becomes something Cardano can credibly market that competitors cannot match.
+Gerolamo is the project that turns that latent advantage into a shipped product: "trustless on-device validation" becomes something Cardano can credibly market that competitors cannot match.
 
 ### Competitive positioning vs. other ecosystems
 
 Decentralization narratives are increasingly contested across the L1 landscape. Ethereum's roadmap has spent years on "stateless clients" and "Verkle trees" specifically to shrink the trust surface of light clients; Solana's light clients depend on RPC providers and in practice are not trustless; most "light wallets" across ecosystems silently delegate validation to centralized infrastructure.
 
-Gerolamo, by contrast, is a real node that runs consensus, validates headers, and evaluates Plutus scripts, all inside a browser tab. That is a tangible, demonstrable advantage Cardano can put in front of:
+Gerolamo, by contrast, is a real node that runs consensus, validates headers and blocks, and evaluates Plutus scripts, all inside a browser tab. That is a tangible, demonstrable advantage Cardano can put in front of:
 
 - developers evaluating which chain to build trust-minimized apps on,
 - wallet teams designing custody UX without giving up on verification,
@@ -59,6 +59,7 @@ This is the kind of differentiator that compounds: every dApp or wallet that shi
 Engineering a node small enough to run in a browser is more than a packaging exercise; it forces real progress on a class of problems the broader Cardano ecosystem will need anyway:
 
 - **Compact / succinct validation.** Building Gerolamo requires rigorously distinguishing what _must_ be revalidated from what can be summarized, witnessed, or checkpointed. The same techniques (Mithril-style certificates, partial state proofs, header-chain verification with cryptographic anchors) are exactly the building blocks of trustless bridges and rollups.
+- **Forcing function for future consensus work (Leios and beyond).** Maintaining a real, in-browser validating node creates a hard constraint that any future consensus protocol upgrade (Leios being the most immediate example) must remain verifiable on light resources. Without an artifact like Gerolamo on the table, "is this still tractable for a light client?" is an easy concern to defer; with it, the question is forced upfront. The verification primitives that fall out of that exercise (succinct certificates, cheap header validation, embeddable verifiers) are then directly reusable in comparable efforts such as trustless bridges and L2 verifiers, which need exactly the same property.
 - **Trustless bridges.** A bridge contract on chain B that needs to verify the state of Cardano needs the same primitive as a browser node: a cheap, succinct, non-interactive way to check Cardano's chain history. Work on Gerolamo's verification path produces and battle-tests exactly the components a bridge implementation would otherwise have to re-derive from scratch.
 - **Layer 2 systems.** Optimistic and validity-rollup-style L2s on Cardano need an efficient, embeddable verifier of the L1's state. A light node engineered for the browser is, structurally, the same artifact: minimal trust, minimal footprint, designed to be embedded inside another runtime. Investments in Gerolamo amortize across the L2 ecosystem.
 - **dApp-side verification.** As more value moves on-chain, dApps will increasingly need to verify chain state themselves rather than trust their backend. Gerolamo gives them a drop-in, audited, JavaScript-native verifier instead of every team rolling its own.
@@ -120,13 +121,18 @@ To provide visibility into how this proposal contributes to ecosystem-level outc
 
 ## Rationale
 
+
 ### Budget Breakdown
 
 The full budget breakdown is given below.
 
-For a fair valuation of the proposal, we will follow a similar process to what is used in the Amaru proposal, which we believe is setting a good standard in terms of Treasury budget proposals, and we will estimate the scopes of this proposal in _FTE_ (Full-Time Equivalent), which we will consider to equal a figure of `$225k` yearly rate.
+For a fair valuation of the proposal, we will follow a similar process to what is used in the Amaru proposal, which we believe is setting a good standard in terms of Treasury budget proposals, and we will estimate the scopes of this proposal in _FTE_ (Full-Time Equivalent).
 
-We use a conversion rate of `4` ADA [`₳`] per USD [`$`].
+Let it be stated that the FTE figure reported below **DOES NOT** directly translate to the gross salary of a developer, instead it represents the gross income of a company who has to sustain various operational overheads (eg. taxes, complementary personnel, independent audits, etc.) before paying the gross salary of the developer.
+
+Therefore, we will consider 1 FTE to equal a figure of `$225k` yearly rate.
+
+We use a conversion rate of 0.25 `ADA/USD`.
 
 #### Complete View
 
@@ -167,7 +173,7 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 - `vendor.ak` vesting contract deployed with the M0–M4 milestone schedule and published payout addresses.
 - Public kickoff announcement on HLabs channels (blog, X/Twitter, Discord) summarizing scope, oversight committee, and milestone schedule.
 - A public proposal-tracking page (in the Gerolamo repo or HLabs governance repo) listing the milestone schedule, current status of each milestone, and links to all deliverables.
-- Initial oversight committee meeting with Santiago Carmuega, Lucas Rosa, and Chris Gianelloni, with the meeting summary published.
+- Initial asynchronous oversight committee review with Santiago Carmuega, Lucas Rosa, and Chris Gianelloni, with the review summary published. (Committee reviews are conducted asynchronously throughout the proposal: there are no live meetings.)
 - Governance / contribution README file added to the Gerolamo repo, documenting reporting cadence and the oversight-committee co-signature flow for disbursements.
 
 **Acceptance criteria** (oversight committee verifies)
@@ -176,7 +182,7 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 - The `vendor.ak` deployment is observable on-chain with the M0–M4 schedule encoded.
 - The public kickoff post exists at a reachable URL.
 - The public proposal-tracking page exists at a reachable URL and lists the milestone schedule.
-- A summary of the initial oversight-committee meeting is published in the HLabs governance repo.
+- A summary of the initial (asynchronous) oversight-committee review is published in the HLabs governance repo.
 
 **Disbursement on completion**
 
@@ -187,7 +193,7 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 **Dependencies & risks**
 
 - *Governance action timing.* M0 begins when the treasury withdrawal action is enacted on-chain, which is gated by the Cardano governance process and the voting / ratification window. M0's wall-clock duration after enactment is targeted at **≤30 days**.
-- *Oversight committee scheduling.* The initial meeting depends on member availability; if a member is unavailable in the 30-day window, an asynchronous summary signed by the available members is sufficient.
+- *Oversight committee reviews are asynchronous by design.* All committee reviews (including the initial kickoff review and every subsequent milestone sign-off) are conducted asynchronously rather than as live meetings, so member availability does not gate the 30-day window. Each review produces a written summary signed by the participating members.
 
 #### Milestone 1 (Q2 2026, Apr–Jun): Storage, Networking & Preprod Sync Foundations
 
@@ -341,6 +347,37 @@ The treasury contract enforces auto-abstain DRep delegation and no SPO delegatio
 
 Funds left in the contract after expiration automatically sweep back to the Cardano treasury. Enforced at the contract level. Can't be overridden.
 
+### Reporting
+
+Progress on this proposal is reported publicly through the [HarmonicLabs/2026-treasury-proposal](https://github.com/HarmonicLabs/2026-treasury-proposal) repository, which is the same repository hosting this proposal document and metadata. The structure mirrors the precedent set by the BlinkLabs Dingo treasury proposal.
+
+#### Monthly Lightweight Updates
+
+At the end of each month during the funding period, HLabs publishes a status update covering:
+
+- what shipped (key PRs, releases, features),
+- progress against the active milestone,
+- risks or blockers identified,
+- the plan for the following month.
+
+Updates are committed to the [`docs/reports/`](https://github.com/HarmonicLabs/2026-treasury-proposal/tree/main/docs/reports) tree of the repository and announced on HLabs community channels (X/Twitter, Discord).
+
+#### Quarterly Detailed Reports
+
+Each quarter, ahead of the corresponding milestone disbursement request, HLabs publishes a full report covering:
+
+- progress against each milestone deliverable and acceptance criterion,
+- a financial summary (received, spent by category, remaining),
+- variance analysis for any budget deviations,
+- updated risk register,
+- the plan for the following quarter.
+
+The quarterly report is committed to [`docs/reports/`](https://github.com/HarmonicLabs/2026-treasury-proposal/tree/main/docs/reports) and is the artifact the independent oversight committee reviews before co-signing the next disbursement.
+
+#### Public Transaction Journal
+
+Every on-chain transaction tied to this proposal (initial treasury withdrawal, milestone disbursements, vendor reorganizations, sweeps) is recorded in a public transaction journal at [`journal/`](https://github.com/HarmonicLabs/2026-treasury-proposal/tree/main/journal) in the repository. Each entry records the transaction hash, action type, amount, signers, justification, and on-chain metadata hash, so any observer can independently verify the activity against the chain.
+
 ### Constitutionality Checklist
 
 In an effort to convince ourselves of the proposal's constitutionality, we thought relevant to include a checklist of the points we cover and for each, our interpretation of the Cardano Constitution.
@@ -359,7 +396,7 @@ In an effort to convince ourselves of the proposal's constitutionality, we thoug
 
 - [x] **Section 7.2**: A full retrospective of past funding and deliverables is available in the [2025 retrospective](https://gateway.pinata.cloud/ipfs/QmZVw82XNXNsgGmBj39R26Mx7jgzWaNjSw4A7JM9Erye9c) document.
 
-- [x] **Section 7.4**: Funds for **periodic** independent audits of deliverables are included in this ask. Verification of milestone delivery is performed by the independent oversight committee, and no disbursement of escrowed funds occurs without the committee's review and co-signature. Each milestone is independently audited before payment is released. **Oversight metrics on the use of ada** are implemented through (i) the public on-chain auditability of the SundaeSwap treasury contract, which exposes every disbursement on-chain, (ii) the independent oversight committee's published review of each milestone, and (iii) monthly progress reports and quarterly financial summaries committed by HLabs throughout the funding period.
+- [x] **Section 7.4**: Funds for **periodic** independent audits of deliverables are included in this ask, accounted for as part of the operational overheads built into the FTE figure (see [Budget Breakdown](#budget-breakdown), where the FTE rate is explicitly defined to cover "various operational overheads (eg. taxes, complementary personnel, independent audits, etc.)" rather than only developer salary). Verification of milestone delivery is performed by the independent oversight committee, and no disbursement of escrowed funds occurs without the committee's review and co-signature. Each milestone is independently audited before payment is released. **Oversight metrics on the use of ada** are implemented through (i) the public on-chain auditability of the SundaeSwap treasury contract, which exposes every disbursement on-chain, (ii) the independent oversight committee's published review of each milestone, and (iii) the monthly progress updates, quarterly financial reports, and public transaction journal published throughout the funding period in the [HarmonicLabs/2026-treasury-proposal](https://github.com/HarmonicLabs/2026-treasury-proposal) repository (see the [Reporting](#reporting) section above for the full structure).
 
 - [x] **Section 7.5**: This proposal designates administrators (the oversight board) responsible for monitoring fund usage and ensuring deliverables are achieved.
 
