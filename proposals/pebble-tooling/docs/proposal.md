@@ -170,9 +170,44 @@ Finally, using a conversion rate of `4` ADA per USD, we formulate a budget ask o
 
 ### Milestones
 
-This proposal spans Q2 2026 through Q1 2027, organized into four quarterly milestones. Each milestone unlocks a fixed share of the total `₳5,175,000` ask from the `vendor.ak` escrow, and disbursement requires the independent oversight committee to verify the deliverables and acceptance criteria below before co-signing.
+This proposal spans an initial kickoff plus Q2 2026 through Q1 2027, organized into a kickoff milestone (Milestone 0) and four quarterly engineering milestones (Milestones 1–4). Each milestone unlocks a fixed share of the total `₳5,175,000` ask from the `vendor.ak` escrow, and disbursement requires the independent oversight committee to verify the deliverables and acceptance criteria below before co-signing.
 
-The four milestones split the budget evenly: **25% per milestone = ₳1,293,750 each**. Acceptance criteria are written to be objective and inspectable from a public artifact (a tagged release, a UPLC-CAPE submission, a published benchmark report, a committed test log) rather than self-reported.
+Disbursement schedule. The total ask of **₳5,175,000** is composed of a base of **₳4,500,000** (5 FTE × $225,000 at $0.25/ADA) plus a refundable contingency reserve of **₳675,000** (15% of base). The kickoff milestone draws from the base only; the four engineering milestones split the remaining base evenly and share the entire contingency reserve evenly:
+
+- **Milestone 0 (kickoff): ₳450,000** = 10% of base, no contingency disbursed at kickoff
+- **Milestones 1–4 (engineering quarters), each ₳1,181,250** = ₳1,012,500 base (22.5% of base) + ₳168,750 contingency (25% of the contingency reserve)
+
+Acceptance criteria are written to be objective and inspectable from a public artifact (a tagged release, a UPLC-CAPE submission, a published benchmark report, a committed test log) rather than self-reported.
+
+#### Milestone 0 (kickoff, on-chain enactment): Project Initialization & Governance Setup
+
+**Deliverables**
+
+- Treasury withdrawal executed on-chain and the requested 5,175,000 ADA escrowed in the SundaeSwap `treasury.ak` contract.
+- `vendor.ak` vesting contract deployed with the M0–M4 milestone schedule and published payout addresses.
+- Public kickoff announcement on HLabs channels (blog, X/Twitter, Discord) summarizing scope, oversight committee, and milestone schedule.
+- A public proposal-tracking page (in the Pebble repo or HLabs governance repo) listing the milestone schedule, current status of each milestone, and links to all deliverables.
+- Initial oversight committee meeting with Santiago Carmuega, Lucas Rosa, and Chris Gianelloni, with the meeting summary published.
+- Governance / contribution README file added to the four maintained library repos and the Pebble repo, documenting reporting cadence and the oversight-committee co-signature flow for disbursements.
+
+**Acceptance criteria** (oversight committee verifies)
+
+- The treasury withdrawal transaction is confirmed on-chain at the SundaeSwap treasury contract address.
+- The `vendor.ak` deployment is observable on-chain with the M0–M4 schedule encoded.
+- The public kickoff post exists at a reachable URL.
+- The public proposal-tracking page exists at a reachable URL and lists the milestone schedule.
+- A summary of the initial oversight-committee meeting is published in the HLabs governance repo.
+
+**Disbursement on completion**
+
+- Base milestone payment: **₳450,000** (10% of the ₳4,500,000 base)
+- Contingency portion: **₳0** (no contingency disbursed in this milestone)
+- Total released: **₳450,000**
+
+**Dependencies & risks**
+
+- *Governance action timing.* M0 begins when the treasury withdrawal action is enacted on-chain, which is gated by the Cardano governance process and the voting / ratification window. M0's wall-clock duration after enactment is targeted at **≤30 days**.
+- *Oversight committee scheduling.* The initial meeting depends on member availability; if a member is unavailable in the 30-day window, an asynchronous summary signed by the available members is sufficient.
 
 #### Milestone 1 (Q2 2026, Apr–Jun): Hard Fork Readiness & Pebble Type System
 
@@ -195,7 +230,9 @@ The four milestones split the budget evenly: **25% per milestone = ₳1,293,750 
 
 **Disbursement on completion**
 
-25% of total = **₳1,293,750**.
+- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
+- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
+- Total released: **₳1,181,250**
 
 **Dependencies & risks**
 
@@ -218,7 +255,9 @@ The four milestones split the budget evenly: **25% per milestone = ₳1,293,750 
 
 **Disbursement on completion**
 
-25% of total = **₳1,293,750**.
+- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
+- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
+- Total released: **₳1,181,250**
 
 **Dependencies & risks**
 
@@ -242,7 +281,9 @@ The four milestones split the budget evenly: **25% per milestone = ₳1,293,750 
 
 **Disbursement on completion**
 
-25% of total = **₳1,293,750**.
+- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
+- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
+- Total released: **₳1,181,250**
 
 **Dependencies & risks**
 
@@ -265,7 +306,9 @@ The four milestones split the budget evenly: **25% per milestone = ₳1,293,750 
 
 **Disbursement on completion**
 
-25% of total = **₳1,293,750**.
+- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
+- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
+- Total released: **₳1,181,250**
 
 **Dependencies & risks**
 
