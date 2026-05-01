@@ -24,7 +24,7 @@ This proposal spans over **12 months**, throughout which there will be several d
 
 ### Total Budget Ask
 
-The estimated USD budget is of **`$1,125,000`** (or **`₳4,500,000`**) + 15% in refundable contingency (**`₳675,000`**); for a total ask of **`5,175,000 ADA`**.
+The estimated USD budget is of **`$1,000,000`** (or **`₳4,000,000`**) + 15% in refundable contingency (**`₳600,000`**); for a total ask of **`4,600,000 ADA`**.
 
 ## Motivation
 
@@ -147,7 +147,7 @@ For a fair valuation of the proposal, we will follow a similar process to what i
 
 Let it be stated that the FTE figure reported below **DOES NOT** directly translate to the gross salary of a developer, instead it represents the gross income of a company who has to sustain various operational overheads (eg. taxes, complementary personnel, independent audits, etc.) before paying the gross salary of the developer.
 
-Therefore, we will consider 1 FTE to equal a figure of `$225k` yearly rate.
+Therefore, we will consider 1 FTE to equal a figure of `$200k` yearly rate.
 
 We use a conversion rate of 0.25 `ADA/USD`.
 
@@ -155,32 +155,32 @@ We use a conversion rate of 0.25 `ADA/USD`.
 
 | Scope                                                     | Estimated (FTEs) | Project Total ($)  |
 | :---                                                      | ---:             | ---:               |
-| Pebble (programming language + dApp development tools)    | 3.5              | `$787,500`         |
-| Hard-fork & tooling maintenance                           | 1.5              | `$337,500`         |
+| Pebble (programming language + dApp development tools)    | 3.5              | `$700,000`         |
+| Hard-fork & tooling maintenance                           | 1.5              | `$300,000`         |
 |                                                           |                  |                    |
-| **Total**                                                 | **5 FTEs**       | `$1,125,000`       |
+| **Total**                                                 | **5 FTEs**       | `$1,000,000`       |
 
 #### Cost Rationale
 
 The total ask for the project is `5 FTEs`.
 
-FTEs are being valued at an annual rate of `$225k`.
+FTEs are being valued at an annual rate of `$200k`.
 
 We are aware of our assumption/optimism bias: our forecast is subject to underestimating complexity, overlooking challenges, and undervaluing the time and cost required to deliver, as well as our biased expectation of market movements. We therefore add a 15% contingency buffer, learning from past mistakes.
 
-This leaves us with the following total: `(5 x $225k) x 1.15 = $1,293,750`
+This leaves us with the following total: `(5 x $200k) x 1.15 = $1,150,000`
 
-Finally, using a conversion rate of `4` ADA per USD, we formulate a budget ask of **`₳5,175,000`**. A [complete breakdown of this budget](#budget-detailed-view) is available below.
+Finally, using a conversion rate of `0.25 ADA/USD`, we formulate a budget ask of **`₳4,600,000`**. A [complete breakdown of this budget](#budget-detailed-view) is available below.
 
 ### Milestones
 
-This proposal spans an initial kickoff plus Q2 2026 through Q1 2027, organized into a kickoff milestone (Milestone 0) and four quarterly engineering milestones (Milestones 1–4). Each milestone unlocks a fixed share of the total `₳5,175,000` ask from the `vendor.ak` escrow, and disbursement requires the independent oversight committee to verify the deliverables and acceptance criteria below before co-signing.
+This proposal spans an initial kickoff plus Q2 2026 through Q1 2027, organized into a kickoff milestone (Milestone 0) and four quarterly engineering milestones (Milestones 1–4). Each milestone unlocks a fixed share of the total `₳4,600,000` ask from the `vendor.ak` escrow, and disbursement requires the independent oversight committee to verify the deliverables and acceptance criteria below before co-signing.
 
-Disbursement schedule. The total ask of **₳5,175,000** is composed of a base of **₳4,500,000** (5 FTE × $225,000 at $0.25/ADA) plus a refundable contingency reserve of **₳675,000** (15% of base). The kickoff milestone draws from the base only; the four engineering milestones split the remaining base evenly and share the entire contingency reserve evenly:
+Disbursement schedule. The total ask of **₳4,600,000** is composed of a base of **₳4,000,000** (5 FTE × $200,000 at $0.25/ADA) plus a refundable contingency reserve of **₳600,000** (15% of base). The kickoff milestone draws from the base only; the four engineering milestones split the remaining base evenly and share the entire contingency reserve evenly:
 
-- **Milestone 0 (kickoff): ₳450,000** = 10% of base, no contingency disbursed at kickoff
-- **Milestones 1–4 (engineering quarters), each ₳1,181,250 total** = ₳1,012,500 base (22.5% of base) + ₳168,750 contingency (25% of the contingency reserve)
-- **Milestone 1 is split into two independently-payable sub-milestones**: **1.A (Pebble)** at 80% of M1 = ₳945,000 (₳810,000 base + ₳135,000 contingency) and **1.B (hard-fork maintenance)** at 20% of M1 = ₳236,250 (₳202,500 base + ₳33,750 contingency). 1.A and 1.B can be co-signed and paid independently as each sub-milestone's deliverables are accepted.
+- **Milestone 0 (kickoff): ₳400,000** = 10% of base, no contingency disbursed at kickoff
+- **Milestones 1–4 (engineering quarters), each ₳1,050,000 total** = ₳900,000 base (22.5% of base) + ₳150,000 contingency (25% of the contingency reserve)
+- **Milestone 1 is split into two independently-payable sub-milestones**: **1.A (Pebble)** at 80% of M1 = ₳840,000 (₳720,000 base + ₳120,000 contingency) and **1.B (hard-fork maintenance)** at 20% of M1 = ₳210,000 (₳180,000 base + ₳30,000 contingency). 1.A and 1.B can be co-signed and paid independently as each sub-milestone's deliverables are accepted.
 
 Acceptance criteria are written to be objective and inspectable from a public artifact (a tagged release, a UPLC-CAPE submission, a published benchmark report, a committed test log) rather than self-reported.
 
@@ -188,7 +188,7 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Deliverables**
 
-- Treasury withdrawal executed on-chain and the requested 5,175,000 ADA escrowed in the SundaeSwap `treasury.ak` contract.
+- Treasury withdrawal executed on-chain and the requested 4,600,000 ADA escrowed in the SundaeSwap `treasury.ak` contract.
 - `vendor.ak` vesting contract deployed with the M0–M4 milestone schedule and published payout addresses.
 - Public kickoff announcement on HLabs channels (blog, X/Twitter, Discord) summarizing scope, oversight committee, and milestone schedule.
 - A public proposal-tracking page (in the Pebble repo or HLabs governance repo) listing the milestone schedule, current status of each milestone, and links to all deliverables.
@@ -205,14 +205,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳450,000** (10% of the ₳4,500,000 base)
+- Base milestone payment: **₳400,000** (10% of the ₳4,000,000 base)
 - Contingency portion: **₳0** (no contingency disbursed in this milestone)
-- Total released: **₳450,000**
-
-**Dependencies & risks**
-
-- *Governance action timing.* M0 begins when the treasury withdrawal action is enacted on-chain, which is gated by the Cardano governance process and the voting / ratification window. M0's wall-clock duration after enactment is targeted at **≤30 days**.
-- *Oversight committee reviews are asynchronous by design.* All committee reviews (including the initial kickoff review and every subsequent milestone sign-off) are conducted asynchronously rather than as live meetings, so member availability does not gate the 30-day window. Each review produces a written summary signed by the participating members.
+- Total released: **₳400,000**
 
 #### Milestone 1.A (Q2 2026, Apr–Jun): Pebble Type System
 
@@ -228,9 +223,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳810,000** (80% of M1 base; 18% of the ₳4,500,000 base)
-- Contingency portion: **₳135,000** (80% of M1 contingency; 20% of the ₳675,000 contingency reserve)
-- Total released: **₳945,000**
+- Base milestone payment: **₳720,000** (80% of M1 base; 18% of the ₳4,000,000 base)
+- Contingency portion: **₳120,000** (80% of M1 contingency; 20% of the ₳600,000 contingency reserve)
+- Total released: **₳840,000**
 
 #### Milestone 1.B (Q2 2026, Apr–Jun): Hard Fork Readiness
 
@@ -245,14 +240,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳202,500** (20% of M1 base; 4.5% of the ₳4,500,000 base)
-- Contingency portion: **₳33,750** (20% of M1 contingency; 5% of the ₳675,000 contingency reserve)
-- Total released: **₳236,250**
-
-**Dependencies & risks** (apply to Milestone 1.B)
-
-- *Hard fork timing.* The hard fork date is set by Intersect / IOG, not HLabs. If it slips by ≤ 1 quarter, this sub-milestone slips with it without affecting Milestone 1.A or the other three milestones. If it slips by > 1 quarter, HLabs will repurpose the freed time toward bringing forward Milestone 2 deliverables and notify the oversight committee.
-- *Plutus V4 spec churn.* Late changes to the spec are absorbed by the maintenance budget; the next quarter's maintenance allocation covers a follow-up patch release if needed.
+- Base milestone payment: **₳180,000** (20% of M1 base; 4.5% of the ₳4,000,000 base)
+- Contingency portion: **₳30,000** (20% of M1 contingency; 5% of the ₳600,000 contingency reserve)
+- Total released: **₳210,000**
 
 #### Milestone 2 (Q3 2026, Jul–Sep): Pebble Language Completeness & Public Benchmarks
 
@@ -272,13 +262,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
-- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
-- Total released: **₳1,181,250**
-
-**Dependencies & risks**
-
-- *UPLC-CAPE submission acceptance window.* Submissions are PRs against the IntersectMBO repo and depend on review cadence outside HLabs' control. Mitigation: the milestone is satisfied as long as the submission is *open* and passing CI by the milestone window end, even if final merge happens later.
+- Base milestone payment: **₳900,000** (22.5% of the ₳4,000,000 base)
+- Contingency portion: **₳150,000** (25% of the ₳600,000 contingency reserve)
+- Total released: **₳1,050,000**
 
 #### Milestone 3 (Q4 2026, Oct–Dec): Developer Tooling & IDE Experience
 
@@ -296,9 +282,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
-- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
-- Total released: **₳1,181,250**
+- Base milestone payment: **₳900,000** (22.5% of the ₳4,000,000 base)
+- Contingency portion: **₳150,000** (25% of the ₳600,000 contingency reserve)
+- Total released: **₳1,050,000**
 
 #### Milestone 4 (Q1 2027, Jan–Mar): Documentation, Tutorials & Adoption Push
 
@@ -315,13 +301,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
-- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
-- Total released: **₳1,181,250**
-
-**Dependencies & risks**
-
-- *Adoption metrics are aspirational, not gating.* The earlier Adoption Indicators table (developer count, npm downloads) is a measurement commitment, not a milestone-acceptance criterion; funds release on shipped artifacts, not on community adoption that HLabs cannot unilaterally control.
+- Base milestone payment: **₳900,000** (22.5% of the ₳4,000,000 base)
+- Contingency portion: **₳150,000** (25% of the ₳600,000 contingency reserve)
+- Total released: **₳1,050,000**
 
 ### Budget Administration and Governance Oversight
 

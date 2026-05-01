@@ -22,7 +22,7 @@ This proposal spans over **12 months**, throughout which there will be several d
 
 ### Total Budget Ask
 
-The estimated USD budget is of **`$1,125,000`** (or **`₳4,500,000`**) + 15% in refundable contingency (**`₳675,000`**); for a total ask of **`5,175,000 ADA`**.
+The estimated USD budget is of **`$1,000,000`** (or **`₳4,000,000`**) + 15% in refundable contingency (**`₳600,000`**); for a total ask of **`4,600,000 ADA`**.
 
 ## Motivation
 
@@ -130,7 +130,7 @@ For a fair valuation of the proposal, we will follow a similar process to what i
 
 Let it be stated that the FTE figure reported below **DOES NOT** directly translate to the gross salary of a developer, instead it represents the gross income of a company who has to sustain various operational overheads (eg. taxes, complementary personnel, independent audits, etc.) before paying the gross salary of the developer.
 
-Therefore, we will consider 1 FTE to equal a figure of `$225k` yearly rate.
+Therefore, we will consider 1 FTE to equal a figure of `$200k` yearly rate.
 
 We use a conversion rate of 0.25 `ADA/USD`.
 
@@ -138,30 +138,30 @@ We use a conversion rate of 0.25 `ADA/USD`.
 
 | Scope                                                     | Estimated (FTEs) | Project Total ($)  |
 | :---                                                      | ---:             | ---:               |
-| Gerolamo (TypeScript Cardano node)                        | 5                | `$1,125,000`       |
+| Gerolamo (TypeScript Cardano node)                        | 5                | `$1,000,000`       |
 |                                                           |                  |                    |
-| **Total**                                                 | **5 FTEs**       | `$1,125,000`       |
+| **Total**                                                 | **5 FTEs**       | `$1,000,000`       |
 
 #### Cost Rationale
 
 The total ask for the project is `5 FTEs`.
 
-FTEs are being valued at an annual rate of `$225k`.
+FTEs are being valued at an annual rate of `$200k`.
 
 We are aware of our assumption/optimism bias: our forecast is subject to underestimating complexity, overlooking challenges, and undervaluing the time and cost required to deliver, as well as our biased expectation of market movements. We therefore add a 15% contingency buffer, learning from past mistakes.
 
-This leaves us with the following total: `(5 x $225k) x 1.15 = $1,293,750`
+This leaves us with the following total: `(5 x $200k) x 1.15 = $1,150,000`
 
-Finally, using a conversion rate of `4` ADA per USD, we formulate a budget ask of **`₳5,175,000`**. A [complete breakdown of this budget](#budget-detailed-view) is available below.
+Finally, using a conversion rate of `0.25 ADA/USD`, we formulate a budget ask of **`₳4,600,000`**. A [complete breakdown of this budget](#budget-detailed-view) is available below.
 
 ### Milestones
 
-This proposal spans an initial kickoff plus Q2 2026 through Q1 2027, organized into a kickoff milestone (Milestone 0) and four quarterly engineering milestones (Milestones 1–4). Each milestone unlocks a fixed share of the total `₳5,175,000` ask from the `vendor.ak` escrow, and disbursement requires the independent oversight committee to verify the deliverables and acceptance criteria below before co-signing.
+This proposal spans an initial kickoff plus Q2 2026 through Q1 2027, organized into a kickoff milestone (Milestone 0) and four quarterly engineering milestones (Milestones 1–4). Each milestone unlocks a fixed share of the total `₳4,600,000` ask from the `vendor.ak` escrow, and disbursement requires the independent oversight committee to verify the deliverables and acceptance criteria below before co-signing.
 
-Disbursement schedule. The total ask of **₳5,175,000** is composed of a base of **₳4,500,000** (5 FTE × $225,000 at $0.25/ADA) plus a refundable contingency reserve of **₳675,000** (15% of base). The kickoff milestone draws from the base only; the four engineering milestones split the remaining base evenly and share the entire contingency reserve evenly:
+Disbursement schedule. The total ask of **₳4,600,000** is composed of a base of **₳4,000,000** (5 FTE × $200,000 at $0.25/ADA) plus a refundable contingency reserve of **₳600,000** (15% of base). The kickoff milestone draws from the base only; the four engineering milestones split the remaining base evenly and share the entire contingency reserve evenly:
 
-- **Milestone 0 (kickoff): ₳450,000** = 10% of base, no contingency disbursed at kickoff
-- **Milestones 1–4 (engineering quarters), each ₳1,181,250** = ₳1,012,500 base (22.5% of base) + ₳168,750 contingency (25% of the contingency reserve)
+- **Milestone 0 (kickoff): ₳400,000** = 10% of base, no contingency disbursed at kickoff
+- **Milestones 1–4 (engineering quarters), each ₳1,050,000** = ₳900,000 base (22.5% of base) + ₳150,000 contingency (25% of the contingency reserve)
 
 Acceptance criteria are written to be objective and inspectable from a public artifact (a tagged release, a committed sync log, a public demo URL, a successful preprod transaction) rather than self-reported.
 
@@ -169,7 +169,7 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Deliverables**
 
-- Treasury withdrawal executed on-chain and the requested 5,175,000 ADA escrowed in the SundaeSwap `treasury.ak` contract.
+- Treasury withdrawal executed on-chain and the requested 4,600,000 ADA escrowed in the SundaeSwap `treasury.ak` contract.
 - `vendor.ak` vesting contract deployed with the M0–M4 milestone schedule and published payout addresses.
 - Public kickoff announcement on HLabs channels (blog, X/Twitter, Discord) summarizing scope, oversight committee, and milestone schedule.
 - A public proposal-tracking page (in the Gerolamo repo or HLabs governance repo) listing the milestone schedule, current status of each milestone, and links to all deliverables.
@@ -186,14 +186,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳450,000** (10% of the ₳4,500,000 base)
+- Base milestone payment: **₳400,000** (10% of the ₳4,000,000 base)
 - Contingency portion: **₳0** (no contingency disbursed in this milestone)
-- Total released: **₳450,000**
-
-**Dependencies & risks**
-
-- *Governance action timing.* M0 begins when the treasury withdrawal action is enacted on-chain, which is gated by the Cardano governance process and the voting / ratification window. M0's wall-clock duration after enactment is targeted at **≤30 days**.
-- *Oversight committee reviews are asynchronous by design.* All committee reviews (including the initial kickoff review and every subsequent milestone sign-off) are conducted asynchronously rather than as live meetings, so member availability does not gate the 30-day window. Each review produces a written summary signed by the participating members.
+- Total released: **₳400,000**
 
 #### Milestone 1 (Q2 2026, Apr–Jun): Storage, Networking & Preprod Sync Foundations
 
@@ -212,14 +207,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
-- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
-- Total released: **₳1,181,250**
-
-**Dependencies & risks**
-
-- *Plutus V4 hard fork timing.* Sync must work across the hard fork boundary; if the hard fork lands inside this milestone window, sync compatibility is rolled forward into Milestone 2's acceptance.
-- *Preprod stability.* If preprod is unavailable for an extended period, the sync log can be reproduced against another public testnet (preview), and the milestone is satisfied by reaching tip on *any* public Cardano testnet.
+- Base milestone payment: **₳900,000** (22.5% of the ₳4,000,000 base)
+- Contingency portion: **₳150,000** (25% of the ₳600,000 contingency reserve)
+- Total released: **₳1,050,000**
 
 #### Milestone 2 (Q3 2026, Jul–Sep): Server-Side Relay Release
 
@@ -238,13 +228,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
-- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
-- Total released: **₳1,181,250**
-
-**Dependencies & risks**
-
-- *Node-to-client protocol surface is wide.* Full compatibility with every `cardano-cli` query is not in scope; the milestone is satisfied by `query tip` (or equivalent) plus the UTxO RPC. Broader compatibility is a Milestone 3/4 concern.
+- Base milestone payment: **₳900,000** (22.5% of the ₳4,000,000 base)
+- Contingency portion: **₳150,000** (25% of the ₳600,000 contingency reserve)
+- Total released: **₳1,050,000**
 
 #### Milestone 3 (Q4 2026, Oct–Dec): Browser Light Node Demo
 
@@ -263,14 +249,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
-- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
-- Total released: **₳1,181,250**
-
-**Dependencies & risks**
-
-- *Cross-browser compatibility.* This milestone targets Chromium engines (Chrome, Edge, Brave, Arc). Firefox and Safari support is part of Milestone 4. Mobile browsers are explicitly out of scope for this proposal.
-- *Browser API churn.* WebAssembly / IndexedDB / Web Worker APIs are stable, but if a major Chromium release introduces a regression, the milestone is satisfied by demonstrating against the previous stable Chromium release.
+- Base milestone payment: **₳900,000** (22.5% of the ₳4,000,000 base)
+- Contingency portion: **₳150,000** (25% of the ₳600,000 contingency reserve)
+- Total released: **₳1,050,000**
 
 #### Milestone 4 (Q1 2027, Jan–Mar): Stability, Wider Browser Reach & Documentation
 
@@ -290,14 +271,9 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 **Disbursement on completion**
 
-- Base milestone payment: **₳1,012,500** (22.5% of the ₳4,500,000 base)
-- Contingency portion: **₳168,750** (25% of the ₳675,000 contingency reserve)
-- Total released: **₳1,181,250**
-
-**Dependencies & risks**
-
-- *Mainnet sync wall-clock time* (the 48-hour figure in the Production Readiness Criteria table) is a measurement commitment, not a milestone-acceptance criterion; funds release on the inspection criteria above, not on hitting a specific sync wall-clock that depends on hardware HLabs cannot pin for the oversight committee's environment.
-- *Block production is explicitly out of scope* for this proposal and is not gated on this milestone. The hand-off report makes the boundary explicit so the next funding cycle can pick it up cleanly.
+- Base milestone payment: **₳900,000** (22.5% of the ₳4,000,000 base)
+- Contingency portion: **₳150,000** (25% of the ₳600,000 contingency reserve)
+- Total released: **₳1,050,000**
 
 ### Budget Administration and Governance Oversight
 
