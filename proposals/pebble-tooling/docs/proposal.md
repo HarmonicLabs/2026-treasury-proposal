@@ -137,6 +137,21 @@ To provide visibility into how this proposal contributes to ecosystem-level outc
 | Documentation completeness | 100% coverage           | All language features documented with examples |
 | Tutorial completion        | ≥3 e2e tutorials        | Published guides covering common patterns      |
 
+### Treasury Risk Minimization Statement
+
+This proposal has been intentionally designed to minimize treasury exposure during the current treasury-constrained environment.
+
+In particular, the scope:
+
+- deliberately excludes additional FTE expansion beyond the minimum team required for delivery;
+- deliberately excludes non-essential operational overhead.
+- minimizes the cost of a single FTE without compromising feasibility.
+
+The proposal focuses exclusively on the minimum viable scope necessary to deliver:
+a production-ready smart contract language, and ensuring ecosystem tooling maintenance.
+
+This approach reflects a deliberate effort to balance innovation, ecosystem value, and responsible treasury stewardship.
+
 ## Rationale
 
 ### Budget Breakdown
@@ -186,22 +201,7 @@ Acceptance criteria are written to be objective and inspectable from a public ar
 
 #### Milestone 0 (kickoff, on-chain enactment): Project Initialization & Governance Setup
 
-**Deliverables**
-
-- Treasury withdrawal executed on-chain and the requested 4,600,000 ADA escrowed in the SundaeSwap `treasury.ak` contract.
-- `vendor.ak` vesting contract deployed with the M0–M4 milestone schedule and published payout addresses.
-- Public kickoff announcement on HLabs channels (blog, X/Twitter, Discord) summarizing scope, oversight committee, and milestone schedule.
-- A public proposal-tracking page (in the Pebble repo or HLabs governance repo) listing the milestone schedule, current status of each milestone, and links to all deliverables.
-- Initial asynchronous oversight committee review with Santiago Carmuega, Lucas Rosa, and Chris Gianelloni, with the review summary published. (Committee reviews are conducted asynchronously throughout the proposal: there are no live meetings.)
-- Governance / contribution README file added to the four maintained library repos and the Pebble repo, documenting reporting cadence and the oversight-committee co-signature flow for disbursements.
-
-**Acceptance criteria** (oversight committee verifies)
-
-- The treasury withdrawal transaction is confirmed on-chain at the SundaeSwap treasury contract address.
-- The `vendor.ak` deployment is observable on-chain with the M0–M4 schedule encoded.
-- The public kickoff post exists at a reachable URL.
-- The public proposal-tracking page exists at a reachable URL and lists the milestone schedule.
-- A summary of the initial (asynchronous) oversight-committee review is published in the HLabs governance repo.
+Milestone 0 is the kickoff milestone and carries no engineering deliverables. It is triggered by the on-chain enactment of the treasury withdrawal and the deployment of the SundaeSwap `treasury.ak` / `vendor.ak` escrow with the M0–M4 schedule encoded.
 
 **Disbursement on completion**
 
