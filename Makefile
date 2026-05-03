@@ -9,7 +9,8 @@ METADATA_FILE ?= $(if $(PROPOSAL_DIR),$(PROPOSAL_DIR)/metadata/proposal-metadata
 export PROPOSAL_DIR
 
 .PHONY: help check-prereqs generate-test-keys metadata register-stake register-receiving-stake delegate-always-abstain fetch-guardrails sign-metadata upload-ipfs hash \
-        governance-action fund-proposal build-tx sign-tx submit-testnet submit-mainnet test-lifecycle report journal-entry ensure-aiken build-contract clean require-proposal
+        governance-action fund-proposal build-tx sign-tx submit-testnet submit-mainnet test-lifecycle report journal-entry ensure-aiken build-contract clean require-proposal \
+        withdraw-deposit-build withdraw-deposit-sign withdraw-deposit-submit-testnet withdraw-deposit-submit-mainnet
 
 help: ## Show all available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
@@ -77,6 +78,20 @@ submit-mainnet: NETWORK = mainnet
 submit-mainnet: require-proposal sign-tx ## Submit transaction to mainnet (with confirmation; requires PROPOSAL=)
 	NETWORK=$(NETWORK) scripts/submit-tx.sh --confirm
 
+withdraw-deposit-build: require-proposal ## Build a tx to reclaim the returned gov-action deposit (requires PROPOSAL=)
+	NETWORK=$(NETWORK) scripts/build-withdraw-deposit.sh
+
+withdraw-deposit-sign: require-proposal withdraw-deposit-build ## Sign the withdraw-deposit tx (requires PROPOSAL=)
+	NETWORK=$(NETWORK) scripts/sign-withdraw-deposit.sh
+
+withdraw-deposit-submit-testnet: NETWORK = preprod
+withdraw-deposit-submit-testnet: require-proposal withdraw-deposit-sign ## Submit withdraw-deposit tx to preprod (requires PROPOSAL=)
+	NETWORK=$(NETWORK) scripts/submit-tx.sh $(PROPOSAL_DIR)/withdraw-deposit.signed
+
+withdraw-deposit-submit-mainnet: NETWORK = mainnet
+withdraw-deposit-submit-mainnet: require-proposal withdraw-deposit-sign ## Submit withdraw-deposit tx to mainnet (with confirmation; requires PROPOSAL=)
+	NETWORK=$(NETWORK) scripts/submit-tx.sh --confirm $(PROPOSAL_DIR)/withdraw-deposit.signed
+
 ensure-aiken: ## Ensure the correct aiken compiler version is installed
 	scripts/ensure-aiken.sh
 
@@ -96,6 +111,7 @@ clean: ## Remove generated transaction and action files (across all proposals)
 	rm -f proposals/*/*.action proposals/*/*.raw proposals/*/*.signed proposals/*/tx.* \
 	      proposals/*/stake-reg.* proposals/*/receiving-stake-reg.* \
 	      proposals/*/fund-proposal.* proposals/*/vote-deleg.* \
+	      proposals/*/withdraw-deposit.* \
 	      proposals/*/metadata/metadata-hash.txt
 	rm -f keys/stake-reg.cert keys/receiving-stake-reg.cert keys/treasury-vote-deleg.cert
 	rm -f scripts/guardrails.plutus

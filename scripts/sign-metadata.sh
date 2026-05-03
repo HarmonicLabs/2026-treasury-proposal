@@ -133,10 +133,20 @@ echo "Signature:  ${SIGNATURE_HEX}"
 echo ""
 echo "Updating metadata with signature..."
 
+AUTHOR_NAME=$(jq -r '.authors[0].name // ""' "$METADATA_FILE")
+if [[ -z "$AUTHOR_NAME" || "$AUTHOR_NAME" == TODO:* ]]; then
+    echo "Error: .authors[0].name is missing or still a TODO placeholder in ${METADATA_FILE}." >&2
+    echo "Set PROPOSAL_AUTHOR and re-run 'make metadata', or edit the JSON directly," >&2
+    echo "before signing." >&2
+    exit 1
+fi
+
 jq \
     --arg pubkey "$PUBKEY_HEX" \
     --arg sig "$SIGNATURE_HEX" \
-    '.authors[0].witness.publicKey = $pubkey | .authors[0].witness.signature = $sig' \
+    '.authors[0].witness.witnessAlgorithm = "ed25519"
+     | .authors[0].witness.publicKey = $pubkey
+     | .authors[0].witness.signature = $sig' \
     "$METADATA_FILE" > "${TMPDIR}/updated.json"
 
 mv "${TMPDIR}/updated.json" "$METADATA_FILE"

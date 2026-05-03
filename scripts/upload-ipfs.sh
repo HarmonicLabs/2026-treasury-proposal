@@ -26,6 +26,8 @@ if [[ ! -f "$METADATA_FILE" ]]; then
     exit 1
 fi
 
+require_metadata_authors "$METADATA_FILE"
+
 if [[ -z "${PINATA_JWT:-}" ]]; then
     echo "Error: PINATA_JWT is not set." >&2
     echo "Set it in config.env or export it." >&2

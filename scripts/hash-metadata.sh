@@ -23,6 +23,8 @@ if [[ ! -f "$METADATA_FILE" ]]; then
     exit 1
 fi
 
+require_metadata_authors "$METADATA_FILE"
+
 # ── Compute hash ─────────────────────────────────────────────────────────────
 
 HASH=$(cardano-cli hash anchor-data --file-text "$METADATA_FILE")

@@ -50,3 +50,59 @@ require_proposal_dir() {
         exit 1
     fi
 }
+
+# Validate that a CIP-100/108 metadata file has a fully populated authors[]
+# witness. Cardano explorers and GovTool flag a governance action as
+# malformed without it, and once the anchor-data-hash is pinned on-chain it
+# cannot be changed without resubmitting the action (= another 100k ADA
+# deposit). Aborts the calling script with a non-zero exit on any failure.
+require_metadata_authors() {
+    local metadata_file="$1"
+
+    if [[ ! -f "$metadata_file" ]]; then
+        echo "Error: Metadata file not found: ${metadata_file}" >&2
+        exit 1
+    fi
+
+    local errors
+    errors=$(jq -r '
+        def fail(msg): "ERROR: " + msg;
+        [
+            if (.authors | type) != "array" or (.authors | length) == 0
+            then fail("authors[] is missing or empty")
+            else empty end,
+            (.authors // [] | to_entries[] | .key as $i | .value |
+                (
+                    if (.name // "" | length) == 0 or (.name | startswith("TODO"))
+                    then fail("authors[\($i)].name is empty or a TODO placeholder")
+                    else empty end
+                ),
+                (
+                    if (.witness.witnessAlgorithm // "") != "ed25519"
+                    then fail("authors[\($i)].witness.witnessAlgorithm must be \"ed25519\"")
+                    else empty end
+                ),
+                (
+                    if (.witness.publicKey // "" | length) == 0
+                    then fail("authors[\($i)].witness.publicKey is empty (run sign-metadata.sh)")
+                    else empty end
+                ),
+                (
+                    if (.witness.signature // "" | length) == 0
+                    then fail("authors[\($i)].witness.signature is empty (run sign-metadata.sh)")
+                    else empty end
+                )
+            )
+        ] | .[]
+    ' "$metadata_file")
+
+    if [[ -n "$errors" ]]; then
+        echo "Metadata fails CIP-100 authors validation: ${metadata_file}" >&2
+        echo "" >&2
+        echo "$errors" >&2
+        echo "" >&2
+        echo "Fix the file and re-run. Once the anchor-data-hash is pinned on-chain" >&2
+        echo "it cannot be changed without resubmitting the gov action." >&2
+        exit 1
+    fi
+}

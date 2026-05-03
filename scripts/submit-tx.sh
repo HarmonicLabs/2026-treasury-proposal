@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # submit-tx.sh - Submit a signed transaction to the Cardano network.
-# Usage: NETWORK=preprod scripts/submit-tx.sh [--confirm]
+# Usage: NETWORK=preprod scripts/submit-tx.sh [--confirm] [path/to/tx.signed]
+#   The signed-tx path defaults to ${PROPOSAL_DIR}/tx.signed if not provided.
 
 # shellcheck source=scripts/_lib.sh
 source "$(dirname "$0")/_lib.sh"
@@ -11,9 +12,12 @@ require_proposal_dir
 # ── Parse arguments ──────────────────────────────────────────────────────────
 
 CONFIRM=false
+TX_SIGNED_OVERRIDE=""
 for arg in "$@"; do
     if [[ "$arg" == "--confirm" ]]; then
         CONFIRM=true
+    else
+        TX_SIGNED_OVERRIDE="$arg"
     fi
 done
 
@@ -27,7 +31,10 @@ esac
 
 # ── Validate prerequisites ──────────────────────────────────────────────────
 
-TX_SIGNED="${PROPOSAL_DIR}/tx.signed"
+TX_SIGNED="${TX_SIGNED_OVERRIDE:-${PROPOSAL_DIR}/tx.signed}"
+if [[ "$TX_SIGNED" != /* ]]; then
+    TX_SIGNED="${REPO_ROOT}/${TX_SIGNED}"
+fi
 if [[ ! -f "$TX_SIGNED" ]]; then
     echo "Error: Signed transaction not found: ${TX_SIGNED}" >&2
     echo "Run 'make sign-tx' first." >&2

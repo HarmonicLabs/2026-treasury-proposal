@@ -58,12 +58,15 @@ if [[ -f "$PROPOSAL_MD" ]]; then
              {"@type": "Other", "label": .[0], "uri": .[1]}]
         ')
 
+    AUTHOR_NAME="${PROPOSAL_AUTHOR:-TODO: author name}"
+
     jq -n \
         --arg title "$TITLE" \
         --arg abstract "$ABSTRACT" \
         --arg motivation "$MOTIVATION" \
         --arg rationale "$RATIONALE" \
         --argjson references "$REFERENCES_JSON" \
+        --arg author "$AUTHOR_NAME" \
         '{
             "@context": {
                 "@language": "en-us",
@@ -73,11 +76,35 @@ if [[ -f "$PROPOSAL_MD" ]]; then
                 "body": {
                     "@id": "CIP108:body",
                     "@context": {
-                        "references": "CIP108:references",
+                        "references": {
+                            "@id": "CIP108:references",
+                            "@container": "@set",
+                            "@context": {
+                                "GovernanceMetadata": "CIP100:GovernanceMetadataReference",
+                                "Other": "CIP100:OtherReference",
+                                "label": "CIP100:reference-label",
+                                "uri": "CIP100:reference-uri"
+                            }
+                        },
                         "title": "CIP108:title",
                         "abstract": "CIP108:abstract",
                         "motivation": "CIP108:motivation",
                         "rationale": "CIP108:rationale"
+                    }
+                },
+                "authors": {
+                    "@id": "CIP100:authors",
+                    "@container": "@set",
+                    "@context": {
+                        "name": "http://xmlns.com/foaf/0.1/name",
+                        "witness": {
+                            "@id": "CIP100:witness",
+                            "@context": {
+                                "witnessAlgorithm": "CIP100:witnessAlgorithm",
+                                "publicKey": "CIP100:publicKey",
+                                "signature": "CIP100:signature"
+                            }
+                        }
                     }
                 }
             },
@@ -88,7 +115,17 @@ if [[ -f "$PROPOSAL_MD" ]]; then
                 "motivation": $motivation,
                 "rationale": $rationale,
                 "references": $references
-            }
+            },
+            "authors": [
+                {
+                    "name": $author,
+                    "witness": {
+                        "witnessAlgorithm": "ed25519",
+                        "publicKey": "",
+                        "signature": ""
+                    }
+                }
+            ]
         }' > "$METADATA_JSON"
 
     echo "Metadata assembled from ${PROPOSAL_MD}"
@@ -123,11 +160,35 @@ cat > "$METADATA_JSON" <<'TEMPLATE'
     "body": {
       "@id": "CIP108:body",
       "@context": {
-        "references": "CIP108:references",
+        "references": {
+          "@id": "CIP108:references",
+          "@container": "@set",
+          "@context": {
+            "GovernanceMetadata": "CIP100:GovernanceMetadataReference",
+            "Other": "CIP100:OtherReference",
+            "label": "CIP100:reference-label",
+            "uri": "CIP100:reference-uri"
+          }
+        },
         "title": "CIP108:title",
         "abstract": "CIP108:abstract",
         "motivation": "CIP108:motivation",
         "rationale": "CIP108:rationale"
+      }
+    },
+    "authors": {
+      "@id": "CIP100:authors",
+      "@container": "@set",
+      "@context": {
+        "name": "http://xmlns.com/foaf/0.1/name",
+        "witness": {
+          "@id": "CIP100:witness",
+          "@context": {
+            "witnessAlgorithm": "CIP100:witnessAlgorithm",
+            "publicKey": "CIP100:publicKey",
+            "signature": "CIP100:signature"
+          }
+        }
       }
     }
   },
@@ -138,7 +199,17 @@ cat > "$METADATA_JSON" <<'TEMPLATE'
     "motivation": "TODO: Proposal motivation",
     "rationale": "TODO: Proposal rationale",
     "references": []
-  }
+  },
+  "authors": [
+    {
+      "name": "TODO: author name",
+      "witness": {
+        "witnessAlgorithm": "ed25519",
+        "publicKey": "",
+        "signature": ""
+      }
+    }
+  ]
 }
 TEMPLATE
 
