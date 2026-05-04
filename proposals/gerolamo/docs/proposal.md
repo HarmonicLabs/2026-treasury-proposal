@@ -168,7 +168,7 @@ Finally, using a conversion rate of `0.25 ADA/USD`, we formulate a budget ask of
 
 #### Financial audit rationale
 
-As part of the operational overhead included in the FTE cost structure, the proposal incorporates a lightweight independent financial audit of fund flows, designed to ensure transparency, accountability, and verifiability of treasury fund usage.
+As part of the operational overhead included in the FTE cost structure, the proposal incorporates a independent financial audit of fund flows, designed to ensure transparency, accountability, and verifiability of treasury fund usage.
 
 ##### Scope
 
