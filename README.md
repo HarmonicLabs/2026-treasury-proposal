@@ -70,9 +70,11 @@ For each proposal (`PROPOSAL=pebble-tooling` or `PROPOSAL=gerolamo`):
 6. `make fetch-guardrails` *(once)*
 7. `make metadata        PROPOSAL=<name>`
 8. `make hash            PROPOSAL=<name>`
-9. `make sign-metadata   PROPOSAL=<name> && make upload-ipfs PROPOSAL=<name>` — then update `ANCHOR_URL` in `proposals/<name>/config.env`
-10. `make fund-proposal  PROPOSAL=<name>`
-11. `make submit-testnet PROPOSAL=<name>` *(or `make submit-mainnet PROPOSAL=<name>`)*
+9. `make sign-metadata   PROPOSAL=<name>`
+10. `make upload-ipfs    PROPOSAL=<name>`
+11. update `ANCHOR_URL` in `proposals/<name>/config.env` as indicated by the output of `upload-ipfs` in the previous step
+12. `make fund-proposal  PROPOSAL=<name>`
+13. `make submit-testnet PROPOSAL=<name>` *(or `make submit-mainnet PROPOSAL=<name>`)*
 
 ## Configuration
 

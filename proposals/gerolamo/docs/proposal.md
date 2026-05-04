@@ -140,7 +140,7 @@ The full budget breakdown is given below.
 
 For a fair valuation of the proposal, we will follow a similar process to what is used in the Amaru proposal, which we believe is setting a good standard in terms of Treasury budget proposals, and we will estimate the scopes of this proposal in _FTE_ (Full-Time Equivalent).
 
-Let it be stated that the FTE figure reported below **DOES NOT** directly translate to the gross salary of a developer, instead it represents the gross income of a company who has to sustain various operational overheads (eg. taxes, complementary personnel, independent audits, etc.) before paying the gross salary of the developer.
+Let it be stated that the FTE figure reported below **DOES NOT** directly translate to the gross salary of a developer. Instead, it represents the gross income of a company which must sustain various operational overheads (eg. taxes, complementary personnel, compliance, legal costs, and a independent financial audit of fund flows and treasury usage), ensuring transparency, accountability, and ex-post verifiability of treasury fund allocation, before paying the gross salary of the developer.
 
 Therefore, we will consider 1 FTE to equal a figure of `$200k` yearly rate.
 
@@ -165,6 +165,28 @@ We are aware of our assumption/optimism bias: our forecast is subject to underes
 This leaves us with the following total: `(5 x $200k) x 1.15 = $1,150,000`
 
 Finally, using a conversion rate of `0.25 ADA/USD`, we formulate a budget ask of **`₳4,600,000`**. A [complete breakdown of this budget](#budget-detailed-view) is available below.
+
+#### Financial audit rationale
+
+As part of the operational overhead included in the FTE cost structure, the proposal incorporates a lightweight independent financial audit of fund flows, designed to ensure transparency, accountability, and verifiability of treasury fund usage.
+
+##### Scope
+
+- Ex-post verification of treasury disbursements
+- Alignment between milestone-based disbursements and reconciled project-level financial reporting, ensuring that each release of funds is supported by auditable transaction records and corresponds to documented project-related activities
+- Traceability of treasury fund movements through verifiable on-chain and off-chain records
+- Verification based on ring-fenced project reporting, supported by auditable transaction trails and reconciled financial summaries
+
+##### Audit Characteristics
+
+- Performed by an independent third-party with no operational involvement in HLabs
+- Conducted on a periodic basis (quarterly reviews and a final assessment)
+- Based on verifiable financial records, transaction-level evidence, and structured project reporting
+- Focused exclusively on financial transparency and accountability of treasury fund usage
+
+##### Audit Scope Definition
+
+This audit is designed as a proportionate financial oversight mechanism focused on treasury-funded activities, ensuring transparency and accountability while remaining aligned with the operational scope of the proposal.
 
 ### Milestones
 
@@ -372,7 +394,7 @@ In an effort to convince ourselves of the proposal's constitutionality, we thoug
 
 - [x] **Section 7.2**: A full retrospective of past funding and deliverables is available in the [2025 retrospective](https://gateway.pinata.cloud/ipfs/QmZVw82XNXNsgGmBj39R26Mx7jgzWaNjSw4A7JM9Erye9c) document.
 
-- [x] **Section 7.4**: Funds for **periodic** independent audits of deliverables are included in this ask, accounted for as part of the operational overheads built into the FTE figure (see [Budget Breakdown](#budget-breakdown), where the FTE rate is explicitly defined to cover "various operational overheads (eg. taxes, complementary personnel, independent audits, etc.)" rather than only developer salary). Verification of milestone delivery is performed by the independent oversight committee, and no disbursement of escrowed funds occurs without the committee's review and co-signature. Each milestone is independently audited before payment is released. **Oversight metrics on the use of ada** are implemented through (i) the public on-chain auditability of the SundaeSwap treasury contract, which exposes every disbursement on-chain, (ii) the independent oversight committee's published review of each milestone, and (iii) the monthly progress updates, quarterly financial reports, and public transaction journal published throughout the funding period in the [HarmonicLabs/2026-treasury-proposal](https://github.com/HarmonicLabs/2026-treasury-proposal) repository (see the [Reporting](#reporting) section above for the full structure).
+- [x] **Section 7.4**: This proposal includes an allocation and framework for independent audit and oversight metrics, ensuring that the use of treasury funds remains transparent, verifiable, and subject to third-party review (see [Financial audit rationale](#financial-audit-rationale)). Additionally, funds for **periodic** independent audits of deliverables are included in this ask, accounted for as part of the operational overheads built into the FTE figure (see [Budget Breakdown](#budget-breakdown)). Verification of milestone delivery is performed by the independent oversight committee, and no disbursement of escrowed funds occurs without the committee's review and co-signature. Each milestone is independently audited before payment is released. **Oversight metrics on the use of ada** are implemented through (i) the public on-chain auditability of the SundaeSwap treasury contract, which exposes every disbursement on-chain, (ii) the independent oversight committee's published review of each milestone, and (iii) the monthly progress updates, quarterly financial reports, and public transaction journal published throughout the funding period in the [HarmonicLabs/2026-treasury-proposal](https://github.com/HarmonicLabs/2026-treasury-proposal) repository (see the [Reporting](#reporting) section above for the full structure).
 
 - [x] **Section 7.5**: This proposal designates administrators (the oversight board) responsible for monitoring fund usage and ensuring deliverables are achieved.
 
