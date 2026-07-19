@@ -2,8 +2,8 @@
 
 Two independent Cardano Treasury Withdrawal governance actions to fund HLabs open source development:
 
-- **Pebble + Tooling Maintenance** — 5 FTE, 5,175,000 ADA — see [proposals/pebble-tooling/docs/proposal.md](proposals/pebble-tooling/docs/proposal.md).
-- **Gerolamo Light Node** — 5 FTE, 5,175,000 ADA — see [proposals/gerolamo/docs/proposal.md](proposals/gerolamo/docs/proposal.md).
+- **Pebble + Tooling Maintenance** — 5 FTE, 4,600,000 ADA — see [proposals/pebble-tooling/docs/proposal.md](proposals/pebble-tooling/docs/proposal.md).
+- **Gerolamo Light Node** — 5 FTE, 4,600,000 ADA — see [proposals/gerolamo/docs/proposal.md](proposals/gerolamo/docs/proposal.md).
 
 Each proposal has its own metadata, anchor, and on-chain governance action. They share the same SundaeSwap treasury contract, oversight board (Santiago Carmuega, Lucas Rosa, Chris Gianelloni), and signing infrastructure.
 
@@ -42,7 +42,9 @@ Every proposal-specific target requires `PROPOSAL=pebble-tooling` or `PROPOSAL=g
 make help                                          # Show all available targets
 make check-prereqs                                 # Verify tools are installed
 make metadata          PROPOSAL=pebble-tooling     # Generate CIP-108 metadata
-make hash              PROPOSAL=pebble-tooling     # Hash metadata with blake2b-256
+make sign-metadata     PROPOSAL=pebble-tooling     # Fill authors[0].witness (must run before hash/upload)
+make hash              PROPOSAL=pebble-tooling     # Hash signed metadata (anchor-data-hash)
+make upload-ipfs       PROPOSAL=pebble-tooling     # Pin signed metadata to IPFS
 make submit-testnet    PROPOSAL=pebble-tooling     # Full preprod submission workflow
 make test-lifecycle    PROPOSAL=pebble-tooling     # Automated preprod lifecycle test
 ```
@@ -69,12 +71,12 @@ For each proposal (`PROPOSAL=pebble-tooling` or `PROPOSAL=gerolamo`):
 5. `make register-receiving-stake` *(once)*
 6. `make fetch-guardrails` *(once)*
 7. `make metadata        PROPOSAL=<name>`
-8. `make hash            PROPOSAL=<name>`
-9. `make sign-metadata   PROPOSAL=<name>`
-10. `make upload-ipfs    PROPOSAL=<name>`
+8. `make sign-metadata   PROPOSAL=<name>`
+9. `make hash            PROPOSAL=<name>`
+10. `make upload-ipfs     PROPOSAL=<name>`
 11. update `ANCHOR_URL` in `proposals/<name>/config.env` as indicated by the output of `upload-ipfs` in the previous step
-12. `make fund-proposal  PROPOSAL=<name>`
-13. `make submit-testnet PROPOSAL=<name>` *(or `make submit-mainnet PROPOSAL=<name>`)*
+12. `make fund-proposal   PROPOSAL=<name>`
+13. `make submit-testnet  PROPOSAL=<name>` *(or `make submit-mainnet PROPOSAL=<name>`)*
 
 ## Configuration
 

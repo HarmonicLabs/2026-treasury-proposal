@@ -1,12 +1,22 @@
 import {
   Address,
-  Ed25519KeyHashHex,
+  CredentialType,
   TransactionId,
   TransactionInput,
 } from "@blaze-cardano/core";
 import { Blaze, makeValue, Provider, Wallet } from "@blaze-cardano/sdk";
-import { getBlazeInstance, getConfigs, transactionDialog } from "cli/shared";
-import { Treasury } from "src";
+import { input } from "@inquirer/prompts";
+
+import { Treasury } from "../../src";
+import { toPermission } from "../../src/metadata/types/permission";
+import {
+  getActualPermission,
+  getBlazeInstance,
+  getConfigs,
+  getSigners,
+  isAddress,
+  transactionDialog,
+} from "../shared";
 
 export async function disburse(
   blaze: Blaze<Provider, Wallet> | undefined = undefined,
@@ -14,41 +24,69 @@ export async function disburse(
   if (!blaze) {
     blaze = await getBlazeInstance();
   }
-  const configsOrScripts = await getConfigs(blaze);
-  const input = (
-    await blaze.provider.resolveUnspentOutputs([
-      TransactionInput.fromCore({
-        txId: TransactionId(
-          "a88413b4c998e832d6a69ec12610af68c48e65517aebf94f2dfbbfaa4974c1ec",
-        ),
-        index: 0,
-      }),
-    ])
-  )[0];
+  const { configs, scripts, metadata } = await getConfigs(blaze);
 
+  // Resolve the treasury UTxO to spend by its "txhash#index" reference.
+  // We intentionally resolve by TransactionInput rather than querying by the
+  // script Address: the project pins @blaze-cardano/core 0.6.x while the
+  // provider bundles 0.8.x, so an Address built here fails the provider's
+  // `instanceof Address` check. resolveUnspentOutputs is method-based and
+  // unaffected.
+  const ref = await input({
+    message: "Enter the treasury UTxO to spend (txhash#index)",
+    validate: (s) =>
+      /^[0-9a-fA-F]{64}#\d+$/.test(s.trim()) ||
+      "Must be of the form <64-hex-txhash>#<index>",
+  });
+  const [txHash, idx] = ref.trim().split("#");
+  const utxos = await blaze.provider.resolveUnspentOutputs([
+    TransactionInput.fromCore({
+      txId: TransactionId(txHash),
+      index: Number(idx),
+    }),
+  ]);
+  if (utxos.length === 0) {
+    throw new Error(`UTxO ${ref} not found (already spent, or wrong network?)`);
+  }
+  const input_ = utxos[0];
+
+  // Where the funds go and how much.
   const recipient = Address.fromBech32(
-    "addr1qyr5l2h8gelmp4qph7kzpzkqtky3mv9yvgkmwvdm3xweu3qu5zwsv0wyc267my62pruyl0ruw3gwjj0v9nucpqhn2gxsv56tkv",
+    await input({
+      message: "Enter the recipient bech32 address",
+      validate: (s) => isAddress(s, CredentialType.KeyHash),
+    }),
   );
-  const amount = makeValue(250_000_000n);
-  const datum = undefined;
-  const signers = [
-    Ed25519KeyHashHex(
-      "074faae7467fb0d401bfac208ac05d891db0a4622db731bb899d9e44",
+  const amount = makeValue(
+    BigInt(
+      await input({
+        message: "How much ADA (in lovelace) should be disbursed?",
+        validate: (value) => {
+          const parsed = BigInt(value || "0");
+          return parsed > 0n ? true : "Amount must be a positive value.";
+        },
+      }),
     ),
-    Ed25519KeyHashHex(
-      "e0b68e229f9c043ab610067ed7f3c6d662b8f3c6bb4ec452c11f6411",
-    ),
-  ];
+  );
+
+  // Disburse requires the `disburse` permission signers (HLabs + a board member
+  // for this instance). getSigners prompts for which signers will sign.
+  const disbursePermissions = metadata
+    ? getActualPermission(
+        metadata.body.permissions.disburse,
+        metadata.body.permissions,
+      )
+    : toPermission(configs.treasury.permissions.disburse);
+  const signers = await getSigners(disbursePermissions);
 
   const tx = await (
     await Treasury.disburse({
-      configsOrScripts,
+      configsOrScripts: { configs, scripts },
       blaze,
-      input,
+      input: input_,
       recipient,
       amount,
-      datum,
-      signers,
+      signers: [...signers.values()],
     })
   ).complete();
 

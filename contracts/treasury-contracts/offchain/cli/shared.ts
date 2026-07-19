@@ -11,7 +11,6 @@ import {
   Blockfrost,
   ColdWallet,
   Core,
-  Maestro,
   NetworkName,
   Wallet,
   type Provider,
@@ -657,15 +656,11 @@ export async function getProvider(): Promise<Provider> {
       `${BLOCKFROST_VAR} detected in env, assuming Blockfrost provider.`,
     );
     providerType = "blockfrost";
-  } else if (process.env[MAESTRO_VAR] !== undefined) {
-    console.log(`${MAESTRO_VAR} detected in env, assuming Maestro provider.`);
-    providerType = "maestro";
   } else {
     providerType = await select({
       message: "Select the provider type",
       choices: [
         { name: "Blockfrost", value: "blockfrost" },
-        { name: "Maestro", value: "maestro" },
         { name: "Custom", value: "custom" },
       ],
     });
@@ -686,22 +681,6 @@ export async function getProvider(): Promise<Provider> {
       return new Blockfrost({
         network: bfNetwork,
         projectId: bfKey,
-      });
-    case "maestro":
-      const mKey = await inputOrEnv({
-        message: "Enter the Maestro API key",
-        env: MAESTRO_VAR,
-      });
-      const mNetwork: "mainnet" | "preview" = await select({
-        message: "Select the network",
-        choices: [
-          { name: "Mainnet", value: "mainnet" },
-          { name: "Preview", value: "preview" },
-        ],
-      });
-      return new Maestro({
-        network: mNetwork,
-        apiKey: mKey,
       });
     case "custom":
       const network = await select({
@@ -1296,9 +1275,46 @@ export async function getOutputs(): Promise<{
   return { amounts, outputs };
 }
 
+// Query the lovelace currently withdrawable from a reward account, straight
+// from Blockfrost's /accounts endpoint (the Provider abstraction exposes no
+// reward-balance method). Requires BLOCKFROST_KEY; the network is inferred from
+// the key prefix, exactly like getProvider().
+export async function getWithdrawableLovelace(
+  rewardAccount: string,
+): Promise<bigint> {
+  const key = process.env[BLOCKFROST_VAR];
+  if (!key) {
+    throw new Error(
+      `Express mode needs ${BLOCKFROST_VAR} to read the reward-account balance on-chain.`,
+    );
+  }
+  const base = key.startsWith("preprod")
+    ? "https://cardano-preprod.blockfrost.io/api/v0"
+    : "https://cardano-mainnet.blockfrost.io/api/v0";
+  const resp = await fetch(`${base}/accounts/${rewardAccount}`, {
+    headers: { project_id: key },
+  });
+  if (!resp.ok) {
+    throw new Error(
+      `Blockfrost /accounts/${rewardAccount} returned ${resp.status}: ${await resp.text()}`,
+    );
+  }
+  const json = (await resp.json()) as { withdrawable_amount?: string };
+  if (json.withdrawable_amount === undefined) {
+    throw new Error(
+      `Blockfrost returned no withdrawable_amount for ${rewardAccount}`,
+    );
+  }
+  return BigInt(json.withdrawable_amount);
+}
+
 export async function getTransactionMetadata<MetadataBody>(
   instance: string,
   body: MetadataBody,
+  // When provided, the author/comment prompts are skipped and these values are
+  // used instead. `txAuthor` accepts a pubkey hash or a bech32 address (the
+  // payment credential is extracted, same as the interactive prompt).
+  nonInteractive?: { txAuthor: string; comment?: string },
 ): Promise<ITransactionMetadata<MetadataBody>> {
   return {
     "@context":
@@ -1306,14 +1322,21 @@ export async function getTransactionMetadata<MetadataBody>(
     hashAlgorithm: "blake2b-256",
     body: body,
     instance,
-    txAuthor: await input({
-      message:
-        "Enter a hexidecimal pubkey hash, or a bech32 encoded address for the author of this transaction",
-      validate: (s) => isAddressOrHex(s, CredentialType.KeyHash),
-    }).then((s) => addressOrHexToHash(s, CredentialType.KeyHash)),
-    comment: await maybeInput({
-      message: "An arbitrary comment you'd like to attach?",
-    }),
+    txAuthor: await addressOrHexToHash(
+      nonInteractive
+        ? nonInteractive.txAuthor
+        : await input({
+            message:
+              "Enter a hexidecimal pubkey hash, or a bech32 encoded address for the author of this transaction",
+            validate: (s) => isAddressOrHex(s, CredentialType.KeyHash),
+          }),
+      CredentialType.KeyHash,
+    ),
+    comment: nonInteractive
+      ? nonInteractive.comment
+      : await maybeInput({
+          message: "An arbitrary comment you'd like to attach?",
+        }),
   };
 }
 

@@ -14,7 +14,22 @@ source "$(dirname "$0")/_lib.sh"
 require_proposal_dir
 
 METADATA_FILE="${1:-${PROPOSAL_DIR}/metadata/proposal-metadata.json}"
-SKEY_FILE="${2:-${REPO_ROOT}/keys/payment.skey}"
+
+# Default skey resolution: explicit $2 wins, then $PROPOSAL_SKEY (already used
+# for governance txs because HW wallets can't sign them), then payment.skey
+# as a last resort. CIP-100 only requires that the witness be a valid ed25519
+# signature whose pubkey matches authors[0].witness.publicKey — the choice of
+# key is just an identity binding.
+if [[ -n "${2:-}" ]]; then
+    SKEY_FILE="$2"
+elif [[ -n "${PROPOSAL_SKEY:-}" ]]; then
+    SKEY_FILE="$PROPOSAL_SKEY"
+else
+    SKEY_FILE="${REPO_ROOT}/keys/payment.skey"
+fi
+if [[ "$SKEY_FILE" != /* ]]; then
+    SKEY_FILE="${REPO_ROOT}/${SKEY_FILE}"
+fi
 
 echo "=== Sign Metadata ==="
 echo ""
@@ -28,7 +43,12 @@ fi
 
 if [[ ! -f "$SKEY_FILE" ]]; then
     echo "Error: Signing key file not found: ${SKEY_FILE}" >&2
-    echo "Provide a Cardano .skey file as the second argument." >&2
+    echo "" >&2
+    echo "sign-metadata.sh needs a software ed25519 key (HW wallets can't sign" >&2
+    echo "raw bytes via this code path). Resolution order:" >&2
+    echo "  1. \$2 (explicit path on the command line)" >&2
+    echo "  2. \$PROPOSAL_SKEY from config.shared.env" >&2
+    echo "  3. ${REPO_ROOT}/keys/payment.skey" >&2
     exit 1
 fi
 

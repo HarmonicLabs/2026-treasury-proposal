@@ -1,5 +1,6 @@
 # Key material - NEVER commit
 keys/
+keys-copy/
 *.skey
 *.vkey
 # hardware wallet signing files

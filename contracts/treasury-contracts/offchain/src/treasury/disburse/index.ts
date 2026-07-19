@@ -3,6 +3,7 @@ import {
   AssetId,
   Datum,
   Ed25519KeyHashHex,
+  NetworkId,
   PlutusData,
   Script,
   Slot,
@@ -81,12 +82,24 @@ export async function disburse<P extends Provider, W extends Wallet>({
     }
   }
 
+  // expiration is a unix millisecond timestamp (a string when loaded from
+  // metadata.json).
+  const expirationUnix = Number(configs.treasury.expiration);
   if (after) {
-    tx = tx.setValidFrom(Slot(Number(configs.treasury.expiration / 1000n) + 1));
+    // Post-expiration disbursement: valid only after the expiration.
+    tx = tx.setValidFrom(Slot(blaze.provider.unixToSlot(expirationUnix) + 1));
   } else {
-    tx = tx.setValidUntil(
-      Slot(Number(configs.treasury.expiration / 1000n) - 1),
+    // Before expiration: the validity upper bound must (a) stay before the
+    // expiration (required by disburse.logic) and (b) stay within the node's
+    // foreseeable era horizon — a bound years out (e.g. the expiration itself)
+    // makes script evaluation fail with PastHorizon. Cap to now + a horizon.
+    const maxHorizonHours =
+      blaze.provider.network === NetworkId.Testnet ? 6 : 36;
+    const upperBoundUnix = Math.min(
+      expirationUnix,
+      Date.now() + maxHorizonHours * 60 * 60 * 1000,
     );
+    tx = tx.setValidUntil(Slot(blaze.provider.unixToSlot(upperBoundUnix) - 30));
   }
 
   for (const signer of signers) {

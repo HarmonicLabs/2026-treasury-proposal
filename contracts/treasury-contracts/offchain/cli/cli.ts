@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
+import "./load-env"; // must be first: loads .env/.env.local before other modules evaluate
+
 import { Command } from "commander";
+import { disburse } from "./treasury/disburse";
 import { fund } from "./treasury/fund";
 import { publish } from "./treasury/publish";
 import { withdraw as initialize } from "./treasury/withdraw";
@@ -33,6 +36,13 @@ program
   .description("Fund a vendor utxo from the treasury")
   .action(async () => {
     await fund();
+  });
+
+program
+  .command("disburse")
+  .description("Disburse funds from the treasury to an arbitrary address")
+  .action(async () => {
+    await disburse();
   });
 
 program
