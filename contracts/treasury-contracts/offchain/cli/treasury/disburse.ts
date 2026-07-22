@@ -1,20 +1,17 @@
-import {
-  Address,
-  CredentialType,
-  TransactionId,
-  TransactionInput,
-} from "@blaze-cardano/core";
+import { Address, CredentialType } from "@blaze-cardano/core";
 import { Blaze, makeValue, Provider, Wallet } from "@blaze-cardano/sdk";
 import { input } from "@inquirer/prompts";
 
 import { Treasury } from "../../src";
 import { toPermission } from "../../src/metadata/types/permission";
+import { loadConfigsAndScripts } from "../../src/shared";
 import {
   getActualPermission,
   getBlazeInstance,
   getConfigs,
   getSigners,
   isAddress,
+  selectUtxo,
   transactionDialog,
 } from "../shared";
 
@@ -26,29 +23,27 @@ export async function disburse(
   }
   const { configs, scripts, metadata } = await getConfigs(blaze);
 
-  // Resolve the treasury UTxO to spend by its "txhash#index" reference.
-  // We intentionally resolve by TransactionInput rather than querying by the
-  // script Address: the project pins @blaze-cardano/core 0.6.x while the
-  // provider bundles 0.8.x, so an Address built here fails the provider's
-  // `instanceof Address` check. resolveUnspentOutputs is method-based and
-  // unaffected.
-  const ref = await input({
-    message: "Enter the treasury UTxO to spend (txhash#index)",
-    validate: (s) =>
-      /^[0-9a-fA-F]{64}#\d+$/.test(s.trim()) ||
-      "Must be of the form <64-hex-txhash>#<index>",
-  });
-  const [txHash, idx] = ref.trim().split("#");
-  const utxos = await blaze.provider.resolveUnspentOutputs([
-    TransactionInput.fromCore({
-      txId: TransactionId(txHash),
-      index: Number(idx),
-    }),
-  ]);
+  // Resolve the treasury UTxO to spend by querying the treasury script address,
+  // as `fund` does. With a single UTxO at the script there is nothing to choose,
+  // so we take it and skip the prompt.
+  const {
+    scripts: {
+      treasuryScript: { scriptAddress: treasuryScriptAddress },
+    },
+  } = loadConfigsAndScripts(blaze, { configs, scripts });
+
+  const utxos = await blaze.provider.getUnspentOutputs(treasuryScriptAddress);
   if (utxos.length === 0) {
-    throw new Error(`UTxO ${ref} not found (already spent, or wrong network?)`);
+    throw new Error(
+      `No UTxOs at the treasury script address ${treasuryScriptAddress.toBech32()} (wrong instance, or wrong network?)`,
+    );
   }
-  const input_ = utxos[0];
+  const input_ = utxos.length === 1 ? utxos[0] : await selectUtxo(utxos);
+  if (utxos.length === 1) {
+    console.log(
+      `Spending the only treasury UTxO: ${input_.input().transactionId().toString()}#${input_.input().index().toString()} (${input_.output().amount().coin().toString()} lovelace)`,
+    );
+  }
 
   // Where the funds go and how much.
   const recipient = Address.fromBech32(
