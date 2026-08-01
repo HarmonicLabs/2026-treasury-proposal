@@ -3,7 +3,7 @@ import { readFile, writeFile } from "fs/promises";
 import path from "path";
 
 void async function main() {
-    const exepectedHash = new ScriptDataHash("f22c64c3a66ef74621f119bd9c016687b5e39143b601a8f5c6dfe5b7f61aba7b");
+    const exepectedHash = new ScriptDataHash("c9db1c31f94d0521d6d5fe77bcb7232e8996e2c394212d230ff93519b56e250b");
 
     const fullPath = path.join( import.meta.url.slice( "file:".length ), "../../tx.unsigned" );
 
